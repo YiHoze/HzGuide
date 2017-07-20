@@ -1,7 +1,7 @@
 % fc-cache -f -v
 % luaotfload-tools -update
 
-\ProvidesClass{hzguide}[2017/07/14]
+\ProvidesClass{hzguide}[2017/07/20]
 
 \LoadClassWithOptions{memoir}
 
@@ -11,7 +11,6 @@
 \RequirePackage{fontspec}
 \RequirePackage{xunicode} %xltxtra
 \RequirePackage{ragged2e}
-\RequirePackage{csquotes}
 \RequirePackage{xspace}
 \RequirePackage{enumitem}
 \RequirePackage{tabto}
@@ -25,7 +24,6 @@
 \RequirePackage{hyperref}
 
 \hypersetup{colorlinks=true, bookmarksnumbered=true, pdfauthor={hzguide.cls}} % allcolors=darkgray
-\MakeOuterQuote{"}
 
 % TeX: ^^b7
 % XeTeX: ^^^^ac00 ^^^^^^020000  \char44032 \char"AC00 \char'126000 \char`가 \char`^^^^ac00
@@ -43,6 +41,7 @@
   doctype     .code:n = { \SetDocType {#1} },
   smallerfont .bool_set:N = \g_smallerfont_bool,
   verbatim    .bool_set:N = \g_verbatim_bool,
+  pairquote   .bool_set:N = \g_pairquote_bool,
   uprightmath .bool_set:N = \g_upright_math_bool,
   bitmap      .bool_set:N = \g_bitmap_bool
 }
@@ -125,7 +124,8 @@
 {
   verbatim = false,
   bitmap = false,
-  language = english
+  language = english,
+  pairquote = true,
 }
 
 \ProcessKeysOptions { hzguide }
@@ -150,12 +150,17 @@
   \RequirePackage{minted}
 }
 
+\bool_if:NT \g_pairquote_bool
+{
+  \RequirePackage{csquotes}
+  \MakeOuterQuote{"}
+}
+
 \bool_if:NT \g_upright_math_bool
 {
   \RequirePackage{unicode-math}
   \setmathfont[math-style=upright]{TeX~Gyre~Pagella}
 }
-
 
 \NewDocumentCommand \PrioritizeBitmap {}
 {
@@ -411,10 +416,8 @@
 
 \IfLang{kor}
 {
-  \usepackage[hangul]{xetexko}
-  %\xetexkofontregime{latin}[puncts=prevfont, colons=prevfont, cjksymbols=hangul]  
-  %xetexko: \interhchar{3pt} \spaceskip=2em plus 1em minus 1em
-  %\defaultfontfeatures{WordSpace={1.25, 0.5, 0.5}}
+  \usepackage[hangul]{xetexko}  
+  %\addhangulfontfeatures{InterHangul=0.5pt, WordSpace={1.25, 0.5, 0.5}}
   %\XeTeXcharclass"201C = \XKlatinopening
   %\XeTeXcharclass"201D = \XKlatinclosing
   \setmainhangulfont{KoPubBatang}[Ligatures=TeX,Scale=MatchUppercase,UprightFont={*PL},BoldFont={*PM}]
@@ -488,7 +491,9 @@
   \RequirePackage{polyglossia}
   \setmainlanguage{russian}
   \setotherlanguage{english}
-  \setquotestyle{russian}
+  \@ifpackageloaded{csquotes}{
+    \setquotestyle{russian}
+  }{}
   \newfontfamily\cyrillicfont{CMU Serif}[Script=Cyrillic]
   \newfontfamily\cyrillicfontsf{CMU Sans Serif}[Script=Cyrillic]
   \AtBeginDocument{
