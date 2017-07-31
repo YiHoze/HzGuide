@@ -1,7 +1,7 @@
 % fc-cache -f -v
 % luaotfload-tools -update
 
-\ProvidesClass{hzguide}[2017/07/20]
+\ProvidesClass{hzguide}[2017/07/31]
 
 \LoadClassWithOptions{memoir}
 
@@ -420,7 +420,7 @@
   %\addhangulfontfeatures{InterHangul=0.5pt, WordSpace={1.25, 0.5, 0.5}}
   %\XeTeXcharclass"201C = \XKlatinopening
   %\XeTeXcharclass"201D = \XKlatinclosing
-  \setmainhangulfont{KoPubBatang}[Ligatures=TeX,Scale=MatchUppercase,UprightFont={*PL},BoldFont={*PM}]
+  \setmainhangulfont{KoPubBatang}[Ligatures=TeX,Scale=MatchUppercase,UprightFont={*PL},BoldFont={*PB}]
   \setsanshangulfont{KoPubDotum}[Ligatures=TeX,Scale=MatchUppercase,UprightFont={*PL},BoldFont={*PB}]
   \AtBeginDocument{
     \renewcommand*{\contentsname}{차례}
@@ -2895,13 +2895,27 @@
 
 % lists  -------------------------------------------------------
 
-\NewDocumentEnvironment {enumerate*} {}
-{ \begin{enumerate}[label=\arabic*)] }
-{ \end{enumerate} }
+\RenewDocumentEnvironment {enumerate} { s O{} }
+{
+  \IfBooleanTF {#1} {
+    \enit@enumerate\enitdp@enumerate{enum}\thr@@{label=\arabic*), #2}
+  }{
+    \enit@enumerate\enitdp@enumerate{enum}\thr@@{#2}
+  }  
+}{
+  \enit@endenumerate
+}
 
-\NewDocumentEnvironment {itemize*} {}
-{ \begin{itemize}\tightlist }
-{ \end{itemize} }
+\RenewDocumentEnvironment {itemize} { s O{} }
+{  
+  \IfBooleanTF {#1} { 
+    \enit@itemize\enitdp@itemize{item}\thr@@{noitemsep, #2}
+  }{
+    \enit@itemize\enitdp@itemize{item}\thr@@{#2}
+  }
+}{
+  \enit@enditemize
+}
 
 % terms list
 \int_new:N \l_terms_int
@@ -3196,12 +3210,13 @@
 \SymbolSetup{itemsep=1ex, delimiter=\hfill}
 
 % option list
+\int_new:N \l_opt_cnt_int
 \cs_new_nopar:Nn \opt_selected: { \foreign*{2611} }
 \cs_new_nopar:Nn \opt_unselected: { \foreign*{2610} }
 \cs_new_nopar:Nn \opt_label:
 {
-  \int_gincr:N \l_tmpa_int
-  \clist_if_in:NoTF \l_tmpa_clist {\int_use:N \l_tmpa_int}
+  \int_gincr:N \l_opt_cnt_int
+  \clist_if_in:NoTF \l_tmpa_clist {\int_use:N \l_opt_cnt_int}
     {\opt_selected:}
     {\opt_unselected:}
 }
@@ -3209,7 +3224,7 @@
 \NewDocumentEnvironment { opt } { s O{} }
 {
   \clist_set:Nn \l_tmpa_clist { #2 }
-  \int_zero:N \l_tmpa_int
+  \int_zero:N \l_opt_cnt_int
   \begin{list} {}
   {
     \IfValueT {#1} { \tightlist }
@@ -3219,10 +3234,6 @@
 {
   \end{list}
 }
-
-\NewDocumentEnvironment { opt* } { m }
-  { \begin{ opt } { #1 } \tightlist }
-  { \end{opt} }
 
 % callout list
 \int_new:N \l_callout_int
