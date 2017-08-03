@@ -1,7 +1,7 @@
 % fc-cache -f -v
 % luaotfload-tools -update
 
-\ProvidesClass{hzguide}[2017/07/31]
+\ProvidesClass{hzguide}[2017/08/03]
 
 \LoadClassWithOptions{memoir}
 
@@ -622,6 +622,114 @@
   }
 }
 
+% covers ----------------------------------------------------------------------
+\keys_define:nn { cover }
+{
+  logo              .tl_set:N = \cover_brand_logo,
+	image			        .bool_set:N = \cover_image_bool,
+	ImageName		      .tl_set:N = \cover_image,
+	title			        .tl_set:N = \cover_title,
+	subtitle			    .tl_set:N = \cover_subtitle,
+  DocumentType      .tl_set:N = \cover_doc_type,
+	% PubDate				  .tl_set:N = \cover_pub_date,
+	PubYear				    .tl_set:N = \cover_pub_year,
+	revision		      .tl_set:N = \cover_revision,
+	note			        .tl_set:N = \cover_note,
+	manufacturer	    .tl_set:N = \cover_manufacturer,
+  address           .tl_set:N = \cover_manufacturer_address,
+	AfterFront		    .tl_set:N = \cover_after_front,
+	BeforeBack		    .tl_set:N = \cover_before_back,
+	font			        .tl_set:N = \cover_font,
+	FontSizeI			    .tl_set:N = \cover_font_size_i,
+	FontSizeII			  .tl_set:N = \cover_font_size_ii,
+	FontSizeIII		    .tl_set:N = \cover_font_size_iii,
+	FontSizeIV			  .tl_set:N = \cover_font_size_iv,
+	style			        .tl_set:N = \cover_style
+}
+
+\NewDocumentCommand \CoverSetup { m }
+{
+  \keys_set:nn { cover } { #1 }  
+}
+
+\tl_set:Nn \cover_pub_year { \int_to_arabic:n {\c_sys_year_int} }
+
+\CoverSetup{
+  font = \sffamily\bfseries\color{darkgray},
+  FontSizeI = \Huge,
+  FontSizeII = \huge,
+  FontSizeIII = \LARGE,
+  FontSizeIV = \Large,
+  style = \raggedright,
+  image = false,
+  ImageName = cover_image,
+  AfterFront=\clearpage, %\cleartorecto,
+  BeforeBack=\clearpage, %\cleartoverso,
+
+}
+
+\NewDocumentCommand \CoverFontSize { m }
+{
+    \str_case:nn {#1}
+    {
+        { 1 } { \cover_font_size_i }
+        { 2 } { \cover_font_size_ii }
+        { 3 } { \cover_font_size_iii }
+        { 4 } { \cover_font_size_iv }
+    }
+}
+
+\NewDocumentCommand \FrontCover {}
+{
+    \thispagestyle{empty}
+    \begin{IfVartwoEnlarge}
+      \setSpacing{1}
+
+	    \includegraphics[scale=\l_placeimage_scale]{\cover_brand_logo}
+   		\par\vspace{.1\textheight}
+      
+      \begin{minipage}{\linewidth}
+         \cover_style\cover_font
+         \CoverFontSize{1} \cover_title
+         \par\medskip
+         \CoverFontSize{2} \cover_subtitle
+      \end{minipage}      
+
+      \bool_if:NT \l_cover_image_bool
+      {
+        \par\vspace{1cm}
+        \begin{center}
+            \includegraphics[scale=\l_placeimage_scale]{\cover_image}
+        \end{center}
+      }
+
+      \vfill
+      \begin{flushright}
+         \cover_font
+         \CoverFontSize{3} \cover_doc_type
+         \par
+        \CoverFontSize{4} \cover_pub_year \hspace{0.5em}|\hspace{0.5em} \cover_revision
+        \end{flushright}        
+    \end{IfVartwoEnlarge}        
+    \cover_after_front
+}
+
+\NewDocumentCommand \BackCover {}
+{
+	\cover_before_back
+	\thispagestyle{empty}
+	\begin{IfVartwoEnlarge}			
+		\vFill
+    \setSpacing{1}
+		\includegraphics[scale=\l_placeimage_scale]{\cover_brand_logo} \hfill \cover_note \\ 
+		\IfVartwo
+			{ \raisebox{0.5ex}{\rule{\headwidth}{0.5pt}} }
+			[ \raisebox{0.5ex}{\rule{\textwidth}{0.5pt}} ] \\ 
+		© \space \cover_pub_year \space \cover_manufacturer \\ 
+    \cover_manufacturer_address
+	\end{IfVartwoEnlarge}
+}
+
 % extra style set  ------------------------------------------------------------
 \NewDocumentCommand \LoadStyleset {}{
 \tl_if_empty:NF \g_style_set {\input{\g_style_set}}
@@ -763,6 +871,11 @@
 \NewDocumentCommand \nil {}
 {
   \rule{0pt}{0pt}
+}
+
+\NewDocumentCommand \vFill {}
+{
+  \nil\vfill
 }
 
 % \foreign[Arial]{Philanthropy}
@@ -1784,7 +1897,7 @@
 
 % graphics * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-\graphicspath{{images/}{../images/}}
+\graphicspath{{images/}{../images/}{../../images/}}
 
 \NewDocumentCommand \ShowGraphicspath {}
 {
@@ -4425,7 +4538,7 @@
   \texttt{#1}
 }
 
-\NewDocumentCommand \texui { s m }
+\NewDocumentCommand \texs { s m }
 {
   \tl_if_head_eq_catcode:nNTF {#2} \
   {
@@ -4534,7 +4647,6 @@
   \patchcmd{\FV@ListVSpace}{\@topsepadd\topsep}{\vspace{.25\baselineskip}}{}{}
 }{}
 
-% index
 \endinput
 
 % how to use different fonts for the same font command
