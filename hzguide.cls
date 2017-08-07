@@ -739,9 +739,8 @@
 \NewDocumentCommand \BackCover {}
 {
 	\cover_before_back
-	\thispagestyle{empty}
 	\begin{IfVartwoEnlarge}			
-		\vFill
+		\AtPageBottom
     \setSpacing{1}
 		\includegraphics[scale=\l_placeimage_scale]{\cover_brand_logo} \hfill \cover_note \\ 
 		\IfVartwo
@@ -4439,11 +4438,15 @@
   \int_set:Nn \l_tmpa_int {1}
   \int_set:Nn \l_tmpb_int {#1}
   \scenepara
-  \par\illuenum*{uncertain}{\item \scenepara}
+  \begin{IllustEnum}*{uncertain}
+    \item \scenepara
+  \end{IllustEnum}
   \int_do_while:nNnn {\l_tmpa_int} < {\l_tmpb_int}
     {
       \int_incr:N \l_tmpa_int
-      \par\illuenum{uncertain}{\item \scenepara}
+      \begin{IllustEnum}{uncertain}
+        \item \scenepara
+      \end{IllustEnum}
     }
 }
 
