@@ -1,7 +1,23 @@
-% fc-cache -f -v
-% luaotfload-tools -update
+% For xelatex to use truetype and opentype fonts:
+% #> fc-cache -f -v 
+% For lualatex to use truetype and opentype fonts:
+% #> luaotfload-tools -update 
 
-\ProvidesClass{hzguide}[2017/08/03]
+% Obey these naming rules for command macros, environment macros, variables, and parameter keys.
+% I. Minimize use of acronyms and abbreviations 
+% II. For those of user interface level (\NewDocumentCommand):
+%     1) As for single words, do not capitalize.
+%     2) As for closed compound words, use camelcase.
+%        If partly abbreviated, do not capitalize.
+%     3) When an environment is made from a command only in order to take paragraphs, capitalize the environment's name if it is a single word.
+% III. For those of programmer interface level (\cs_new:Npn):
+%     1) Use only lowercase since underscores can be used.
+%     2) It is allowed to omit prefixes 'g_' and 'l_' and suffixes such as '_bool' and '_tl' 
+%        when those are intended to be limitedly used with specific purposes at user interface level, such as cover design.
+% IV. For those of designer interface level:
+%     Follow clause II. However, it is allowed to use lowercase with compound words.
+
+\ProvidesClass{hzguide}[2017/08/07]
 
 \LoadClassWithOptions{memoir}
 
@@ -75,6 +91,12 @@
     {turkish}     { \tl_set:Nn \hzlang {tur} } % 18 TÜRKÇE
     {TC}          { \tl_set:Nn \hzlang {TC} } % traditional chinese
   }
+}
+
+% \BookmarkLanguage{ENGLISH}[0]
+\NewDocumentCommand \BookmarkLanguage { m O{-1} }
+{
+	\bookmark[level=#2, page=1]{#1}	
 }
 
 \NewDocumentCommand \IfLang { m +m o }
@@ -695,7 +717,7 @@
          \CoverFontSize{2} \cover_subtitle
       \end{minipage}      
 
-      \bool_if:NT \l_cover_image_bool
+      \bool_if:NT \cover_image_bool
       {
         \par\vspace{1cm}
         \begin{center}
@@ -873,9 +895,10 @@
   \rule{0pt}{0pt}
 }
 
-\NewDocumentCommand \vFill {}
+\NewDocumentCommand \AtPageBottom { s }
 {
   \nil\vfill
+  \IfBooleanTF{#1}{}{ \thispagestyle{empty} }
 }
 
 % \foreign[Arial]{Philanthropy}
@@ -2182,6 +2205,9 @@
   }
 }
 
+\cs_set_eq:NN \image \placeimage
+\cs_set_eq:NN \ImageSetup \PlaceImageSetup
+
 % \illustimage*^[option]{image}(caption){ text } -------------------------------
 %\illustimage[options]{filename}(caption){description}
 %\illustimage*: user-specified action
@@ -2220,7 +2246,7 @@
   first=false,  
   beforeskip=.15\baselineskip,
   afterskip=.15\baselineskip,
-  firstskip=0pt,
+  firstskip=1pt,
   frame=false,
   width=0pt,
   position=left,
@@ -2382,95 +2408,90 @@
   }
 }
 
-
-\NewEnviron{IlluImg}[1]{\illustimage{#1}{\BODY}}
-\NewDocumentEnvironment {IllustImage} { s o m d() }
+% as environment
+\NewEnviron{IllustratedImage}[1]{\illustimage{#1}{\BODY}}
+\NewDocumentEnvironment {IllustImage} { s t^ o m d() }
 {
-  \IfBooleanT {#1}
-    { \exp_args:No \IllustImageSetup{\l_illustimage_star} }
-  \IfValueT {#2} { \IllustImageSetup{#2} }
-  \IfValueT {#4} { \tl_set:Nn \l_illustimage_caption {#4} }
-  \IlluImg{#3}
+  \IfBooleanT {#1} { 
+    \exp_args:No \IllustImageSetup{\l_illustimage_star} 
+  }
+  \IfBooleanT {#2} { 
+    \IllustImageSetup{first=true} 
+  }
+  \IfValueT {#3} { 
+    \IllustImageSetup{#3} 
+  }
+  \IfValueT {#5} { 
+    \tl_set:Nn \l_illustimage_caption {#5} 
+  }
+  \IllustratedImage{#4}
+}{
+  \endIllustratedImage
 }
+
+% as environment for symbol
+\NewDocumentEnvironment { IllustSymbol } { O{} m }
 {
-  \endIlluImg
+  \IllustImageSetup{frame=false, verticaloffset=0.75ex, verticalalign=m, #1} 
+  \IllustratedImage{#2}
+}{
+  \endIllustratedImage
 }
 
-\NewDocumentCommand \illustsymbol { O{} m +m }
-{
-  \illustimage[frame=false, verticaloffset=0.75ex, verticalalign=m, #1]{#2}{#3}
-}
-
-\NewDocumentCommand \illuitem { O{} m m }
-{
-  \illustimage[#1] { #2 }
-  {
+% as environment for itemize
+\NewEnviron{IllustratedItemize}[1]{
+  \illustimage{#1}{
     \begin{itemize}
-      #3
+    \BODY
     \end{itemize}
   }
 }
-
-\NewEnviron{IlluItem}[2][]{ \illuitem[#1]{#2}{\BODY} }
-
-\NewDocumentCommand \illuenum { s t| }
+\NewDocumentEnvironment { IllustItem } { o m }
 {
-  \IfBooleanTF {#1}
+  \IfValueT{#1} { \IllustImageSetup{#1} }
+  \IllustratedItemize{#2}
+}{
+  \endIllustratedItemize
+}
+
+% as environment for enumerate
+\NewEnviron{IllustratedEnumerateStart}[1]{
+  \illustimage{#1}{
+    \begin{enumerate}[series=IlluEnum]
+    \BODY
+    \end{enumerate}
+  }
+}
+\NewEnviron{IllustratedEnumerateContinue}[1]{
+  \illustimage{#1}{
+    \begin{enumerate}[series=IlluEnum, resume=IlluEnum]
+    \BODY
+    \end{enumerate}
+  }
+}
+\NewDocumentEnvironment { IllustEnum } { s t^ o m }
+{
+  \IfBooleanT {#1} {
+    \IllustImageSetup{first=true}
+  }
+  \IfBooleanT {#2} {
+    \exp_args:No \IllustImageSetup{\l_illustimage_star}
+  }
+  \IfValueT {#3} { 
+    \IllustImageSetup{#3} 
+  }
+  \IfBooleanTF{#1}
   {
-    \IfBooleanTF {#2}
-    { \IllustEnumerateStartAdhoc }
-    { \IllustEnumerateStart }
+    \IllustratedEnumerateStart{#4}
   }{
-    \IfBooleanTF {#2}
-    { \IllustEnumerateContinueAdhoc }
-    { \IllustEnumerateContinue }
+    \IllustratedEnumerateContinue{#4}
   }
-}
-
-\NewEnviron{IlluEnum*}[2][]{ \illuenum*[#1]{#2}{\BODY} }
-\NewEnviron{IlluEnum}[2][]{ \illuenum[#1]{#2}{\BODY} }
-\NewEnviron{IlluEnum*|}[2][]{ \illuenum*|[#1]{#2}{\BODY} }
-\NewEnviron{IlluEnum|}[2][]{ \illuenum|[#1]{#2}{\BODY} }
-\NewEnviron{IlluEnum*+}[2][]{ \illuenum*|[#1]{#2}{\BODY} }
-\NewEnviron{IlluEnum+}[2][]{ \illuenum|[#1]{#2}{\BODY} }
-
-\NewDocumentCommand \IllustEnumerateStart { O{} m +m }
-{
-  \illustimage[first=true,#1]{#2}
+}{
+  \IfBooleanTF{#1}
   {
-    \begin{enumerate}[series=IlluEnum]
-      #3
-    \end{enumerate}
-  }
-}
-
-\NewDocumentCommand \IllustEnumerateContinue { O{} m +m }
-{
-  \illustimage[#1]{#2}
-  {
-    \begin{enumerate}[series=IlluEnum, resume=IlluEnum]
-      #3
-    \end{enumerate}
-  }
-}
-
-\NewDocumentCommand \IllustEnumerateStartAdhoc { O{} m +m }
-{
-  \illustimage*[first=true, #1]{#2}
-  {
-    \begin{enumerate}[series=IlluEnum]
-      #3
-    \end{enumerate}
-  }
-}
-
-\NewDocumentCommand \IllustEnumerateContinueAdhoc { O{} m +m }
-{
-  \illustimage*[#1]{#2}
-  {
-    \begin{enumerate}[series=IlluEnum, resume=IlluEnum]
-      #3
-    \end{enumerate}
+    \endIllustratedEnumerateStart
+  }{
+    \endIllustratedEnumerateContinue
   }
 }
 
@@ -2709,8 +2730,7 @@
   \IfValueT{#2} { \tl_set:Nn \l_placetable_caption {#2} }
   \IfValueT{#3} { \tl_set:Nn \l_placetable_footnote {#3} }
   \PlaceTable
-}
-{
+}{
   \endPlaceTable
 }
 
@@ -3701,7 +3721,6 @@
   note = NOTE,
 }
 
-
 \tl_new:N \l_reference_style
 
 \NewDocumentCommand \ReferenceSetup { m }
@@ -3817,6 +3836,17 @@
 }{
   \end{admonition}
 }
+
+\cs_set_eq:NN \danger \Danger
+\cs_set_eq:NN \enddanger \endDanger
+\cs_set_eq:NN \warning \Warning
+\cs_set_eq:NN \endwarning \endWarning
+\cs_set_eq:NN \caution \Caution
+\cs_set_eq:NN \endcaution \endCaution
+\cs_set_eq:NN \notice \Notice
+\cs_set_eq:NN \endnotice \endNotice
+\cs_set_eq:NN \note \Note
+\cs_set_eq:NN \endnote \endNote
 
 \keys_define:nn {instance}
 {
