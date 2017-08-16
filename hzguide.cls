@@ -17,7 +17,7 @@
 % IV. For those of designer interface level:
 %     Follow clause II. However, it is allowed to use lowercase with compound words.
 
-\ProvidesClass{hzguide}[2017/08/07]
+\ProvidesClass{hzguide}[2017/08/16]
 
 \LoadClassWithOptions{memoir}
 
@@ -707,7 +707,7 @@
     \begin{IfVartwoEnlarge}
       \setSpacing{1}
 
-	    \includegraphics[scale=\l_placeimage_scale]{\cover_brand_logo}
+	    \includegraphics[scale=\l_image_scale]{\cover_brand_logo}
    		\par\vspace{.1\textheight}
       
       \begin{minipage}{\linewidth}
@@ -721,7 +721,7 @@
       {
         \par\vspace{1cm}
         \begin{center}
-            \includegraphics[scale=\l_placeimage_scale]{\cover_image}
+            \includegraphics[scale=\l_image_scale]{\cover_image}
         \end{center}
       }
 
@@ -742,7 +742,7 @@
 	\begin{IfVartwoEnlarge}			
 		\AtPageBottom
     \setSpacing{1}
-		\includegraphics[scale=\l_placeimage_scale]{\cover_brand_logo} \hfill \cover_note \\ 
+		\includegraphics[scale=\l_image_scale]{\cover_brand_logo} \hfill \cover_note \\ 
 		\IfVartwo
 			{ \raisebox{0.5ex}{\rule{\headwidth}{0.5pt}} }
 			[ \raisebox{0.5ex}{\rule{\textwidth}{0.5pt}} ] \\ 
@@ -1304,10 +1304,9 @@
 }
 
 \newcommand\foliomarks{
-  \renewcommand\chaptermark[1]{\markboth{##1}{}}
-  \renewcommand\sectionmark[1]{\markright{##1}}
+    \renewcommand\chaptermark[1]{\markboth{##1}{##1}}
+    \renewcommand\sectionmark[1]{} %\markright{#1}
 }
-
 %\patchcommand{\@memfront}{}{\foliomarks}
 %\patchcommand{\@memmain}{}{\foliomarks}
 
@@ -1329,8 +1328,8 @@
   ulratio         .tl_set:N = \ulratio, % specify after column
   lrmargin        .dim_set:N = \lrmargin,
   vartwomargin    .dim_set:N = \vartwomargin,
-  hffont          .tl_set:N = \hffont,
-  hfhook          .tl_set:N = \hfhook,
+  font            .tl_set:N = \hffont,
+  hook            .tl_set:N = \hfhook,
   evenheadinner   .tl_set:N = \evenheadinner,
   oddheadinner    .tl_set:N = \oddheadinner,
   evenfootinnder  .tl_set:N = \evenfootinneer,
@@ -2025,34 +2024,34 @@
 \box_new:N \l_image_box
 \box_new:N \l_text_box
 
-% \placeimage[...]{image} -----------------------------------------------------
+% \image[...]{image} -----------------------------------------------------
 
-\keys_define:nn { placeimage }
+\keys_define:nn { image }
 {
-  beforeskip    .skip_set:N = \l_placeimage_before_skip,
-  afterskip     .skip_set:N = \l_placeimage_after_skip,
-  extraskip     .skip_set:N = \l_placeimage_extra_skip,
-  float         .bool_set:N = \l_placeimage_float_bool,
-  frame         .bool_set:N = \l_placeimage_frame_bool,
-  scale         .tl_set:N = \l_placeimage_scale,
-  flush         .bool_set:N = \l_placeimage_flush_bool,
-  landscape     .bool_set:N = \l_placeimage_landscape_bool,
-  align         .tl_set:N = \l_placeimage_align,
-  caption       .tl_set:N = \l_placeimage_caption,
-  label         .tl_set:N = \l_placeimage_label,
-  legend        .bool_set:N = \l_placeimage_legend_bool,
-  showfilename  .bool_set:N = \l_placeimage_showfilename_bool,
-  star          .tl_set:N = \l_placeimage_star,
-  vbar          .tl_set:N = \l_placeimage_vbar
+  beforeskip    .skip_set:N = \l_image_before_skip,
+  afterskip     .skip_set:N = \l_image_after_skip,
+  extraskip     .skip_set:N = \l_image_extra_skip,
+  float         .bool_set:N = \l_image_float_bool,
+  frame         .bool_set:N = \l_image_frame_bool,
+  scale         .tl_set:N = \l_image_scale,
+  flush         .bool_set:N = \l_image_flush_bool,
+  landscape     .bool_set:N = \l_image_landscape_bool,
+  align         .tl_set:N = \l_image_align,
+  caption       .tl_set:N = \l_image_caption,
+  label         .tl_set:N = \l_image_label,
+  legend        .bool_set:N = \l_image_legend_bool,
+  showfilename  .bool_set:N = \l_image_showfilename_bool,
+  star          .tl_set:N = \l_image_star,
+  vbar          .tl_set:N = \l_image_vbar
 }
-\bool_new:N \l_placeimage_extra_bool
+\bool_new:N \l_image_extra_bool
 
-\NewDocumentCommand \PlaceImageSetup { m }
+\NewDocumentCommand \ImageSetup { m }
 {
-  \keys_set:nn { placeimage } {#1}
+  \keys_set:nn { image } {#1}
 }
 
-\PlaceImageSetup{
+\ImageSetup{
   beforeskip=0pt,
   afterskip=0pt,
   extraskip=1em,
@@ -2066,86 +2065,86 @@
   vbar=landscape
 }
 
-\NewDocumentCommand \placeimage { s t| O{} m o d() }
+\NewDocumentCommand \image { s t| O{} m o d() }
 {
   \group_begin:
   \IfValueTF{#5} {
-    \bool_set_true:N \l_placeimage_extra_bool
+    \bool_set_true:N \l_image_extra_bool
   }{
-    \bool_set_false:N \l_placeimage_extra_bool
+    \bool_set_false:N \l_image_extra_bool
   }
   \IfBooleanT {#1}
-    { \exp_args:No \PlaceImageSetup{\l_placeimage_star} }
+    { \exp_args:No \ImageSetup{\l_image_star} }
   \IfBooleanT {#2}
-    { \exp_args:No \PlaceImageSetup{\l_placeimage_vbar} }
-  \PlaceImageSetup{#3}
-  \IfValueT{#6} { \tl_set:Nn \l_placeimage_caption {#6} }
-  \tl_if_empty:NT \l_placeimage_label
+    { \exp_args:No \ImageSetup{\l_image_vbar} }
+  \ImageSetup{#3}
+  \IfValueT{#6} { \tl_set:Nn \l_image_caption {#6} }
+  \tl_if_empty:NT \l_image_label
     {
       \IfValueTF{#5} {
-        \tl_set:Nn \l_placeimage_label {#4~#5}
+        \tl_set:Nn \l_image_label {#4~#5}
       }{
-        \tl_set:Nn \l_placeimage_label {#4}
+        \tl_set:Nn \l_image_label {#4}
       }
     }
-  \placeimage_save:nn {#4} {#5}
-  \bool_if:NTF \l_placeimage_float_bool {
+  \image_save:nn {#4} {#5}
+  \bool_if:NTF \l_image_float_bool {
     \begin{figure}
-    \placeimage_put:
+    \image_put:
     \end{figure}
   }{
-    \object_skip_before:n {\l_placeimage_before_skip}
-    \placeimage_put:
-    \object_skip_after:n {\l_placeimage_after_skip}
+    \object_skip_before:n {\l_image_before_skip}
+    \image_put:
+    \object_skip_after:n {\l_image_after_skip}
   }
   \group_end:
 }
 
-\cs_new:Npn \placeimage_save:nn #1 #2
+\cs_new:Npn \image_save:nn #1 #2
 {
-  \bool_if:NTF \l_placeimage_frame_bool
+  \bool_if:NTF \l_image_frame_bool
   {
-    \bool_if:NTF \l_placeimage_extra_bool {
+    \bool_if:NTF \l_image_extra_bool {
       \hbox_set:Nn \l_image_box{
         \objectframe{
-          \includegraphics[scale=\l_placeimage_scale]{#1}
-          \hspace{\l_placeimage_extra_skip}
-          \includegraphics[scale=\l_placeimage_scale]{#2}
+          \includegraphics[scale=\l_image_scale]{#1}
+          \hspace{\l_image_extra_skip}
+          \includegraphics[scale=\l_image_scale]{#2}
         }
       }
     }{
       \hbox_set:Nn \l_image_box{
         \objectframe{
-          \includegraphics[scale=\l_placeimage_scale]{#1}
+          \includegraphics[scale=\l_image_scale]{#1}
         }
       }
     }
    }
    {
-     \bool_if:NTF \l_placeimage_extra_bool {
+     \bool_if:NTF \l_image_extra_bool {
       \hbox_set:Nn \l_image_box{
-          \includegraphics[scale=\l_placeimage_scale]{#1}
-          \hspace{\l_placeimage_extra_skip}
-          \includegraphics[scale=\l_placeimage_scale]{#2}
+          \includegraphics[scale=\l_image_scale]{#1}
+          \hspace{\l_image_extra_skip}
+          \includegraphics[scale=\l_image_scale]{#2}
       }
     }{
       \hbox_set:Nn \l_image_box{
-          \includegraphics[scale=\l_placeimage_scale]{#1}
+          \includegraphics[scale=\l_image_scale]{#1}
       }
     }
    }
 }
 
-\cs_new:Nn \placeimage_put:
+\cs_new:Nn \image_put:
 {
-  \bool_if:NTF \l_placeimage_landscape_bool
-    { \placeimage_put_landscape: }
-    { \placeimage_put_portrait: }
+  \bool_if:NTF \l_image_landscape_bool
+    { \image_put_landscape: }
+    { \image_put_portrait: }
 }
 
-\cs_new:Nn \placeimage_put_portrait:
+\cs_new:Nn \image_put_portrait:
 {
-  \bool_if:NTF \l_placeimage_flush_bool
+  \bool_if:NTF \l_image_flush_bool
   {
     \hspace*{-\vartwosecindent}
   }
@@ -2159,13 +2158,13 @@
     }
   }
   \begin{minipage}{\l_tmpa_dim}
-    \l_placeimage_align\nil
+    \l_image_align\nil
     \box_use:N \l_image_box
-    \placeimage_caption:
+    \image_caption:
   \end{minipage}
 }
 
-\cs_new:Nn \placeimage_put_landscape:
+\cs_new:Nn \image_put_landscape:
 {
   \dim_compare:nTF { \g_protrude_dim > 0pt }
   {
@@ -2177,35 +2176,35 @@
   }
   \rotatebox{-90}{
     \begin{minipage}{\l_tmpb_dim}
-      \l_placeimage_align\nil
+      \l_image_align\nil
       \box_use:N \l_image_box
-      \placeimage_caption:
+      \image_caption:
     \end{minipage}
   }
 }
 
-\cs_new:Nn \placeimage_caption:
+\cs_new:Nn \image_caption:
 {
-  \bool_if:NT \l_placeimage_showfilename_bool
+  \bool_if:NT \l_image_showfilename_bool
   {
-    \tl_set:Nx \l_tmpa_tl {\l_placeimage_label}
+    \tl_set:Nx \l_tmpa_tl {\l_image_label}
     \legend{\tl_to_str:N \l_tmpa_tl}
   }
-  \tl_if_empty:NF \l_placeimage_caption
+  \tl_if_empty:NF \l_image_caption
   {
-    \bool_if:NTF \l_placeimage_legend_bool
+    \bool_if:NTF \l_image_legend_bool
     {
-      \legend{\l_placeimage_caption}
+      \legend{\l_image_caption}
     }
     {
-      \imgcaption{\l_placeimage_caption}
-      \label{\l_placeimage_label}
+      \imgcaption{\l_image_caption}
+      \label{\l_image_label}
     }
   }
 }
 
-\cs_set_eq:NN \image \placeimage
-\cs_set_eq:NN \ImageSetup \PlaceImageSetup
+%\cs_set_eq:NN \placeimage \image 
+%\cs_set_eq:NN \PlaceImageSetup \ImageSetup 
 
 % \illustimage*^[option]{image}(caption){ text } -------------------------------
 %\illustimage[options]{filename}(caption){description}
@@ -2565,42 +2564,40 @@
   \par\lineimg[0pt]{#1}
 }
 
-% \placetable[]{ } ------------------------------------
+% \settable[]{ } ------------------------------------
 \taburowcolors{white .. backgray}
 \newcommand\tableheadfont{\bfseries}
 \NewExpandableDocumentCommand\TableHeadFont{}{\rowfont{\tableheadfont}}
 
-\cs_new:Npn \placetable_footnotestyle:n #1
+\cs_new:Npn \table_footnotestyle:n #1
 {
   \renewcommand\thefootnote{ \use:c {#1} {footnote} }
   \renewcommand\thempfootnote{ \use:c {#1} {mpfootnote} }
 }
 
-\keys_define:nn { placetable }
+\keys_define:nn { table }
 {
-  beforeskip    .skip_set:N = \l_placetable_before_skip,
-  afterskip     .skip_set:N = \l_placetable_after_skip,
-  float         .bool_set:N = \l_placetable_float_bool,
-  align         .tl_set:N = \l_placetable_align,
-  landscape     .bool_set:N = \l_placetable_landscape_bool,
-  caption       .tl_set:N = \l_placetable_caption,
-  label         .tl_set:N = \l_placetable_label,
-  legend        .bool_set:N = \l_placetable_legend_bool,
-  font          .tl_set:N = \l_placetable_font,
-  fontsize      .tl_set:N = \l_placetable_fontsize,
-  hook          .tl_set:N = \l_placetable_hook,
-  footnote      .tl_set:N = \l_placetable_footnote,
-  footnotestyle .code:n = { \placetable_footnotestyle:n {#1} },
-  stretch       .tl_set:N = \l_placetable_stretch,
-  norowcolor    .bool_set:N  = \l_placetable_norowcolor_bool
+  beforeskip    .skip_set:N = \l_table_before_skip,
+  afterskip     .skip_set:N = \l_table_after_skip,
+  float         .bool_set:N = \l_table_float_bool,
+  align         .tl_set:N = \l_table_align,
+  landscape     .bool_set:N = \l_table_landscape_bool,
+  caption       .tl_set:N = \l_table_caption,
+  label         .tl_set:N = \l_table_label,
+  legend        .bool_set:N = \l_table_legend_bool,
+  font          .tl_set:N = \l_table_font,
+  fontsize      .tl_set:N = \l_table_fontsize,
+  hook          .tl_set:N = \l_table_hook,
+  footnote      .tl_set:N = \l_table_footnote,
+  footnotestyle .code:n = { \table_footnotestyle:n {#1} },
+  stretch       .tl_set:N = \l_table_stretch,
+  norowcolor    .bool_set:N  = \l_table_norowcolor_bool
 }
 
 \NewDocumentCommand \TableSetup { m }
 {
-  \keys_set:nn { placetable } { #1 }
+  \keys_set:nn { table } { #1 }
 }
-
-\cs_set_eq:NN \PlaceTableSetup \TableSetup
 
 \TableSetup{
   beforeskip=0pt,
@@ -2614,51 +2611,44 @@
   stretch=1
 }
 
-%\cs_new:Nn \placetable_clear:
-%{
-%  \tl_clear:N \l_placetable_caption
-%  \tl_clear:N \l_placetable_label
-%  \tl_clear:N \l_placetable_footnote
-%}
-
 \NewDocumentCommand \placetable { O{} d() d<> m }
 {
   \group_begin:
-  %\placetable_clear:
-  \PlaceTableSetup{#1}
-  \IfValueT{#2} { \tl_set:Nn \l_placetable_caption {#2} }
-  \IfValueT{#3} { \tl_set:Nn \l_placetable_footnote {#3} }
-  \bool_if:NT \l_placetable_norowcolor_bool { \taburowcolors{} }
+  %\table_clear:
+  \TableSetup{#1}
+  \IfValueT{#2} { \tl_set:Nn \l_table_caption {#2} }
+  \IfValueT{#3} { \tl_set:Nn \l_table_footnote {#3} }
+  \bool_if:NT \l_table_norowcolor_bool { \taburowcolors{} }
   \hbox_set:Nn \l_text_box
   {
-    \tl_set:Nn \arraystretch {\l_placetable_stretch}
-    \l_placetable_font
-    \l_placetable_fontsize
-    \l_placetable_hook
+    \tl_set:Nn \arraystretch {\l_table_stretch}
+    \l_table_font
+    \l_table_fontsize
+    \l_table_hook
     #4
   }
   \bool_if:NTF \l_place_float_bool
   {
     \begin{table}
-    \placetable_put:N \l_text_box
+    \table_put:N \l_text_box
     \end{table}
   }
   {
-    \object_skip_before:n {\l_placetable_before_skip}
-    \placetable_put:
-    \object_skip_after:n {\l_placetable_after_skip}
+    \object_skip_before:n {\l_table_before_skip}
+    \table_put:
+    \object_skip_after:n {\l_table_after_skip}
   }
   \group_end:
 }
 
-\cs_new:Nn \placetable_put:
+\cs_new:Nn \table_put:
 {
-  \bool_if:NTF \l_placetable_landscape_bool
-    { \placetable_put_landscape: }
-    { \placetable_put_portrait: }
+  \bool_if:NTF \l_table_landscape_bool
+    { \table_put_landscape: }
+    { \table_put_portrait: }
 }
 
-\cs_new:Nn \placetable_put_portrait:
+\cs_new:Nn \table_put_portrait:
 {
   \dim_compare:nTF { \g_protrude_dim > 0pt }
   {
@@ -2668,13 +2658,13 @@
     \dim_set:Nn \l_tmpa_dim { \linewidth }
   }
   \begin{minipage}{\l_tmpa_dim}
-    \placetable_caption:
+    \table_caption:
     \box_use:N \l_text_box
-    \placetable_footnote:
+    \table_footnote:
   \end{minipage}
 }
 
-\cs_new:Nn \placetable_put_landscape:
+\cs_new:Nn \table_put_landscape:
 {
   \dim_compare:nTF { \g_protrude_dim > 0pt }
   {
@@ -2686,37 +2676,37 @@
   }
   \rotatebox{-90}{
     \begin{minipage}{\l_tmpb_dim}
-      \l_placetable_align\nil
-      \placetable_caption:
+      \l_table_align\nil
+      \table_caption:
       \box_use:N \l_text_box
-      \placetable_footnote:
+      \table_footnote:
     \end{minipage}
   }
 }
 
-\cs_new:Nn \placetable_caption:
+\cs_new:Nn \table_caption:
 {
-  \tl_if_empty:NF \l_placetable_caption
+  \tl_if_empty:NF \l_table_caption
   {
-    \bool_if:NTF \l_placetable_legend_bool
+    \bool_if:NTF \l_table_legend_bool
     {
-      \legend{\l_placetable_caption}
+      \legend{\l_table_caption}
     }
     {
-      \tabcaption{\l_placetable_caption}
-      \label{\l_placetable_label}
+      \tabcaption{\l_table_caption}
+      \label{\l_table_label}
     }
   }
 }
 
-\cs_new:Nn \placetable_footnote:
+\cs_new:Nn \table_footnote:
 {
-  \tl_if_empty:NF \l_placetable_footnote
+  \tl_if_empty:NF \l_table_footnote
   {
     \vspace{-.5\baselineskip}\par
     \begin{minipage}{\linewidth}
       \setfootnoterule{0pt}{0pt}{0pt}
-      \l_placetable_footnote
+      \l_table_footnote
     \end{minipage}
   }
 }
@@ -2725,9 +2715,9 @@
 
 \NewDocumentEnvironment { Table } { o d() d<> }
 {
-  \IfValueT{#1} { \PlaceTableSetup{#1} }
-  \IfValueT{#2} { \tl_set:Nn \l_placetable_caption {#2} }
-  \IfValueT{#3} { \tl_set:Nn \l_placetable_footnote {#3} }
+  \IfValueT{#1} { \TableSetup{#1} }
+  \IfValueT{#2} { \tl_set:Nn \l_table_caption {#2} }
+  \IfValueT{#3} { \tl_set:Nn \l_table_footnote {#3} }
   \PlaceTable
 }{
   \endPlaceTable
@@ -2751,9 +2741,9 @@
 
 \NewDocumentEnvironment { SpecTable } { s o d() d<> }
 {
-  \IfValueT{#2} { \PlaceTableSetup{#2} }
-  \IfValueT{#3} { \tl_set:Nn \l_placetable_caption {#3} }
-  \IfValueT{#4} { \tl_set:Nn \l_placetable_footnote {#4} }
+  \IfValueT{#2} { \TableSetup{#2} }
+  \IfValueT{#3} { \tl_set:Nn \l_table_caption {#3} }
+  \IfValueT{#4} { \tl_set:Nn \l_table_footnote {#4} }
   \IfBooleanTF{#1}{\spectablex}{\spectable}
 }
 {
@@ -2771,7 +2761,7 @@
 
 \NewDocumentEnvironment { ImageTable } { d<> }
 {
-  \IfValueT{#1} { \tl_set:Nn \l_placetable_footnote {#1} }
+  \IfValueT{#1} { \tl_set:Nn \l_table_footnote {#1} }
   \imagetable
 }
 {
@@ -2780,10 +2770,10 @@
 
 \NewDocumentCommand \TableCommon { O{} }
 {
-  \PlaceTableSetup{#1}
-  \tl_set:Nn \arraystretch {\l_placetable_stretch}
-  \l_placetable_font
-  \l_placetable_fontsize
+  \TableSetup{#1}
+  \tl_set:Nn \arraystretch {\l_table_stretch}
+  \l_table_font
+  \l_table_fontsize
   \taburowcolors{backgray .. white}
 }
 
@@ -2818,13 +2808,13 @@
 \NewDocumentCommand \SetObjectAlign { m }
 {
   \CaptionSetup { align = #1 }
-  \PlaceImageSetup { align = #1 }
-  \PlaceTableSetup { align = #1 }
+  \ImageSetup { align = #1 }
+  \TableSetup { align = #1 }
 }
 
 \NewDocumentCommand \ShowImageFilename { s }
 {
-  \PlaceImageSetup{showfilename=true}
+  \ImageSetup{showfilename=true}
   \IllustImageSetup{showfilename=true}
   \MarginImageSetup{showfilename=true}
   \LineImageSetup{showfilename=true}
@@ -2833,7 +2823,7 @@
 
 \NewDocumentCommand \HideImageFilename { }
 {
-  \PlaceImageSetup{showfilename=false}
+  \ImageSetup{showfilename=false}
   \IllustImageSetup{showfilename=false}
   \MarginImageSetup{showfilename=false}
   \LineImageSetup{showfilename=false}
@@ -2843,14 +2833,14 @@
 {
   \IfNoValueTF {#2}
   {
-    \tl_set:Nn \l_placeimage_scale {#1}
+    \tl_set:Nn \l_image_scale {#1}
     \tl_set:Nn \l_illustimage_scale {#1}
     \tl_set:Nn \l_lineimg_scale {#1}
   }
   {
     \str_case:nn {#2}
     {
-      {\placeimage}   { \tl_set:Nn \l_placeimage_scale {#1} }
+      {\image}   { \tl_set:Nn \l_image_scale {#1} }
       {\illustimage}  { \tl_set:Nn \l_illustimage_scale {#1} }
       {\lineimg}      { \tl_set:Nn \l_lineimg_scale {#1} }
     }
@@ -2870,10 +2860,10 @@
 
 \NewDocumentCommand \MakeAlbum { s O {0.5} m }
 {
-  \PlaceImageSetup{scale=#2}
+  \ImageSetup{scale=#2}
   \IfBooleanTF {#1}
-    { \PlaceImageSetup{showfilename=false} }
-    { \PlaceImageSetup{showfilename=true} }
+    { \ImageSetup{showfilename=false} }
+    { \ImageSetup{showfilename=true} }
   \ior_open:Nn \l_txt_io { #3 }
   \ior_map_inline:Nn \l_txt_io
   {
@@ -2881,7 +2871,7 @@
     \tl_trim_spaces:N \l_tmpa_tl
     \tl_if_empty:NF { \l_tmpa_tl }
     {
-      \placeimage{\l_tmpa_tl}\par
+      \image{\l_tmpa_tl}\par
     }
   }
   \ior_close:N \l_txt_io
@@ -4413,7 +4403,7 @@
 
 \NewDocumentCommand \sceneimage {}
 {
-  \par\placeimage{uncertain}
+  \par\image{uncertain}
 }
 
 \NewDocumentCommand \scenelineimg {}
@@ -4438,12 +4428,14 @@
   \int_set:Nn \l_tmpa_int {1}
   \int_set:Nn \l_tmpb_int {#1}
   \scenepara
+  \par
   \begin{IllustEnum}*{uncertain}
     \item \scenepara
   \end{IllustEnum}
   \int_do_while:nNnn {\l_tmpa_int} < {\l_tmpb_int}
     {
       \int_incr:N \l_tmpa_int
+      \par
       \begin{IllustEnum}{uncertain}
         \item \scenepara
       \end{IllustEnum}
@@ -4503,7 +4495,7 @@
 
 \NewDocumentCommand \sceneproblems { O{3} }
 {
-  \listofproblems*
+  %\listofproblems*
   \int_set:Nn \l_tmpa_int {0}
   \int_set:Nn \l_tmpb_int {#1}
   \int_do_while:nNnn {\l_tmpa_int} < {\l_tmpb_int}
@@ -4521,6 +4513,7 @@
           \str_set:Nx \l_tmpa_str { \int_to_alph:n \l_tmpa_int }
           \problem{Problem~\l_tmpa_str}
           \scenepara*
+          \scenelist*
         }
       \group_end:
     }
