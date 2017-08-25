@@ -139,8 +139,8 @@
   { #2 }
 }
 
-\NewEnviron{IfDoc}[1]{\IfDocType{#1}{\BODY}[]}
-\NewEnviron{IfNotDoc}[1]{\IfNotDocType{#1}{\BODY}[]}
+\NewEnviron{IfDoc}[1]{\IfDocType{#1}{\BODY}}
+\NewEnviron{IfNotDoc}[1]{\IfNotDocType{#1}{\BODY}}
 
 \keys_set:nn { hzguide }
 {
@@ -442,8 +442,8 @@
   %\addhangulfontfeatures{InterHangul=0.5pt, WordSpace={1.25, 0.5, 0.5}}
   %\XeTeXcharclass"201C = \XKlatinopening
   %\XeTeXcharclass"201D = \XKlatinclosing
-  \setmainhangulfont{KoPubBatang}[Ligatures=TeX,Scale=MatchUppercase,UprightFont={*PL},BoldFont={*PB}]
-  \setsanshangulfont{KoPubDotum}[Ligatures=TeX,Scale=MatchUppercase,UprightFont={*PL},BoldFont={*PB}]
+  \setmainhangulfont{KoPubBatang}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PL}, BoldFont={*PB}]
+  \setsanshangulfont{KoPubDotum}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PL}, BoldFont={*PB}]
   \AtBeginDocument{
     \renewcommand*{\contentsname}{차례}
     \AdmonitionSetup {
@@ -1929,7 +1929,6 @@
 }
 
 % captions --------------------------------------------------------------------
-
 \newfixedcaption{\imgcaption}{figure}
 \newfixedcaption{\tabcaption}{table}
 
@@ -2024,7 +2023,7 @@
 \box_new:N \l_image_box
 \box_new:N \l_text_box
 
-% \image[...]{image} -----------------------------------------------------
+% \image*|[options]{image}[label](caption) -------------------------------------
 
 \keys_define:nn { image }
 {
@@ -2202,9 +2201,6 @@
     }
   }
 }
-
-%\cs_set_eq:NN \placeimage \image 
-%\cs_set_eq:NN \PlaceImageSetup \ImageSetup 
 
 % \illustimage*^[option]{image}(caption){ text } -------------------------------
 %\illustimage[options]{filename}(caption){description}
@@ -3016,6 +3012,16 @@
 }
 
 % lists  -------------------------------------------------------
+\keys_define:nn { hzlist }
+{
+  enumerate   .tl_set:N = \g_hzlist_enumerate_style,
+  itemize     .tl_set:N = \g_hzlist_itemize_style
+}
+
+\NewDocumentCommand \SetListStyle { m }
+{
+  \keys_set:nn {hzlist} {#1}
+}
 
 \RenewDocumentEnvironment {enumerate} { s O{} }
 {
@@ -3024,6 +3030,7 @@
   }{
     \enit@enumerate\enitdp@enumerate{enum}\thr@@{#2}
   }  
+  \g_hzlist_enumerate_style
 }{
   \enit@endenumerate
 }
@@ -3035,6 +3042,7 @@
   }{
     \enit@itemize\enitdp@itemize{item}\thr@@{#2}
   }
+  \g_hzlist_itemize_style
 }{
   \enit@enditemize
 }
@@ -3255,7 +3263,7 @@
   \end{list}
 }
 
-\NewDocumentCommand \AlignTerms { o m }
+\NewDocumentCommand \alignterms { o m }
 {
   \hbox_set:Nn \l_tmpa_box
   {
@@ -3268,7 +3276,7 @@
   \end{terms}
 }
 
-\NewEnviron{terms+}[1][]{ \AlignTerms[#1]{\BODY} }
+\NewEnviron{Terms}[1][]{ \alignterms[#1]{\BODY} }
 
 \NewDocumentEnvironment { UI } { s t{|} } % a variant of terms
 {
