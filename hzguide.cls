@@ -17,7 +17,7 @@
 % IV. For those of designer interface level:
 %     Follow clause II. However, it is allowed to use lowercase with compound words.
 
-\ProvidesClass{hzguide}[2017/08/16]
+\ProvidesClass{hzguide}[2017/08/31]
 
 \LoadClassWithOptions{memoir}
 
@@ -43,8 +43,11 @@
 
 % TeX: ^^b7
 % XeTeX: ^^^^ac00 ^^^^^^020000  \char44032 \char"AC00 \char'126000 \char`가 \char`^^^^ac00
-%\let\cleardoublepage\relax to inhibit \mainmatter from producing a blank page
-%\patchcommand\tableofcontents{\clearpage}{}
+% \let\cleardoublepage\relax to inhibit \mainmatter from producing a blank page
+% \patchcommand\tableofcontents{\clearpage}{}
+
+% \begin{minipage}[pos][height][contentpos]{width} text \end{minipage}
+% \parbox[pos][height][contentpos]{width}{text}
 
 % class options * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -647,13 +650,15 @@
 % covers ----------------------------------------------------------------------
 \keys_define:nn { cover }
 {
-  logo              .tl_set:N = \cover_brand_logo,
-	image			        .bool_set:N = \cover_image_bool,
-	ImageName		      .tl_set:N = \cover_image,
+  TopSkip           .skip_set:N = \cover_top_skip,
+  FrontLogoImage    .tl_set:N = \cover_image_logo_front,	
+  BackLogoImage     .tl_set:N = \cover_image_logo_back,	
+  ProductImage      .tl_set:N = \cover_image_product,
+  BackgroundImage   .tl_set:N = \cover_image_background,
 	title			        .tl_set:N = \cover_title,
-	subtitle			    .tl_set:N = \cover_subtitle,
+  subtitle			    .tl_set:N = \cover_subtitle,
+  TitleAlign			  .tl_set:N = \cover_title_align,
   DocumentType      .tl_set:N = \cover_doc_type,
-	% PubDate				  .tl_set:N = \cover_pub_date,
 	PubYear				    .tl_set:N = \cover_pub_year,
 	revision		      .tl_set:N = \cover_revision,
 	note			        .tl_set:N = \cover_note,
@@ -661,12 +666,12 @@
   address           .tl_set:N = \cover_manufacturer_address,
 	AfterFront		    .tl_set:N = \cover_after_front,
 	BeforeBack		    .tl_set:N = \cover_before_back,
-	font			        .tl_set:N = \cover_font,
+  FontI			        .tl_set:N = \cover_font_i,
+  FontII            .tl_set:N = \cover_font_ii,
 	FontSizeI			    .tl_set:N = \cover_font_size_i,
 	FontSizeII			  .tl_set:N = \cover_font_size_ii,
 	FontSizeIII		    .tl_set:N = \cover_font_size_iii,
-	FontSizeIV			  .tl_set:N = \cover_font_size_iv,
-	style			        .tl_set:N = \cover_style
+	FontSizeIV			  .tl_set:N = \cover_font_size_iv,	
 }
 
 \NewDocumentCommand \CoverSetup { m }
@@ -677,14 +682,15 @@
 \tl_set:Nn \cover_pub_year { \int_to_arabic:n {\c_sys_year_int} }
 
 \CoverSetup{
-  font = \sffamily\bfseries\color{darkgray},
+  TopSkip = .1\textheight,
+  FontI = \sffamily\bfseries\color{darkgray},
+  FontII = \sffamily\bfseries\color{darkgray},
   FontSizeI = \Huge,
   FontSizeII = \huge,
   FontSizeIII = \LARGE,
   FontSizeIV = \Large,
-  style = \raggedright,
-  image = false,
-  ImageName = cover_image,
+  TitleAlign = \raggedright,
+  ProductImage = cover_image,
   AfterFront=\clearpage, %\cleartorecto,
   BeforeBack=\clearpage, %\cleartoverso,
 
@@ -704,36 +710,43 @@
 \NewDocumentCommand \FrontCover {}
 {
     \thispagestyle{empty}
+    \tl_if_empty:NF \cover_image_background
+    {
+      \watermark{x=0, y=0, image=\cover_image_background}
+    }
     \begin{IfVartwoEnlarge}
       \setSpacing{1}
-
-	    \includegraphics[scale=\l_image_scale]{\cover_brand_logo}
-   		\par\vspace{.1\textheight}
-      
+      \tl_if_empty:NF \cover_image_logo_front
+      {
+        \includegraphics[scale=\l_image_scale]{\cover_image_logo_front}
+      }
+      \nil\par\vspace{\cover_top_skip}
       \begin{minipage}{\linewidth}
-         \cover_style\cover_font
+         \cover_title_align\cover_font_i
          \CoverFontSize{1} \cover_title
          \par\medskip
          \CoverFontSize{2} \cover_subtitle
       \end{minipage}      
-
-      \bool_if:NT \cover_image_bool
+      \tl_if_empty:NF \cover_image_product
       {
         \par\vspace{1cm}
         \begin{center}
-            \includegraphics[scale=\l_image_scale]{\cover_image}
+            \includegraphics[scale=\l_image_scale]{\cover_image_product}
         \end{center}
       }
-
       \vfill
       \begin{flushright}
-         \cover_font
+         \cover_font_ii
          \CoverFontSize{3} \cover_doc_type
          \par
         \CoverFontSize{4} \cover_pub_year \hspace{0.5em}|\hspace{0.5em} \cover_revision
         \end{flushright}        
     \end{IfVartwoEnlarge}        
     \cover_after_front
+    \tl_if_empty:NF \cover_image_background
+    {
+      \ClearWatermark
+    }    
 }
 
 \NewDocumentCommand \BackCover {}
@@ -741,11 +754,17 @@
 	\cover_before_back
 	\begin{IfVartwoEnlarge}			
 		\AtPageBottom
-    \setSpacing{1}
-		\includegraphics[scale=\l_image_scale]{\cover_brand_logo} \hfill \cover_note \\ 
-		\IfVartwo
-			{ \raisebox{0.5ex}{\rule{\headwidth}{0.5pt}} }
-			[ \raisebox{0.5ex}{\rule{\textwidth}{0.5pt}} ] \\ 
+    \setSpacing{1}    
+    \tl_if_empty:NF \cover_image_logo_back
+    {
+      \includegraphics[scale=\l_image_scale]{\cover_image_logo_back}
+    } 
+    \nil \hfill \cover_note \\       
+		\IfVartwo{ 
+      \raisebox{0.5ex}{\rule{\headwidth}{0.5pt}} 
+    }[ 
+      \raisebox{0.5ex}{\rule{\textwidth}{0.5pt}} 
+    ] \\ 
 		© \space \cover_pub_year \space \cover_manufacturer \\ 
     \cover_manufacturer_address
 	\end{IfVartwoEnlarge}
@@ -2329,7 +2348,7 @@
   }{
     \object_skip_before:n {\l_illustimage_before_skip}
   }
-  \begin{minipage}[\l_illustimage_valign]{\linewidth} 
+  \begin{minipage}{\linewidth} 
     \begin{minipage}[\l_illustimage_valign]{\l_tmpa_dim}
       \vspace{0pt}
       \bool_if:NT \l_illustimage_broad_bool
@@ -2360,7 +2379,7 @@
   }{
     \object_skip_before:n {\l_illustimage_before_skip}
   }
-  \begin{minipage}[\l_illustimage_valign]{\linewidth}
+  \begin{minipage}{\linewidth}
     \begin{minipage}[\l_illustimage_valign]{\l_tmpb_dim}
       \vspace{0pt}
       \begin{minipage}{\linewidth}        
@@ -4642,7 +4661,7 @@
 % font
 \setmainfont{TeX Gyre Pagella}
 \setsansfont{TeX Gyre Heros}
-\setmonofont[AutoFakeBold=1.25]{Latin Modern Mono}
+\setmonofont{TeX Gyre Cursor}
 
 % sectional divisions
 \setsecnumdepth{section}
