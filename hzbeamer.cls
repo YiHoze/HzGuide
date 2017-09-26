@@ -1,36 +1,45 @@
-\ProvidesClass{hzslide}[2016/04/20]
-
+\ProvidesClass{hzbeamer}[2017/09/06]
 \RequirePackage{xparse, l3keys2e}
 
 \ExplSyntaxOn
-\keys_define:nn { hzslide }
+\keys_define:nn { hzbeamer }
 {
 	flier	.bool_set:N = \g_flier_bool,
 	hangul	.bool_set:N = \g_hangul_bool
 }
 
-\ProcessKeysOptions { hzslide }
+\ProcessKeysOptions { hzbeamer }
 
 \NewDocumentCommand \IfFlier { m o }
 {
-	\bool_if:NTF \g_flier_bool
-		{ #1 }
-		{ \IfValueT {#2} {#2} }
+	\bool_if:NTF \g_flier_bool 
+	{ 
+		#1 
+	}{ 
+		\IfValueT {#2} {#2} 
+	}
 }
 
 \NewDocumentCommand \IfSlide { m o }
 {
-	\bool_if:NTF \g_flier_bool		
-		{ \IfValueT {#2} {#2} }
-		{ #1 }
+	\bool_if:NTF \g_flier_bool
+	{ 
+		\IfValueT {#2} {#2}  
+	}{ 
+		#1
+	}
 }
 
 \NewDocumentCommand \IfHangul { m o }
 {
 	\bool_if:NTF \g_hangul_bool
-		{ #1 }
-		{ \IfValueT {#2} {#2} }
+	{ 
+		#1 
+	}{ 
+		\IfValueT {#2} {#2} 
+	}
 }
+\ExplSyntaxOff
 
 \IfSlide{
 	\DeclareOption*{\PassOptionsToClass{\CurrentOption}{beamer}}
@@ -41,7 +50,7 @@
 		inner/sectionpage=none, 
 		%%outer/progressbar=head,
 		outer/numbering=none,
-		%%color/block=fill
+		color/block=fill
 	}	
 }[
 	\LoadClassWithOptions{article}
@@ -53,19 +62,21 @@
 
 \RequirePackage{iftex}
 \RequirePackage{fontspec, xunicode, xltxtra}
+\RequirePackage{bookmark}
+\RequirePackage{etoolbox}
 \RequirePackage{environ}
 \RequirePackage{graphicx}
 \RequirePackage{tikz}
 \RequirePackage{tcolorbox}
+\RequirePackage{tabu}
 \RequirePackage{pdfpages}
 \includepdfset{nup=2x1}
 %%\RequirePackage[yyyymmdd]{datetime}
 %%\renewcommand\dateseparator{-}
 
 %% fonts
-%%\setmainfont{Optima~LT~Std}
-%%\setsansfont{Helvetica~LT~Std}[UprightFont={*-Light}, BoldFont={*-Roman}]
-\setmonofont{Latin~Modern~Mono}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{Latin Modern Mono}
 
 \IfHangul{
 	\RequirePackage[hangul]{kotex}
@@ -77,7 +88,14 @@
 	\setmonohangulfont{KoPubDotum}[Scale=MatchLowercase,UprightFont={*PL},BoldFont={*PM}]
 }
 
+% Bookmark frame titles
+% \apptocmd{\beamer@@frametitle}{\bookmark[page=\the\c@page,level=3]{#1}}%
+% {\message{** patching of \string\beamer@@frametitle succeeded **}}%
+% {\message{** patching of \string\beamer@@frametitle failed **}}%
+
 \newcommand\justified{\rightskip\z@skip\leftskip\z@skip}
+
+\ExplSyntaxOn
 \NewDocumentCommand \narrative {s}
 {
 	\IfBooleanTF{#1} {\normalsize} {\small}
@@ -87,9 +105,13 @@
 %% division
 \NewDocumentCommand \Section {s m}
 {
-	\IfBooleanTF{#1}
-		{\section{#2}\plain{#2}}
-		{\section{#2}}		
+	\section{#2}
+	\IfBooleanT{#1}
+	{
+		\begin{frame}[standout]
+		#2
+		\end{frame}
+	}	
 }
 
 \bool_new:N \g_extra_bool
@@ -128,16 +150,16 @@
 	\bool_if:NT \g_speech_bool
 	{
 		\group_begin:
-    		\setbeamercolor{background~canvas}{
-      			use=palette~primary,
-      			parent=palette~primary
-    		}
-    		\begin{frame}{}
-        		\usebeamercolor[fg]{palette~primary}
-        		\IfBooleanTF {#1}
-        			{ \narrative* #2 }
-        			{ \begin{center} \large #2 \end{center} }        			
-    		\end{frame}
+		\setbeamercolor{background~canvas}{
+			use=palette~primary,
+			parent=palette~primary
+		}
+		\begin{frame}{}
+			\usebeamercolor[fg]{palette~primary}
+			\IfBooleanTF {#1}
+				{ \narrative* #2 }
+				{ \begin{center} \large #2 \end{center} }        			
+		\end{frame}
   		\group_end:
   	}
 }
@@ -153,15 +175,15 @@
 }
 \LineimgScale{1}
 
-\NewDocumentCommand \lineimg { o m }
+\NewDocumentCommand \lineimg { o m O{-.25\height} }
 {
 	\IfValueTF {#1}
 		{ \tl_set:Nn \l_tmpa_tl {#1} }
 		{ \tl_set:Nx \l_tmpa_tl { \g_lineimg_scale } }
-	\raisebox{-.25\height}{\includegraphics[scale=\l_tmpa_tl]{#2}}
+	\raisebox{#3}{\includegraphics[scale=\l_tmpa_tl]{#2}}
 }
 
-\newtcolorbox{RuleBox}{colframe=gray, colback=white, arc=.25ex, boxrule=.75pt, boxsep=0pt}
+\newtcolorbox{rulebox}{colframe=gray, colback=white, arc=.25ex, boxrule=.75pt, boxsep=0pt}
 
 \dim_new:N \g_image_width
 \dim_new:N \g_image_height
@@ -194,7 +216,7 @@
 	\begin{center}
 		\begin{minipage}{1.1\l_tmpa_dim}
 			\IfBooleanTF {#2}
-			{ \begin{RuleBox} \box_use:N \l_tmpa_box \end{RuleBox} }
+			{ \begin{rulebox} \box_use:N \l_tmpa_box \end{rulebox} }
 			{ \box_use:N \l_tmpa_box }
 		\end{minipage}
 	\end{center}
@@ -219,9 +241,9 @@
 		\vspace*{1ex}
 		\IfBooleanTF {#1}
 		{ 
-			\begin{RuleBox}
+			\begin{rulebox}
 				\includegraphics[width=.95\linewidth]{#3} 
-			\end{RuleBox}
+			\end{rulebox}
 		}
 		{ 
 			\includegraphics[width=.95\linewidth]{#3} 
@@ -235,16 +257,11 @@
 	\group_end:
 }
 
-%% for \includepdf
 \NewDocumentEnvironment {excerpt} { } 
 {
 	\setbeamercolor{background~canvas}{bg=}
 }{}
 
-%%\NewDocumentCommand \includepage { m m }
-%%{
-%%	\includegraphics[page=#1, width=.5\linewidth]{#2}
-%%}
 \graphicspath{{images/}{../images/}}
 
 \IfSlide{
@@ -271,12 +288,20 @@
 	\renewcommand\insertcontinuationtext{{\scriptsize(cont.)}}
 ]
 
-%%\addtobeamertemplates
 %% blocks
 \setbeamerfont{block~body}{size=\narrative}
 \setbeamerfont{block~body~example}{size=\narrative}
 \setbeamerfont{block~body~alerted}{size=\narrative}
 
+\definecolor{backgray}{gray}{0.9}
+\newtcolorbox{shadebox}[1][]{
+	before~skip=.5\baselineskip, after~skip=.5\baselineskip,	
+	boxrule=0.25pt, colframe=gray, colback=backgray, arc=0.5ex,
+	boxsep=0.25ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
+	titlerule=0.75pt, toptitle=0.25ex, bottomtitle=0.5ex,
+	title=#1
+}
+    
 
 %% lists
 \setbeamertemplate{enumerate~subitem}{\Alph{enumii}.}
@@ -415,6 +440,8 @@
 }
 
 %% tables
+\taburowcolors{white .. lightgray}
+\NewExpandableDocumentCommand\TableHeadFont{}{\rowfont{\bfseries}}
 \NewDocumentCommand \cellhead {m}
 {
 	\group_begin:
@@ -435,7 +462,7 @@
 
 \ExplSyntaxOff
 
-\def\verbatim@font{\ttfamily\small}
+\def\verbatim@font{\ttfamily\footnotesize}
 
 \AtBeginDocument{
 	\justified
