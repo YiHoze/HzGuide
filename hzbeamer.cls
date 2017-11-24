@@ -77,6 +77,7 @@
 %% fonts
 \setsansfont{TeX Gyre Heros}
 \setmonofont{Latin Modern Mono}
+%\setmonofont{TeX Gyre Cursor}
 
 \IfHangul{
 	\RequirePackage[hangul]{kotex}

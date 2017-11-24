@@ -17,7 +17,7 @@
 % IV. For those of designer interface level:
 %     Follow clause II. However, it is allowed to use lowercase with compound words.
 
-\ProvidesClass{hzguide}[2017/08/31]
+\ProvidesClass{hzguide}[2018/11/24]
 
 \LoadClassWithOptions{memoir}
 
@@ -651,28 +651,28 @@
 % covers ----------------------------------------------------------------------
 \keys_define:nn { cover }
 {
-    TopSkip           .skip_set:N = \cover_top_skip,
-    FrontLogoImage    .tl_set:N = \cover_image_logo_front,	
-    BackLogoImage     .tl_set:N = \cover_image_logo_back,	
-    ProductImage      .tl_set:N = \cover_image_product,
-    BackgroundImage   .tl_set:N = \cover_image_background,
-    title			        .tl_set:N = \cover_title,
-    subtitle			    .tl_set:N = \cover_subtitle,
-    TitleAlign			  .tl_set:N = \cover_title_align,
-    DocumentType      .tl_set:N = \cover_doc_type,
-    PubYear				    .tl_set:N = \cover_pub_year,
-    revision		      .tl_set:N = \cover_revision,
-    note			        .tl_set:N = \cover_note,
+    TopSkip             .skip_set:N = \cover_top_skip,
+    FrontLogoImage      .tl_set:N = \cover_image_logo_front,	
+    BackLogoImage       .tl_set:N = \cover_image_logo_back,	
+    ProductImage        .tl_set:N = \cover_image_product,
+    BackgroundImage     .tl_set:N = \cover_image_background,
+    title			    .tl_set:N = \cover_title,
+    subtitle            .tl_set:N = \cover_subtitle,
+    TitleAlign			.tl_set:N = \cover_title_align,
+    DocumentType        .tl_set:N = \cover_doc_type,
+    PubYear				.tl_set:N = \cover_pub_year,
+    revision		    .tl_set:N = \cover_revision,
+    note			    .tl_set:N = \cover_note,
     manufacturer	    .tl_set:N = \cover_manufacturer,
-    address           .tl_set:N = \cover_manufacturer_address,
+    address             .tl_set:N = \cover_manufacturer_address,
     AfterFront		    .tl_set:N = \cover_after_front,
     BeforeBack		    .tl_set:N = \cover_before_back,
-    FontI			        .tl_set:N = \cover_font_i,
-    FontII            .tl_set:N = \cover_font_ii,
-    FontSizeI			    .tl_set:N = \cover_font_size_i,
-    FontSizeII			  .tl_set:N = \cover_font_size_ii,
+    FontI			    .tl_set:N = \cover_font_i,
+    FontII              .tl_set:N = \cover_font_ii,
+    FontSizeI			.tl_set:N = \cover_font_size_i,
+    FontSizeII			.tl_set:N = \cover_font_size_ii,
     FontSizeIII		    .tl_set:N = \cover_font_size_iii,
-    FontSizeIV			  .tl_set:N = \cover_font_size_iv,	
+    FontSizeIV			.tl_set:N = \cover_font_size_iv,	
 }
 
 \NewDocumentCommand \CoverSetup { m }
@@ -2041,7 +2041,7 @@
 \box_new:N \l_image_box
 \box_new:N \l_text_box
 
-% \image*|[options]{image}[label](caption) -------------------------------------
+% \image*|[options]{image}[extra image](caption) -------------------------------------
 
 \keys_define:nn { image }
 {
@@ -2050,8 +2050,10 @@
     extraskip     .skip_set:N = \l_image_extra_skip,
     float         .bool_set:N = \l_image_float_bool,
     frame         .bool_set:N = \l_image_frame_bool,
+    fitline       .bool_set:N = \l_image_fitline_bool, % fit images to the specified width; not valid when an extra image is given.
+    fitwidth      .tl_set:N = \l_image_fitwidth_tl,
     scale         .tl_set:N = \l_image_scale,
-    flush         .bool_set:N = \l_image_flush_bool,
+    flush         .bool_set:N = \l_image_flush_bool, % flush images into the left margin
     landscape     .bool_set:N = \l_image_landscape_bool,
     align         .tl_set:N = \l_image_align,
     caption       .tl_set:N = \l_image_caption,
@@ -2074,6 +2076,8 @@
     extraskip=1em,
     float=false,
     frame=false,
+    fitline=false,
+    fitwidth=\linewidth,
     scale=1,
     landscape=false,
     legend=false,
@@ -2097,13 +2101,13 @@
     \ImageSetup{#3}
     \IfValueT{#6} { \tl_set:Nn \l_image_caption {#6} }
     \tl_if_empty:NT \l_image_label
-        {
-            \IfValueTF{#5} {
-                \tl_set:Nn \l_image_label {#4~#5}
-            }{
-                \tl_set:Nn \l_image_label {#4}
-            }
+    {
+        \IfValueTF{#5} {
+            \tl_set:Nn \l_image_label {#4~#5}
+        }{
+            \tl_set:Nn \l_image_label {#4}
         }
+    }
     \image_save:nn {#4} {#5}
     \bool_if:NTF \l_image_float_bool {
         \begin{figure}
@@ -2135,9 +2139,20 @@
                     \includegraphics[scale=\l_image_scale]{#1}
                 }
             }
+            \bool_if:NT \l_image_fitline_bool
+            {
+                \dim_set_towidth:Nn \l_tmpa_dim { \box_use:N \l_image_box }                
+                \dim_compare:nT { \l_tmpa_dim > \l_image_fitwidth_tl }
+                {
+                    \hbox_set:Nn \l_image_box{
+                        \objectframe{
+                            \includegraphics[width=\l_image_fitwidth_tl]{#1}
+                        }
+                    }
+                }
+            }
         }
-     }
-     {
+     }{
          \bool_if:NTF \l_image_extra_bool {
             \hbox_set:Nn \l_image_box{
                     \includegraphics[scale=\l_image_scale]{#1}
@@ -2148,9 +2163,54 @@
             \hbox_set:Nn \l_image_box{
                     \includegraphics[scale=\l_image_scale]{#1}
             }
+            \bool_if:NT \l_image_fitline_bool
+            {
+                \dim_set_towidth:Nn \l_tmpa_dim { \box_use:N \l_image_box }
+                \dim_compare:nT { \l_tmpa_dim > \l_image_fitwidth_tl }
+                {
+                    \hbox_set:Nn \l_image_box{
+                        \includegraphics[width=\l_image_fitwidth_tl]{#1}
+                    }
+                }
+            }
         }
      }
 }
+
+% \cs_new:Npn \image_save:nn #1 #2
+% {
+%     \bool_if:NTF \l_image_frame_bool
+%     {
+%         \bool_if:NTF \l_image_extra_bool {
+%             \hbox_set:Nn \l_image_box{
+%                 \objectframe{
+%                     \includegraphics[scale=\l_image_scale]{#1}
+%                     \hspace{\l_image_extra_skip}
+%                     \includegraphics[scale=\l_image_scale]{#2}
+%                 }
+%             }
+%         }{
+%             \hbox_set:Nn \l_image_box{
+%                 \objectframe{
+%                     \includegraphics[scale=\l_image_scale]{#1}
+%                 }
+%             }
+%         }
+%      }
+%      {
+%          \bool_if:NTF \l_image_extra_bool {
+%             \hbox_set:Nn \l_image_box{
+%                     \includegraphics[scale=\l_image_scale]{#1}
+%                     \hspace{\l_image_extra_skip}
+%                     \includegraphics[scale=\l_image_scale]{#2}
+%             }
+%         }{
+%             \hbox_set:Nn \l_image_box{
+%                     \includegraphics[scale=\l_image_scale]{#1}
+%             }
+%         }
+%      }
+% }
 
 \cs_new:Nn \image_put:
 {
@@ -2164,8 +2224,7 @@
     \bool_if:NTF \l_image_flush_bool
     {
         \hspace*{-\vartwosecindent}
-    }
-    {
+    }{
         \dim_compare:nTF { \g_protrude_dim > 0pt }
         {
             \dim_set_towidth:Nn \l_tmpa_dim { \box_use:N \l_image_box }
