@@ -1,0 +1,596 @@
+\ProvidesPackage{karisphinx}[2017/08/31]
+
+\RequirePackage[none]{hyphenat}
+\RequirePackage{amsmath}
+\RequirePackage{amstext}
+\RequirePackage{amssymb}
+\RequirePackage{fancyvrb}
+\RequirePackage{bookmark}
+\RequirePackage[absolute]{textpos}
+%\RequirePackage{sphinx}
+\RequirePackage{tabulary}
+\RequirePackage{sphinxhighlight}
+\RequirePackage{sphinxmulticell}
+\RequirePackage{footnotehyper-sphinx}
+%\RequirePackage{hypcap}
+
+% symbol letters --------------------------------------------------------------
+\def\PYGZbs{\allowbreak\char`\\\allowbreak}
+\def\PYGZus{\allowbreak\char`\_\allowbreak}
+\def\PYGZob{\allowbreak\char`\{\allowbreak}
+\def\PYGZcb{\allowbreak\char`\}\allowbreak}
+\def\PYGZca{\allowbreak\char`\^\allowbreak}
+\def\PYGZam{\allowbreak\char`\&\allowbreak}
+\def\PYGZlt{\allowbreak\char`\<\allowbreak}
+\def\PYGZgt{\allowbreak\char`\>\allowbreak}
+\def\PYGZsh{\allowbreak\char`\#\allowbreak}
+\def\PYGZpc{\allowbreak\char`\%\allowbreak}
+\def\PYGZdl{\allowbreak\char`\$\allowbreak}
+\def\PYGZhy{\allowbreak\char`\-\allowbreak}
+\def\PYGZsq{\allowbreak\char`\'\allowbreak}
+\def\PYGZdq{\allowbreak\char`\"\allowbreak}
+\def\PYGZti{\allowbreak\char`\~\allowbreak}
+\def\PYGZat{\allowbreak@\allowbreak}
+\def\PYGZlb{\allowbreak[\allowbreak}
+\def\PYGZrb{\allowbreak]\allowbreak}
+\def\PYGZsq{\allowbreak\textquotesingle\allowbreak}
+
+% punctuation ----------------------------------------------------------------
+%\protected\def\sphinxquotedblleft{“} %``
+%\protected\def\sphinxquotedblright{”} %''
+
+% font ------------------------------------------------------------------------
+\setmainfont{TeX Gyre Pagella}[Mapping=tex-text-sq]
+\setsansfont{TeX Gyre Heros}[Mapping=tex-text-sq]
+\setmonofont{zco} %Nimbus 15
+\@ifpackageloaded{xetexko}{
+    \xetexkofontregime{latin}[cjksymbols=hangul]
+}
+
+
+% front matter ---------------------------------------------------------------
+\ExplSyntaxOn
+\cs_set_eq:NN \OrgMaketitle \maketitle
+\RenewDocumentCommand \maketitle {}{    
+    \IfFileExists{colophon.tex}{
+        \input{colophon.tex}
+    }{
+        \begin{IfVartwoEnlarge}
+            \thispagestyle{empty}    
+            \OrgMaketitle      
+        \end{IfVartwoEnlarge}
+        \cleartorecto
+    }  
+}
+
+\DeclareDocumentCommand \sphinxtableofcontents {}
+{
+    \newpage
+    \tableofcontents
+}
+
+\def\date#1{}
+\gdef\@date{\today}
+
+% cover ---------------------------------------------------------------
+\CoverSetup{
+    %AfterFront=\cleartorecto,
+    BeforeBack=\cleartoverso,
+}
+
+\NewDocumentCommand \SwitchToReportStyle {}
+{
+    \cs_set_eq:NN \FrontCover \ReportCover
+    \cs_set_eq:NN \CoverSetup \ReportCoverSetup    
+    \DeclareDocumentCommand \sphinxtableofcontents {}
+    {
+        \newpage
+        \tableofcontents
+        \listoffigures
+        \listoftables    
+    }
+    \HeadingSetup{
+        %cftstyle=section,
+        paragraphstyle=indent
+    }
+}
+
+\keys_define:nn { ReportCover }
+{
+    code                .tl_set:N = \cover_code,
+    version             .tl_set:N = \cover_version,
+    title               .tl_set:N = \cover_title,
+    institute           .tl_set:N = \cover_manufacturer,
+    StatementTitle      .tl_set:N = \cover_statement_title,
+    StatementContent    .tl_set:N = \cover_statement_content,
+    WarningTitle        .tl_set:N = \cover_warning_title,
+    WarningContent      .tl_set:N = \cover_warning_content,
+    proprietary         .tl_set:N = \cover_proprietary,
+    ProprietaryDetail   .tl_set:N = \cover_proprietary_detail,    
+    PreparerName        .tl_set:N = \cover_preparer_name,
+    PreparerTitle       .tl_set:N = \cover_preparer_title,
+    PreparerDepartment  .tl_set:N = \cover_preparer_department,
+    ReviewerName        .tl_set:N = \cover_reviewer_name,
+    ReviewerTitle       .tl_set:N = \cover_reviewer_title,
+    ReviewerDepartment  .tl_set:N = \cover_reviewer_department,
+    ApproverName        .tl_set:N = \cover_approver_name,
+    ApproverTitle       .tl_set:N = \cover_approver_title,
+    ApproverDepartment  .tl_set:N = \cover_approver_department,
+    PubYear				.tl_set:N = \cover_pub_year,
+    BackLogoImage       .tl_set:N = \cover_image_logo_back
+}
+
+\NewDocumentCommand \ReportCoverSetup { m }
+{
+    \keys_set:nn { ReportCover } { #1 }
+    \PagestyleSetup{
+     headouter=\cover_code,
+     headinner=\cover_version,
+     footinner=\cover_proprietary_detail,
+     chapterpage=true
+    }
+}
+
+\NewDocumentCommand \ReportCover {}
+{
+    \begin{IfVartwoEnlarge}
+    \thispagestyle{empty}
+    \begin{textblock*}{.25\textwidth}(.75\paperwidth, .05\paperheight)
+        \raggedleft
+        \cover_version
+    \end{textblock*}
+    \nil\vspace{.2\textheight}
+    \begin{center}
+        \Huge\bfseries 
+        \cover_title
+    \end{center}
+    \par\vspace{.2\textheight}
+    \begin{center}
+        \LARGE\bfseries
+        \cover_manufacturer
+    \end{center}
+    \par\bigskip\setlength\fboxsep{2ex}
+    \fbox{\begin{minipage}{\linewidth}\raggedright
+        \textbf{\cover_statement_title} \\
+        \cover_statement_content
+    \end{minipage}}
+    \par\medskip
+    \fbox{\begin{minipage}{\linewidth}\raggedright
+        \textbf{\cover_warning_title} \\
+        \cover_warning_content
+    \end{minipage}}
+    \par\vfill
+    \begin{center}
+        \Huge\bfseries
+        \cover_proprietary
+    \end{center}
+    \begin{textblock*}{\paperwidth}(0mm, .9\paperheight)
+        \begin{center}
+        \cover_proprietary_detail
+        \end{center}
+    \end{textblock*}
+    \end{IfVartwoEnlarge}
+    \newpage
+    \begin{IfVartwoEnlarge}
+    \nil\vspace{.2\textheight}
+    \begin{center}
+        \Huge\bfseries 
+        \cover_title
+    \end{center}
+    \par\vspace{.2\textheight}
+    \begin{minipage}{.4\linewidth}\bfseries
+        Prepared by: \par\vspace{7mm}
+        \rule{\linewidth}{1pt} \\
+        \cover_preparer_name \par
+        \cover_preparer_title \\
+        \cover_preparer_department
+    \end{minipage}
+    \hfill
+    \begin{minipage}{.4\linewidth}\bfseries
+        Reviewed by: \par\vspace{7mm}
+        \rule{\linewidth}{1pt} \\
+        \cover_reviewer_name \par
+        \cover_reviewer_title \\
+        \cover_reviewer_department
+    \end{minipage}
+    \par\vspace{1cm}
+    \begin{minipage}{.4\linewidth}
+    \end{minipage}\hfill
+    \begin{minipage}{.4\linewidth}\bfseries
+        Approved by: \par\vspace{7mm}
+        \rule{\linewidth}{1pt} \\
+        \cover_approver_name \par
+        \cover_approver_title \\
+        \cover_approver_department
+    \end{minipage}
+    \end{IfVartwoEnlarge}
+}
+\ExplSyntaxOff
+
+% heading ---------------------------------------------------------------------
+\setsecnumdepth{subsubsection}
+\settocdepth{subsubsection}
+\renewcommand\paragraph[1]{\subsubsection*{#1}}
+
+\ExplSyntaxOn
+\DeclareDocumentCommand\sphinxstyletopictitle { m }
+{
+    \textbf{#1}\par\medskip
+}
+\cs_set_eq:NN \sphinxstylesidebartitle \sphinxstyletopictitle
+\DeclareDocumentCommand\sphinxstyleothertitle { m }
+{
+    \textbf{#1}
+}
+\DeclareDocumentCommand\sphinxstylesidebarsubtitle { m }
+{
+    \newline\textbf{#1}\smallskip
+}
+\ExplSyntaxOff
+
+% color ----------------------------------------------------------------------
+\definecolor{nbsphinxout}{named}{blue}
+\definecolor{nbsphinxin}{named}{red}
+
+% inline ---------------------------------------------------------------------
+\ExplSyntaxOn
+%basic
+% \RenewDocumentCommand \emph { m }
+% {
+%   \textsl{#1}
+% }
+\DeclareDocumentCommand \sphinxstylestrong { m }
+{
+    \textbf{#1}
+}
+\DeclareDocumentCommand \sphinxstrong { m }
+{
+    \textbf{#1}
+}
+\DeclareDocumentCommand \sphinxstyleemphasis { m }
+{
+    \emph{#1}
+}
+\DeclareDocumentCommand \sphinxstyleabbreviation { m }
+{
+    \textsc{#1}
+}
+% literal
+\DeclareDocumentCommand \sphinxcode { m }
+{ 
+    \texttt{#1}
+}
+\DeclareDocumentCommand \sphinxbfcode { m }
+{   
+    \textbf{\sphinxcode{#1}}
+}
+\DeclareDocumentCommand \sphinxstyleliteralintitle { m }
+{
+    \sphinxcode{#1}
+}
+\DeclareDocumentCommand \sphinxstyleliteralemphasis { m }
+{
+    \emph{\sphinxcode{#1}}
+}
+\DeclareDocumentCommand \sphinxstyleliteralstrong { m }
+{
+    \sphinxbfcode{#1}
+}
+\DeclareDocumentCommand \sphinxstyleliteralintitle { m }
+{
+    \sphinxcode{#1}
+}
+% cross-referencep
+\DecolorHyperlinks
+\DeclareDocumentCommand \sphinxtitleref { m }
+{
+    \textcolor{darkgray}{\textbf{#1}}
+}
+\DeclareDocumentCommand \sphinxcrossref { m }
+{
+    \textcolor{darkgray}{\textbf{#1}}
+}
+\DeclareDocumentCommand \sphinxhref { m m }
+{
+    \href{#1}{#2}
+}
+\DeclareDocumentCommand \sphinxurl { m }
+{
+    \url{#1}
+}
+\ExplSyntaxOff
+
+% list ------------------------------------------------------------------------
+\TermsSetup{
+    newline=true, marker={{},{}}, font=\bfseries, index=false,
+    star={newline=false, font=\bfseries, delimiter=\hfill, itemsep=-1ex}
+}
+%\SetListStyle{enumerate=\raggedright, itemize=\raggedright}
+
+\ExplSyntaxOn
+\NewDocumentEnvironment { optionlist } { g }
+{
+    \begin{terms}*
+}{
+    \end{terms}
+}
+
+\RenewDocumentEnvironment { description } { s }
+{
+    \IfBooleanTF {#1} { 
+    \begin{terms}* 
+    }{ 
+    \begin{terms} 
+    }
+}{
+    \end{terms}
+}
+\ExplSyntaxOff
+
+% image ----------------------------------------------------------------------
+\ExplSyntaxOn
+\keys_define:nn { imagescale }
+{
+    bitmap  .tl_set:N = \g_image_scale_bitmap,
+    vector  .tl_set:N = \g_image_scale_vector
+}
+\NewDocumentCommand \SetImageScale { m }
+{
+    \keys_set:nn { imagescale }{ #1 }
+}
+\SetImageScale{
+    bitmap = 0.9,
+    vector = 0.75
+}
+
+\cs_set_eq:NN \orgfigure \figure
+\cs_set_eq:NN \orgendfigure \endfigure
+
+\NewDocumentCommand \DisableFigureFloat {}
+{
+    \DeclareDocumentEnvironment { figure } { o }
+    {  
+        \def\@captype{figure}
+    }{}
+
+    \DeclareDocumentCommand \sphinxincludegraphics { o m }
+    {
+        \group_begin:
+        \tl_set:Nn \l_tmpa_tl {##2}
+        \tl_replace_once:Nnn \l_tmpa_tl {.svg}{.pdf}
+        \tl_if_in:NnTF \l_tmpa_tl {.pdf}
+        {
+            \par\image[scale=\g_image_scale_vector]{\l_tmpa_tl}
+        }{
+            \par\image[scale=\g_image_scale_bitmap]{\l_tmpa_tl}  
+        }
+        \group_end:
+    }
+}
+
+\NewDocumentCommand \EnableFigureFloat {}
+{
+    \cs_set_eq:NN \figure \orgfigure
+    \cs_set_eq:NN \endfigure \orgendfigure
+
+    \DeclareDocumentCommand \sphinxincludegraphics { o m }
+    {
+        \group_begin:  
+        \tl_set:Nn \l_tmpa_tl {##2}
+        \tl_replace_once:Nnn \l_tmpa_tl {.svg}{.pdf}
+        \tl_if_in:NnTF \l_tmpa_tl {.pdf}
+        {
+            \hbox_set:Nn \l_image_box{
+                \includegraphics[scale=\g_image_scale_vector]{\l_tmpa_tl}
+            }
+        }{
+            \hbox_set:Nn \l_image_box{
+                \includegraphics[scale=\g_image_scale_bitmap]{\l_tmpa_tl}
+            }
+        }
+        \dim_set_towidth:Nn \l_tmpa_dim { \box_use:N \l_image_box }
+        \dim_compare:nTF { \l_tmpa_dim > \linewidth }
+        {
+            \includegraphics[width=\linewidth]{\l_tmpa_tl}
+        }{
+            \object_locate:N \l_tmpa_dim
+            \box_use:N \l_image_box
+        }
+        \group_end:
+    }
+}
+
+\DisableFigureFloat 
+
+\AtBeginDocument{
+    \ImageSetup{
+        beforeskip=.25\baselineskip,
+        afterskip=.5\baselineskip,
+        align=\centering,
+        fitline=true
+    }
+    \CaptionSetup{
+        beforeskip=0.5ex,
+        afterskip=0.5ex,
+        align=\centering
+    }
+    \renewenvironment{savenotes}{
+        \object_skip_before:n {\l_table_before_skip}
+		\begin{minipage}{\linewidth}
+		\FNH@savenotes\ignorespaces
+	}{
+		\FNH@spewnotes\ignorespacesafterend
+        \object_skip_after:n {\l_table_after_skip}
+		\end{minipage}
+	}
+}
+\ExplSyntaxOff
+
+% table ---------------------------------------------------------------------
+\let\capstart\relax
+\ExplSyntaxOn
+\DeclareDocumentCommand \sphinxcapstartof { m }
+{
+    \def\@captype{#1}
+}
+\DeclareDocumentCommand \sphinxcaption { o m }
+{
+    \caption{#2}
+}
+\DeclareDocumentCommand \sphinxstylethead { m }
+{
+    \textbf{#1}
+}
+\let\sphinxaftercaption\relax
+%\protected\def\sphinxstyletheadfamily{}
+\DeclareExpandableDocumentCommand \sphinxstyletheadfamily{}{}
+\DeclareDocumentCommand\tablecontinued { m }
+{ 
+    \textsf{#1}
+}
+
+\ExplSyntaxOff
+\newcommand*\sphinxtablepre{0pt}
+\newcommand*\sphinxtablepost{\medskipamount}
+\def\sphinxatlongtablestart
+     {\par
+    \vskip\parskip
+    \vskip\dimexpr\sphinxtablepre\relax 
+    \vbox{}
+    \LTpre\z@skip\LTpost\z@skip 
+    \edef\sphinxbaselineskip{\dimexpr\the\dimexpr\baselineskip\relax\relax}%
+     }
+\def\sphinxatlongtableend{\prevdepth\z@\vskip\sphinxtablepost\relax}
+\def\sphinxattablestart{\par\vskip\dimexpr\sphinxtablepre\relax\small}
+\let\sphinxattableend\sphinxatlongtableend
+\newcolumntype{\X}[2]{p{\dimexpr(\linewidth-\arrayrulewidth)*#1/#2-\tw@\tabcolsep-\arrayrulewidth\relax}}
+\newcolumntype{\Y}[1]{p{\dimexpr#1\dimexpr\linewidth-\arrayrulewidth\relax-\tw@\tabcolsep-\arrayrulewidth\relax}}
+\newcolumntype{T}{L}
+
+% admonition ------------------------------------------------------------------
+\ExplSyntaxOn
+\DeclareDocumentEnvironment {sphinxadmonition} { m m }
+{
+    \begin{admonition}{#2}
+}{
+    \end{admonition}
+}
+% 'notice' might be deprecated by nbsphinx
+\DeclareDocumentEnvironment {notice} { m m }
+{
+    \begin{admonition}{#1}
+}{
+    \end{admonition}
+}
+
+\renewtcolorbox{BreakableShadeBox}[1][]{
+    before~skip=0pt, after~skip=0pt,
+    boxrule=0.75pt, colframe=white, colback=backgray, arc=0.5ex,
+    boxsep=1ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
+    titlerule=0.75pt, toptitle=0.5ex, bottomtitle=0.5ex,
+    colbacktitle=lightgray, coltitle=black,
+    fonttitle=\bfseries, breakable=true, title=#1
+}
+\ReferenceSetup{
+    beforeskip=.4\baselineskip,
+    afterskip=.6\baselineskip,
+    type=BreakableShade, 
+    style=\raggedright,
+    font=\ttfamily\footnotesize
+}
+\AdmonitionSetup{
+    type=BreakableShade,
+    style=\raggedright
+}
+
+\ExplSyntaxOff
+
+% literal ---------------------------------------------------------------------
+{\catcode`\ =\active\gdef\vobeyspaces{\catcode`\ =\active\let =\@xobeysp}}
+\def\@xobeysp{\penalty\z@\mbox{}\space\penalty\z@}
+{\catcode`\^^M=\active\gdef\vobeylines{\catcode`\^^M=\active\let^^M=\x@vobeylines}}
+\def\x@vobeylines{\par\leavevmode\relax}
+
+\ExplSyntaxOn
+\NewDocumentEnvironment {sphinxVerbatim} { o }
+{  
+    \begin{reference}
+    \setSpacing{1}
+    \vobeyspaces\vobeylines
+}{
+    \vspace{-\baselineskip}
+    \end{reference}
+}
+
+\cs_set_eq:NN \OriginalVerbatim    \sphinxVerbatim
+\cs_set_eq:NN \endOriginalVerbatim \endsphinxVerbatim
+\cs_set_eq:NN \Verbatim    \sphinxVerbatim
+\cs_set_eq:NN \endVerbatim \endsphinxVerbatim
+
+\NewDocumentCommand\DUrole{mm}{#2}
+\NewDocumentEnvironment {DUlineblock} { m }
+{
+    \group_begin:
+    \list{}{
+    \setlength{\partopsep}{\parskip}
+    \addtolength{\partopsep}{\baselineskip}
+    \setlength{\topsep}{0pt}
+    \setlength{\itemsep}{0.1\baselineskip}
+    \setlength{\parsep}{0pt}
+    \setlength{\leftmargin}{#1}
+    \addtolength{\leftmargin}{1em}
+    }
+    \raggedright
+}{
+    \endlist
+    \group_end:
+}
+
+\newenvironment{fulllineitems}{}{}
+\NewDocumentCommand \pysiglinewithargsret { m m m }
+{
+    \begin{flushleft}
+    \hangfrom{\textcolor{Navy}{\large #1}}
+    \textcolor{Mahogany}{\ttfamily (#2)}
+    #3
+    \end{flushleft}
+    \par
+}
+
+\NewDocumentCommand \pysigline { m }
+{
+    \textcolor{Mahogany}{\large#1}
+    \par  
+}
+\ExplSyntaxOff
+
+\newcommand{\pysigstartmultiline}{%
+ \def\pysigstartmultiline{\vskip\smallskipamount\parskip\z@skip\itemsep\z@skip}%
+ \edef\pysigstopmultiline
+     {\noexpand\leavevmode\parskip\the\parskip\relax\itemsep\the\itemsep\relax}%
+ \parskip\z@skip\itemsep\z@skip
+}
+
+% bibliography & index -------------------------------------------------------
+\BookmarkIndexHead
+\makeindex
+%\onecolindex
+\ExplSyntaxOn
+\cs_set_eq:NN \sphinxthebibliography \thebibliography
+\cs_set_eq:NN \endsphinxthebibliography \endthebibliography
+\cs_set_eq:NN \sphinxtheindex \theindex
+\cs_set_eq:NN \endsphinxtheindex \endtheindex
+% module index by autodoc 
+\DeclareDocumentCommand\sphinxstyleindexentry { m }
+{
+    \texttt{#1}
+}
+\DeclareDocumentCommand\sphinxstyleindexextra { m }
+{
+    \emph{#1}
+}
+\DeclareDocumentCommand\sphinxstyleindexpageref { m }
+{
+    ,~\pageref{#1}
+}
+\ExplSyntaxOff

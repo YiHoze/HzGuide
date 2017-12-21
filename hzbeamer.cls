@@ -461,9 +461,12 @@
 	\alt<\l_tmpa_tl->{#3}{\textcolor{lightgray}{#3}}
 }
 
+\NewDocumentCommand \setverbatimfont { m }
+{
+	\def\verbatim@font{#1}	
+}
 \ExplSyntaxOff
-
-\def\verbatim@font{\ttfamily\footnotesize}
+\setverbatimfont{\ttfamily\footnotesize}
 
 \AtBeginDocument{
 	\justified

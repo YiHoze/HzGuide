@@ -17,7 +17,7 @@
 % IV. For those of designer interface level:
 %     Follow clause II. However, it is allowed to use lowercase with compound words.
 
-\ProvidesClass{hzguide}[2018/11/24]
+\ProvidesClass{hzguide}[2018/11/28]
 
 \LoadClassWithOptions{memoir}
 
@@ -1272,41 +1272,160 @@
 }
 
 % pagestyle -------------------------------------------------------------------
+\tl_new:N \hffont
+\tl_set:Nn \hffont {\rmfamily\small}
 
-% one column
-\copypagestyle{common}{ruled}
-\makepsmarks{common}{\foliomarks}
-\makeheadrule{common}{\textwidth}{\normalrulethickness}
-\makeevenhead{common}{\hffont\leftmark}{}{\hffont\evenheadinner}
-\makeoddhead{common}{\hffont\oddheadinner}{}{\hffont\rightmark}
-\makeevenfoot{common}{\hfhook\hffont\thepage}{}{}
-\makeoddfoot{common}{}{}{\hffont\thepage\hfhook}
-
-% vartwo column
-\copypagestyle{vartwo}{companion}
-\makerunningwidth{vartwo}{\headwidth}
-\makeheadrule{vartwo}{\headwidth}{\normalrulethickness}
-%\makefootrule{vartwo}{\headwidth}{\normalrulethickness}{1ex}
-\makepsmarks{vartwo}{\foliomarks}
-\makeheadposition{vartwo}{flushright}{flushright}{flushright}{flushright}
-\makeevenhead{vartwo}{\hffont\leftmark}{}{\hffont\evenheadinner}
-\makeoddhead{vartwo}{\hffont\oddheadinner}{}{\hffont\rightmark}
-\makeevenfoot{vartwo}{\hfhook\hffont\thepage}{}{}
-\makeoddfoot{vartwo}{}{}{\hffont\thepage\hfhook}
-
-\cs_new:Nn \folio_common:
+\keys_define:nn { pagestyle }
 {
-    \setlength{\headwidth}{\textwidth}
-    \pagestyle{common}
-    \copypagestyle{chapter}{common}
-    \makeheadrule{chapter}{0pt}{0pt}
-    \makeevenhead{chapter}{}{}{}
-    \makeoddhead{chapter}{}{}{}
-    \copypagestyle{nohead}{chapter}
+    font            .tl_gset:N =     \hffont,
+    headleft        .code:n =       { \pagestyle_headleft:n  {#1} },
+    headcenter      .code:n =       { \pagestyle_headcenter:n  {#1} },
+    headright       .code:n =       { \pagestyle_headright:n  {#1} },
+    headinner       .code:n =       { \pagestyle_headinner:n {#1} },
+    headouter       .code:n =       { \pagestyle_headouter:n {#1} },    
+    footleft        .code:n =       { \pagestyle_footleft:n  {#1} },
+    footcenter      .code:n =       { \pagestyle_footcenter:n  {#1} },
+    footright       .code:n =       { \pagestyle_footright:n  {#1} },
+    footinner       .code:n =       { \pagestyle_footinner:n {#1} },
+    footouter       .code:n =       { \pagestyle_footouter:n {#1} },
+    evenheadleft    .tl_gset:N =     \g_ps_evenheadleft_tl,
+    evenheadcenter  .tl_gset:N =     \g_ps_evenheadcenter_tl,
+    evenheadright   .tl_gset:N =     \g_ps_evenheadright_tl,
+    oddheadleft     .tl_gset:N =     \g_ps_oddheadleft_tl,
+    oddheadcenter   .tl_gset:N =     \g_ps_oddheadcenter_tl,
+    oddheadright    .tl_gset:N =     \g_ps_oddheadright_tl,
+    evenfootleft    .tl_gset:N =     \g_ps_evenfootleft_tl,
+    evenfootcenter  .tl_gset:N =     \g_ps_evenfootcenter_tl,
+    evenfootright   .tl_gset:N =     \g_ps_evenfootright_tl,
+    oddfootleft     .tl_gset:N =     \g_ps_oddfootleft_tl,
+    oddfootcenter   .tl_gset:N =     \g_ps_oddfootcenter_tl,
+    oddfootright    .tl_gset:N =     \g_ps_oddfootright_tl,
+    headrule        .bool_gset:N =   \g_ps_headrule_bool,
+    footrule        .bool_gset:N =   \g_ps_footrule_bool,    
+    chaptermark     .bool_gset:N =   \g_ps_chaptermark_bool,
+    sectionmark     .bool_gset:N =   \g_ps_sectionmark_bool,
+    chapterpage     .bool_gset:N =   \g_ps_chapterpage_bool
 }
 
+\cs_new:Npn \pagestyle_headleft:n #1
+{
+    \tl_gset:Nn \g_ps_evenheadleft_tl {#1}
+    \tl_gset:Nn \g_ps_oddheadleft_tl {#1}
+}
+\cs_new:Npn \pagestyle_headcenter:n #1
+{
+    \tl_gset:Nn \g_ps_evenheadcenter_tl {#1}
+    \tl_gset:Nn \g_ps_oddheadcenter_tl {#1}
+}
+\cs_new:Npn \pagestyle_headright:n #1
+{
+    \tl_gset:Nn \g_ps_evenheadright_tl {#1}
+    \tl_gset:Nn \g_ps_oddheadright_tl {#1}
+}
+\cs_new:Npn \pagestyle_headinner:n #1
+{
+    \tl_gset:Nn \g_ps_evenheadright_tl {#1}
+    \tl_gset:Nn \g_ps_oddheadleft_tl {#1}
+}
+\cs_new:Npn \pagestyle_headouter:n #1
+{
+    \tl_gset:Nn \g_ps_evenheadleft_tl {#1}
+    \tl_gset:Nn \g_ps_oddheadright_tl {#1}
+}
+\cs_new:Npn \pagestyle_footleft:n #1
+{
+    \tl_gset:Nn \g_ps_evenfootleft_tl {#1}
+    \tl_gset:Nn \g_ps_oddfootleft_tl {#1}
+}
+\cs_new:Npn \pagestyle_footcenter:n #1
+{
+    \tl_gset:Nn \g_ps_evenfootcenter_tl {#1}
+    \tl_gset:Nn \g_ps_oddfootcenter_tl {#1}
+}
+\cs_new:Npn \pagestyle_footright:n #1
+{
+    \tl_gset:Nn \g_ps_evenfootright_tl {#1}
+    \tl_gset:Nn \g_ps_oddfootright_tl {#1}
+}
+\cs_new:Npn \pagestyle_footinner:n #1
+{
+    \tl_gset:Nn \g_ps_evenfootright_tl {#1}
+    \tl_gset:Nn \g_ps_oddfootleft_tl {#1}
+}
+\cs_new:Npn \pagestyle_footouter:n #1
+{
+    \tl_gset:Nn \g_ps_evenfootleft_tl {#1}
+    \tl_gset:Nn \g_ps_oddfootright_tl {#1}
+}
+
+\NewDocumentCommand \PagestyleSetup { m }
+{
+  \keys_set:nn { pagestyle } { #1 }  
+  \PagestyleSettle{\g_layout_type}
+}
+
+\NewDocumentCommand \PagestyleSettle { m }
+{
+    %\makerunningwidth{#1}{\headwidth}    
+    \bool_if:NTF \g_ps_headrule_bool
+    {
+        \makeheadrule{#1}{\headwidth}{\normalrulethickness}   
+    }{
+        \makeheadrule{#1}{0pt}{0pt}
+    }
+    \bool_if:NTF \g_ps_footrule_bool
+    {
+        \makefootrule{#1}{\headwidth}{\normalrulethickness}{1ex}
+    }{
+        \makefootrule{#1}{0pt}{0pt}{0pt}
+    }
+    \makeevenhead{#1}{\hffont\g_ps_evenheadleft_tl}{\hffont\g_ps_evenheadcenter_tl}{\hffont\g_ps_evenheadright_tl}
+    \makeoddhead{#1}{\hffont\g_ps_oddheadleft_tl}{\hffont\g_ps_oddheadcenter_tl}{\hffont\g_ps_oddheadright_tl}
+    \makeevenfoot{#1}{\hffont\g_ps_evenfootleft_tl}{\hffont\g_ps_evenfootcenter_tl}{\hffont\g_ps_evenfootright_tl}
+    \makeoddfoot{#1}{\hffont\g_ps_oddfootleft_tl}{\hffont\g_ps_oddfootcenter_tl}{\hffont\g_ps_oddfootright_tl}
+    \pagestyle{#1}
+    \copypagestyle{chapter}{#1}
+    \bool_if:NF \g_ps_chapterpage_bool
+    {
+        \makeheadrule{chapter}{0pt}{0pt}
+        \makeevenhead{chapter}{}{}{}
+        \makeoddhead{chapter}{}{}{}
+        \copypagestyle{noheader}{chapter}
+    }
+    \bool_if:NTF \g_ps_chaptermark_bool
+    {
+        \renewcommand\chaptermark[1]{\markboth{##1}{##1}}
+    }{
+        \renewcommand\chaptermark[1]{}
+    }
+    \bool_if:NTF \g_ps_sectionmark_bool
+    {
+        \renewcommand\sectionmark[1]{\markright{#1}}
+    }{
+        \renewcommand\sectionmark[1]{}
+    }
+}
+
+% one column
+\cs_new:Nn \folio_common:
+{
+    \copypagestyle{common}{ruled}
+    \setlength{\headwidth}{\textwidth}
+    \PagestyleSetup{
+        headrule=true,
+        evenheadleft=\leftmark,
+        oddheadright=\rightmark,
+        evenfootleft=\thepage,
+        oddfootright=\thepage,
+        chaptermark=true,
+        sectionmark=false,
+    }
+}
+
+% vartwo column
 \cs_new:Nn \folio_vartwo:
 {
+    \copypagestyle{vartwo}{companion}        
     \setlength\vartwosecindent{\marginparwidth}
     \addtolength\vartwosecindent{\marginparsep}
     \if@twocolumn
@@ -1314,48 +1433,36 @@
     \else
         \setlength{\headwidth}{\textwidth}
     \fi
-    \addtolength{\headwidth}{\vartwosecindent}
-    \copypagestyle{chapter}{vartwo}
-    \copypagestyle{nohead}{chapter}
-    \makeheadrule{chapter}{0pt}{0pt}
-    \makeevenhead{chapter}{}{}{}
-    \makeoddhead{chapter}{}{}{}
-    \pagestyle{vartwo}
+    \addtolength{\headwidth}{\vartwosecindent}    
+    \makeheadposition{vartwo}{flushright}{flushright}{flushright}{flushright}
+    \PagestyleSetup{
+        headrule=true,
+        evenheadleft=\leftmark,
+        oddheadright=\rightmark,
+        evenfootleft=\thepage,
+        oddfootright=\thepage,
+        chaptermark=true,
+        sectionmark=false,
+    }
 }
-
-\newcommand\foliomarks{
-        \renewcommand\chaptermark[1]{\markboth{##1}{##1}}
-        \renewcommand\sectionmark[1]{} %\markright{#1}
-}
-%\patchcommand{\@memfront}{}{\foliomarks}
-%\patchcommand{\@memmain}{}{\foliomarks}
 
 % setup -----------------------------------------------------------------------
-
-\tl_new:N \hffont
-\tl_set:Nn \hffont {\rmfamily\small}
 
 \keys_define:nn {hzlayout}
 {
     paper           .code:n = { \layout_paper_configure:n {#1} },
-    stockwidth      .dim_set:N = \stockwidth,
-    stockheight     .dim_set:N = \stockheight,
-    paperwidth      .dim_set:N = \paperwidth,
-    paperheight     .dim_set:N = \paperheight,
-    landscape       .bool_set:N = \g_layout_landscape_bool,
+    stockwidth      .dim_gset:N = \stockwidth,
+    stockheight     .dim_gset:N = \stockheight,
+    paperwidth      .dim_gset:N = \paperwidth,
+    paperheight     .dim_gset:N = \paperheight,
+    landscape       .bool_gset:N = \g_layout_landscape_bool,
     column          .code:n = { \layout_column_configure:n {#1} },
-    ulmargin        .dim_set:N = \ulmargin,
-    ulratio         .tl_set:N = \ulratio, % specify after column
-    lrmargin        .dim_set:N = \lrmargin,
-    vartwomargin    .dim_set:N = \vartwomargin,
-    font            .tl_set:N = \hffont,
-    hook            .tl_set:N = \hfhook,
-    evenheadinner   .tl_set:N = \evenheadinner,
-    oddheadinner    .tl_set:N = \oddheadinner,
-    evenfootinnder  .tl_set:N = \evenfootinneer,
-    oddfootinner    .tl_set:N = \oddfootinner,
-    showtrim        .bool_set:N = \g_layout_showtrim_bool,
-    hook            .tl_set:N = \g_layout_hook
+    ulmargin        .dim_gset:N = \ulmargin,
+    ulratio         .tl_gset:N = \ulratio, % specify after column
+    lrmargin        .dim_gset:N = \lrmargin,
+    vartwomargin    .dim_gset:N = \vartwomargin,
+    showtrim        .bool_gset:N = \g_layout_showtrim_bool,
+    hook            .tl_gset:N = \g_layout_hook
 }
 
 \bool_set_false:N \g_layout_showtrim_bool
@@ -1545,8 +1652,6 @@
         { \copypagestyle{report}{vartwo} }
         [ \copypagestyle{report}{plain} ]
     \makeheadrule{report}{0pt}{0pt}
-    %\makeheadrule{report}{\textwidth}{\normalrulethickness}
-    %\makefootrule{report}{\textwidth}{\normalrulethickness}{1ex}
     \makeoddhead{report}{}{}{}
     \makeoddfoot{report}{}{\hffont\thepage}{}
     \makeevenhead{report}{}{}{}
@@ -1943,8 +2048,8 @@
 }
 
 \ObjectSetup{
-    beforeskip=.5\baselineskip,
-    afterskip=.5\baselineskip,
+    beforeskip=.4\baselineskip,
+    afterskip=.6\baselineskip,
     framecolor=gray
 }
 
@@ -3877,10 +3982,11 @@
 \keys_define:nn {instance}
 {
     beforeskip  .dim_set:N = \l_instance_before_skip,
-    afterskip  .dim_set:N = \l_instance_after_skip,
-    type       .code:n = { \instance_type:n {#1} },
-    fontcolor  .tl_set:N = \l_instance_fontcolor,
-    style    .tl_set:N = \l_instance_style
+    afterskip   .dim_set:N = \l_instance_after_skip,
+    type        .code:n = { \instance_type:n {#1} },
+    font        .tl_set:N = \l_instance_font,
+    fontcolor   .tl_set:N = \l_instance_fontcolor,
+    style       .tl_set:N = \l_instance_style
 }
 
 \NewDocumentCommand \InstanceSetup { m }
@@ -3920,7 +4026,7 @@
 {
     \object_skip_before:n {\l_instance_before_skip}
     \begin{InstanceBox}
-    \color{\l_instance_fontcolor}
+    \color{\l_instance_fontcolor}\l_instance_font
     \l_instance_style
 }{
     \end{InstanceBox}
@@ -4743,6 +4849,8 @@
 }{}
 
 \endinput
+
+--------------------------------------------------------------------------------
 
 % how to use different fonts for the same font command
 \newhangulfontfamily\gungseo{GungSeo}[SlantedFont=*]
