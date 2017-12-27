@@ -17,7 +17,7 @@
 % IV. For those of designer interface level:
 %     Follow clause II. However, it is allowed to use lowercase with compound words.
 
-\ProvidesClass{hzguide}[2018/11/28]
+\ProvidesClass{hzguide}[2017/12/27]
 
 \LoadClassWithOptions{memoir}
 
@@ -1467,11 +1467,14 @@
 
 \bool_set_false:N \g_layout_showtrim_bool
 
-\NewDocumentCommand \LayoutSetup { m }
+\NewDocumentCommand \LayoutSetup { s m }
 {
-    \keys_set:nn { hzlayout } { #1 }
-    \layout_settle:
+    \keys_set:nn { hzlayout } { #2 }
+    \IfBooleanF{#1}{
+        \layout_settle:
+    }
 }
+\LayoutSetup*{paper=A4, column=one}
 
 \cs_new:Nn \layout_settle:
 {
@@ -1951,7 +1954,7 @@
     \renewcommand{\@makefntext}[1]{\makefootmark#1 ##1}
 }
 
-\AtBeginDocument{
+\AtBeginDocument{    
     \setlength{\verbatimindent}{0pt}
     \renewcommand*{\verbatimbreakchar}{}
 }
