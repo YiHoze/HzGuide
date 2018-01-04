@@ -3039,12 +3039,16 @@
 
 \ior_new:N \l_txt_io
 
-\NewDocumentCommand \MakeAlbum { s O {0.5} m }
-{
-    \ImageSetup{scale=#2}
-    \IfBooleanTF {#1}
-        { \ImageSetup{showfilename=false} }
-        { \ImageSetup{showfilename=true} }
+\NewDocumentCommand \MakeAlbum { s O {0.5} m }{
+    
+    \ImageSetup{scale=#2, fitline=true}
+    \IfBooleanTF{#1}
+    { 
+        \ImageSetup{showfilename=false}        
+    }{ 
+        \ImageSetup{showfilename=true} 
+        \CaptionSetup{align=\raggedright}
+    }
     \ior_open:Nn \l_txt_io { #3 }
     \ior_map_inline:Nn \l_txt_io
     {
