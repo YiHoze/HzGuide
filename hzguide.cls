@@ -17,11 +17,11 @@
 % IV. For those of designer interface level:
 %     Follow clause II. However, it is allowed to use lowercase with compound words.
 
-\ProvidesClass{hzguide}[2017/12/27]
+\ProvidesClass{hzguide}[2019/01/19]
 
 \LoadClassWithOptions{memoir}
 
-\RequirePackage{iftex}
+%\RequirePackage{iftex}
 \RequirePackage{expl3,xparse,l3keys2e}
 \RequirePackage{environ}
 \RequirePackage{fontspec}
@@ -612,13 +612,11 @@
 }
 
 \box_new:N \l_tmpc_box
-
 \cs_new:Npn \dim_set_towidth:Nn #1 #2
 {
     \hbox_set:Nn \l_tmpc_box { #2 }
     \dim_set:Nn #1 { \box_wd:N \l_tmpc_box }
 }
-
 \cs_new:Npn \dim_set_toheight:Nn #1 #2
 {
     \hbox_set:Nn \l_tmpc_box { #2 }
@@ -1384,6 +1382,7 @@
     \makeevenfoot{#1}{\hffont\g_ps_evenfootleft_tl}{\hffont\g_ps_evenfootcenter_tl}{\hffont\g_ps_evenfootright_tl}
     \makeoddfoot{#1}{\hffont\g_ps_oddfootleft_tl}{\hffont\g_ps_oddfootcenter_tl}{\hffont\g_ps_oddfootright_tl}
     \pagestyle{#1}
+    \copypagestyle{adhoc}{#1}
     \copypagestyle{chapter}{#1}
     \bool_if:NF \g_ps_chapterpage_bool
     {
@@ -1400,7 +1399,7 @@
     }
     \bool_if:NTF \g_ps_sectionmark_bool
     {
-        \renewcommand\sectionmark[1]{\markright{#1}}
+        \renewcommand\sectionmark[1]{\markright{##1}}
     }{
         \renewcommand\sectionmark[1]{}
     }
@@ -1627,7 +1626,7 @@
 
 \NewDocumentCommand \sectionline {}
 {
-    \sectionalign \sectionfont \nobreak\color{\sectioncolor}
+    \sectionalign \sectionfont \nobreak \color{\sectioncolor}
 }
 
 \NewDocumentCommand \secstyle {} { \sectionline\secfontsize }
@@ -1670,9 +1669,9 @@
 \cs_new:Nn \style_type_smartphone:
 {
     \makechapterstyle{null}{
-        \renewcommand{\chapnamefont}{\chapterline\LARGE}
-        \renewcommand{\chapnumfont}{\chapterline\LARGE}
-        \renewcommand{\chaptitlefont}{\chapterline\LARGE}
+        \renewcommand{\chapnamefont}{\LARGE\chapterline\chapternamesize}
+        \renewcommand{\chapnumfont}{\LARGE\chapterline\chapternumbersize}
+        \renewcommand{\chaptitlefont}{\LARGE\chapterline\chaptertitlesize}
     }
     \keys_set:nn {hzheading}
     {
@@ -1808,15 +1807,18 @@
     chapteralign          .tl_set:N = \chapteralign,
     chapterfont           .tl_set:N = \chapterfont,
     chaptercolor          .tl_set:N = \chaptercolor,
+    chapternamesize       .tl_set:N = \chapternamesize,
+    chapternumbersize     .tl_set:N = \chapternumbersize,
+    chaptertitlesize      .tl_set:N = \chaptertitlesize,
     chapterstyle          .code:n = { \style_chapter_configure:n {#1} },
     nochaptername         .bool_set:N = \g_style_nochaptername_bool,
     sectionalign          .tl_set:N = \sectionalign,
     sectionfont           .tl_set:N = \sectionfont,
     sectioncolor          .tl_set:N = \sectioncolor,
     sectionstyle          .code:n = { \style_section_configure:n {#1} },
-    sectionfontsize       .tl_set:N = \secfontsize,
-    subsectionfontsize    .tl_set:N = \subsecfontsize,
-    subsubsectionfontsize .tl_set:N = \subsubsecfontsize,
+    sectionsize           .tl_set:N = \secfontsize,
+    subsectionsize        .tl_set:N = \subsecfontsize,
+    subsubsectionsize     .tl_set:N = \subsubsecfontsize,
     paragraphstyle        .code:n = { \style_paragraph_configure:n {#1} },
     parskip               .skip_set: N = \hzparskip,
     parindent             .skip_set: N = \hzparindent,
@@ -1849,9 +1851,9 @@
     sectionalign=\raggedright, %\memRTLraggedright,
     sectionfont=\normalfont\bfseries,
     sectioncolor=black,
-    sectionfontsize=\Large,
-    subsectionfontsize=\large,
-    subsubsectionfontsize=\normalsize,
+    sectionsize=\Large,
+    subsectionsize=\large,
+    subsubsectionsize=\normalsize,
     parskip=.25\baselineskip,
     parindent=1em
 }
@@ -1899,9 +1901,9 @@
 }
 
 \makechapterstyle{null}{
-    \renewcommand{\chapnamefont}{\chapterline\huge}
-    \renewcommand{\chapnumfont}{\chapterline\HUGE}
-    \renewcommand{\chaptitlefont}{\chapterline\Huge}
+    \renewcommand{\chapnamefont}{\huge\chapterline\chapternamesize}
+    \renewcommand{\chapnumfont}{\HUGE\chapterline\chapternumbersize}
+    \renewcommand{\chaptitlefont}{\Huge\chapterline}\chaptertitlesize
 }
 
 \makechapterstyle{hzchapter}{
@@ -1923,17 +1925,17 @@
 
 \makechapterstyle{hzarticle}{
     \chapterstyle{article}
-    \renewcommand{\chapnamefont}{\chapterline\huge}
-    \renewcommand{\chapnumfont}{\chapterline\HUGE}
-    \renewcommand{\chaptitlefont}{\chapterline\Huge}
+    \renewcommand{\chapnamefont}{\huge\chapterline\chapternamesize}
+    \renewcommand{\chapnumfont}{\HUGE\chapterline\chapternumbersize}
+    \renewcommand{\chaptitlefont}{\Huge\chapterline\chaptertitlesize}
 }
 
 \makechapterstyle{hzarticlefirm}{
     \chapterstyle{null}
-    \setlength{\beforechapskip}{0pt}
+    \setlength{\beforechapskip}{\baselineskip}
     \setlength{\midchapskip}{0pt}
     \setlength{\afterchapskip}{\baselineskip}
-    \renewcommand{\chapterheadstart}{\vspace{\beforechapskip}}
+    \renewcommand{\chapterheadstart}{\vspace*{\beforechapskip}}
     \renewcommand{\printchaptername}{}
     \renewcommand{\chapternamenum}{}
     \renewcommand{\printchapternum}{\chapnumfont\thechapter\quad}
@@ -2747,8 +2749,8 @@
 
 % \settable[]{ } ------------------------------------
 \taburowcolors{white .. backgray}
-\newcommand\tableheadfont{\bfseries}
-\NewExpandableDocumentCommand\TableHeadFont{}{\rowfont{\tableheadfont}}
+%\newcommand\tableheadfont{\bfseries}
+\NewExpandableDocumentCommand\TableHeadFont{}{\rowfont{\bfseries}}
 
 \cs_new:Npn \table_footnotestyle:n #1
 {
@@ -3039,8 +3041,8 @@
 
 \ior_new:N \l_txt_io
 
-\NewDocumentCommand \MakeAlbum { s O {0.5} m }{
-    
+\NewDocumentCommand \MakeAlbum { s O {0.5} m }
+{    
     \ImageSetup{scale=#2, fitline=true}
     \IfBooleanTF{#1}
     { 

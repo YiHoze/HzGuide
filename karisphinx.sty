@@ -9,10 +9,14 @@
 \RequirePackage[absolute]{textpos}
 %\RequirePackage{sphinx}
 \RequirePackage{tabulary}
+\RequirePackage{multirow}
 \RequirePackage{sphinxhighlight}
 \RequirePackage{sphinxmulticell}
 \RequirePackage{footnotehyper-sphinx}
 %\RequirePackage{hypcap}
+
+% 
+\newtheorem{theorem}{Theorem}
 
 % symbol letters --------------------------------------------------------------
 \def\PYGZbs{\allowbreak\char`\\\allowbreak}
@@ -53,7 +57,7 @@
 \cs_set_eq:NN \OrgMaketitle \maketitle
 \RenewDocumentCommand \maketitle {}{    
     \IfFileExists{colophon.tex}{
-        \input{colophon.tex}
+        \input{colophon.tex}        
     }{
         \begin{IfVartwoEnlarge}
             \thispagestyle{empty}    
@@ -81,17 +85,30 @@
 \NewDocumentCommand \SwitchToReportStyle {}
 {
     \cs_set_eq:NN \FrontCover \ReportCover
-    \cs_set_eq:NN \CoverSetup \ReportCoverSetup    
+    \cs_set_eq:NN \CoverSetup \ReportCoverSetup        
     \DeclareDocumentCommand \sphinxtableofcontents {}
-    {
+    {   
+        \setcounter{page}{0}     
+        \newpage        
+        \renewcommand*{\cftchapterdotsep}{\cftdotsep}
+        \tableofcontents*
         \newpage
-        \tableofcontents
-        \listoffigures
-        \listoftables    
+        \renewcommand\numberlinehook[1]{\figurename\enspace}
+        \listoffigures*
+        \newpage
+        \renewcommand\numberlinehook[1]{\tablename\enspace}
+        \listoftables*    
+        \mainmatter        
+        \HeadingSetup{sectionalign={}}
+        \renewcommand{\thefigure}{\arabic{chapter}-\arabic{figure}}
+        \renewcommand{\thetable}{\arabic{chapter}-\arabic{table}}
     }
     \HeadingSetup{
-        %cftstyle=section,
+        cftstyle=section,
         paragraphstyle=indent
+    }
+    \CaptionSetup{        
+        delimiter=\space        
     }
 }
 
@@ -124,27 +141,32 @@
 {
     \keys_set:nn { ReportCover } { #1 }
     \PagestyleSetup{
-     headouter=\cover_code,
-     headinner=\cover_version,
-     footinner=\cover_proprietary_detail,
-     chapterpage=true
-    }
+        headrule=false,    
+        headouter=\cover_code,
+        headinner=\cover_version,
+        footinner=\cover_proprietary_detail,
+        footouter=\thepage,
+        chapterpage=true
+    } 
+    \makeevenfoot{adhoc}{}{\hffont\cover_proprietary_detail}{}
+    \makeoddfoot{adhoc}{}{\hffont\cover_proprietary_detail}{}
 }
 
 \NewDocumentCommand \ReportCover {}
-{
+{   
+    \frontmatter     
     \begin{IfVartwoEnlarge}
     \thispagestyle{empty}
     \begin{textblock*}{.25\textwidth}(.75\paperwidth, .05\paperheight)
         \raggedleft
         \cover_version
     \end{textblock*}
-    \nil\vspace{.2\textheight}
+    \nil\vspace{.15\textheight}
     \begin{center}
         \Huge\bfseries 
         \cover_title
     \end{center}
-    \par\vspace{.2\textheight}
+    \par\vspace{.15\textheight}
     \begin{center}
         \LARGE\bfseries
         \cover_manufacturer
@@ -161,7 +183,7 @@
     \end{minipage}}
     \par\vfill
     \begin{center}
-        \Huge\bfseries
+        \LARGE\bfseries
         \cover_proprietary
     \end{center}
     \begin{textblock*}{\paperwidth}(0mm, .9\paperheight)
@@ -170,7 +192,8 @@
         \end{center}
     \end{textblock*}
     \end{IfVartwoEnlarge}
-    \newpage
+    \newpage    
+    \thispagestyle{adhoc}
     \begin{IfVartwoEnlarge}
     \nil\vspace{.2\textheight}
     \begin{center}
@@ -203,7 +226,8 @@
         \cover_approver_title \\
         \cover_approver_department
     \end{minipage}
-    \end{IfVartwoEnlarge}
+    \end{IfVartwoEnlarge}    
+    \HeadingSetup{sectionalign=\centering}
 }
 \ExplSyntaxOff
 
@@ -404,7 +428,7 @@
 
 \AtBeginDocument{
     \ImageSetup{
-        beforeskip=.25\baselineskip,
+        beforeskip=.75\baselineskip,
         afterskip=.5\baselineskip,
         align=\centering,
         fitline=true
@@ -423,6 +447,7 @@
         \object_skip_after:n {\l_table_after_skip}
 		\end{minipage}
 	}
+    \taburowcolors{}
 }
 \ExplSyntaxOff
 
