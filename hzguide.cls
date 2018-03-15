@@ -1783,8 +1783,8 @@
     \tl_set:Nn \l_admonition_style_basic {\setlength\parindent{\hzparindent}}
     \abnormalparskip{0pt}
     \setlist{partopsep=0pt, topsep=.25\baselineskip, itemsep=.25ex}
-    \setlist[itemize]{labelindent=.5em,labelwidth=1em,labelsep=.5em,leftmargin=!}
-    \setlist[enumerate]{labelindent=.5em,labelwidth=1.25em,labelsep=.5em,leftmargin=!}
+    \setlist[itemize]{labelindent=.5em,labelwidth=1em,labelsep=.5em}
+    \setlist[enumerate]{labelindent=.5em,labelwidth=1.25em,labelsep=.5em}
     \TermsSetup{topsep=0.5\baselineskip,itemsep=.5ex}
 }
 
@@ -1793,8 +1793,8 @@
     \setlength{\parindent}{0em}
     \abnormalparskip{\hzparskip}
     \setlist{partopsep=0pt, topsep=.5ex, itemsep=0pt}
-    \setlist[itemize]{labelindent=0em,labelwidth=1em,labelsep=.5em,leftmargin=!}
-    \setlist[enumerate]{labelindent=0em,labelwidth=1.25em,labelsep=.5em,leftmargin=!}
+    \setlist[itemize]{labelindent=0em,labelwidth=1em,labelsep=.5em}
+    \setlist[enumerate]{labelindent=0em,labelwidth=1.25em,labelsep=.5em}
     \TermsSetup{topsep=0.5ex,itemsep=.25ex}
 }
 
@@ -2813,7 +2813,7 @@
     \bool_if:NTF \l_table_float_bool
     {
         \begin{table}
-        \table_put:N \l_text_box
+        \table_put:
         \end{table}
     }
     {
@@ -3306,7 +3306,7 @@
     labelsep=0.5em,
     index=true,
     newline=false,
-    star={itemsep=-1ex}
+    star={itemsep=0ex}
 }
 
 \cs_new:Npn \terms_leftmargin:n #1
