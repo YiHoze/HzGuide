@@ -17,7 +17,7 @@
 % IV. For those of designer interface level:
 %     Follow clause II. However, it is allowed to use lowercase with compound words.
 
-\ProvidesClass{hzguide}[2019/01/19]
+\ProvidesClass{hzguide}[2018/03/15]
 
 \LoadClassWithOptions{memoir}
 
