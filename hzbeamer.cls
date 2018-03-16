@@ -50,7 +50,7 @@
 		inner/sectionpage=none, 
 		%%outer/progressbar=head,
 		outer/numbering=none,
-		color/block=fill
+		color/block=transparent
 	}	
 }[
 	\LoadClassWithOptions{article}
@@ -290,6 +290,8 @@
 ]
 
 %% blocks
+\newcommand\sepbelow{\parbox{0pt}{\rule{0pt}{4ex}}}
+\setbeamerfont{block~title}{size=\normalsize\sepbelow}
 \setbeamerfont{block~body}{size=\narrative}
 \setbeamerfont{block~body~example}{size=\narrative}
 \setbeamerfont{block~body~alerted}{size=\narrative}

@@ -2096,9 +2096,8 @@
 
 \NewDocumentCommand \DecolorHyperlinks { O {darkgray} O {\bfseries} }
 {
-    \hypersetup{colorlinks=false,pdfborder={0 0 0}}
-    \cs_set_eq:NN \oldtitleref \titleref
-    \renewcommand\titleref[1]{\textcolor{#1}{#2\oldtitleref{##1}}}
+    \hypersetup{colorlinks=false,pdfborder={0 0 0}}    
+    \renewcommand{\theTitleReference}[2]{\textcolor{#1}{#2 ##1}}
 }
 
 % graphics * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -2894,7 +2893,7 @@
     }
 }
 
-\NewEnviron{PlaceTable}{\placetable{\BODY}}
+%\NewEnviron{PlaceTable}[1][]{\placetable[#1]{\BODY}}
 
 \NewDocumentEnvironment { Table } { o d() d<> }
 {
@@ -4042,10 +4041,10 @@
     \object_skip_after:n {\l_instance_after_skip}
 }
 
-\cs_set_eq:NN \Reference \reference
-\cs_set_eq:NN \endReference \endreference
-\cs_set_eq:NN \Instance \instance
-\cs_set_eq:NN \endInstance \endinstance
+% \cs_set_eq:NN \Reference \reference
+% \cs_set_eq:NN \endReference \endreference
+% \cs_set_eq:NN \Instance \instance
+% \cs_set_eq:NN \endInstance \endinstance
 
 \NewDocumentCommand \SetEmphasisAs { m }
 {
