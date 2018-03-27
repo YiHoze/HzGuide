@@ -284,6 +284,10 @@
 { 
     \texttt{#1}
 }
+\DeclareDocumentCommand \sphinxupquote { m }
+{ 
+    #1
+}
 \DeclareDocumentCommand \sphinxbfcode { m }
 {   
     \textbf{\sphinxcode{#1}}
@@ -537,6 +541,7 @@
 \def\x@vobeylines{\par\leavevmode\relax}
 
 \ExplSyntaxOn
+\DeclareDocumentCommand\fvset{m}{}
 \NewDocumentEnvironment {sphinxVerbatim} { o }
 {  
     \begin{reference}

@@ -224,7 +224,7 @@
 }
 
 %% images with their descriptions
-\NewDocumentEnvironment {Illust} { t| o m }
+\NewDocumentEnvironment {illust} { s o m }
 {
 	\group_begin:
 	\IfNoValueTF{#2}
@@ -266,18 +266,26 @@
 \graphicspath{{images/}{../images/}}
 
 \IfSlide{
-	\NewDocumentCommand \biblio {m}
+	\NewDocumentCommand \biblio {s m}
 	{
 		\group_begin:
-		\setlength\parskip{-1ex}
-		\begin{flushright}		
-			\rule{.3\linewidth}{.25pt}\\
-			\footnotesize #1
+		\IfBooleanTF{#1}
+		{
+			\setlength\parskip{0ex}
+		}{
+			\setlength\parskip{-1ex}
+		}		
+		\begin{flushright}
+			\IfBooleanF{#1}
+			{
+				\rule{.3\linewidth}{.25pt}\\
+			}
+			\footnotesize #2
 		\end{flushright}
 		\group_end:
 	}
 }[
-	\NewDocumentCommand \biblio {m} {---\thinspace #1}
+	\NewDocumentCommand \biblio {s m} {---\thinspace #2}
 ]
 
 %% frame title
@@ -340,12 +348,12 @@
 
 \NewDocumentCommand \smiley {} 
 { 
-	{\bfseries\foreign*{263A}~} 
+	{\color{red}\bfseries\foreign*{263A}~} 
 }
 
 \NewDocumentCommand \frowny {} 
 { 
-	{\bfseries\foreign*{2639}~}
+	{\color{blue}\bfseries\foreign*{2639}~}
 }
 
 \NewDocumentCommand \prefer {s} 
@@ -469,6 +477,8 @@
 }
 \ExplSyntaxOff
 \setverbatimfont{\ttfamily\footnotesize}
+
+\setbeamercolor{alerted text}{fg=Brown}
 
 \AtBeginDocument{
 	\justified
