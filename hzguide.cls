@@ -443,9 +443,11 @@
 \IfLang{kor}
 {
     \usepackage[hangul]{xetexko}  
-    %\addhangulfontfeatures{InterHangul=0.5pt, WordSpace={1.25, 0.5, 0.5}}
     %\XeTeXcharclass"201C = \XKlatinopening
     %\XeTeXcharclass"201D = \XKlatinclosing
+    % Use truetype fonts to use PDF2htmlEX
+    % \setmainhangulfont{NanumMyeongjo}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*}, BoldFont={*Bold}]
+    % \setsanshangulfont{NanumGothic}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*}, BoldFont={*Bold}]
     \setmainhangulfont{KoPubBatang}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PL}, BoldFont={*PB}]
     \setsanshangulfont{KoPubDotum}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PL}, BoldFont={*PB}]
     \AtBeginDocument{
@@ -622,6 +624,24 @@
     \hbox_set:Nn \l_tmpc_box { #2 }
     \dim_set:Nn #1 { \box_ht:N \l_tmpc_box + \box_dp:N \l_tmpc_box }
 }
+
+% \clist_new:N \g_tex_files_clist
+% \NewDocumentCommand \InputOnly { m }
+% {
+% 	\clist_gput_right:Nn \g_tex_files_clist {#1}
+% }
+% \NewDocumentCommand \Input { m }
+% {
+% 	\clist_if_empty:NTF \g_tex_files_clist
+% 	{
+% 		\input{#1}
+% 	}{
+% 		\clist_if_in:NnT \g_tex_files_clist {#1} 
+% 		{
+% 			\input{#1}
+% 		}
+% 	}
+% }
 
 % adhoc style -----------------------------------------------------------------
 \keys_define:nn { adhoc }
@@ -4294,8 +4314,6 @@
          \draw (TopLeft.center) rectangle (BottomRight.center);
      \end{tikzpicture}
 }
-
-%\renewcommand\UrlFont{\sffamily}
 
 \NewDocumentCommand \email { m }
 {

@@ -39,6 +39,25 @@
 		\IfValueT {#2} {#2} 
 	}
 }
+
+\clist_new:N \g_tex_files_clist
+\NewDocumentCommand \InputOnly { m }
+{
+	\clist_gput_right:Nn \g_tex_files_clist {#1}
+}
+\NewDocumentCommand \Input { m }
+{
+	\clist_if_empty:NTF \g_tex_files_clist
+	{
+		\input{#1}
+	}{
+		\clist_if_in:NnT \g_tex_files_clist {#1} 
+		{
+			\input{#1}
+		}
+	}
+}
+
 \ExplSyntaxOff
 
 \IfSlide{
