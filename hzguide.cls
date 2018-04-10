@@ -443,11 +443,16 @@
 \IfLang{kor}
 {
     \usepackage[hangul]{xetexko}  
+    %\xetexkofontregime{hangul}
     %\XeTeXcharclass"201C = \XKlatinopening
     %\XeTeXcharclass"201D = \XKlatinclosing
     % Use truetype fonts to use PDF2htmlEX
-    % \setmainhangulfont{NanumMyeongjo}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*}, BoldFont={*Bold}]
-    % \setsanshangulfont{NanumGothic}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*}, BoldFont={*Bold}]
+        % \setmainhangulfont{NanumMyeongjo}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*}, BoldFont={*Bold}]
+        % \setsanshangulfont{NanumGothic}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*}, BoldFont={*Bold}]
+    %\setmainhangulfont{NotoSerifCJKkr}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Regular}, BoldFont={*-Bold}]
+    %\setsanshangulfont{NotoSansCJKkr}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Regular}, BoldFont={*-Bold}]
+    %\setmainhangulfont{NotoSerifCJKkr}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Light}, BoldFont={*-SemiBold}]
+    %\setsanshangulfont{NotoSansCJKkr}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Light}, BoldFont={*-SemiBold}]
     \setmainhangulfont{KoPubBatang}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PL}, BoldFont={*PB}]
     \setsanshangulfont{KoPubDotum}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PL}, BoldFont={*PB}]
     \AtBeginDocument{
@@ -3295,6 +3300,7 @@
     marker      .code:n = { \terms_define_marker:n {#1} },
     markersep   .skip_set:N = \l_terms_markersep,
     enumerate   .bool_set:N = \l_terms_enumerate_bool,
+    enummarker   .tl_set:N = \l_terms_enummarker_tl,
     base        .tl_set:N = \l_terms_base,
     font        .tl_set:N = \l_terms_font,
     color       .tl_set:N = \l_terms_color,
@@ -3325,7 +3331,9 @@
     labelsep=0.5em,
     index=true,
     newline=false,
-    star={itemsep=0ex}
+    star={itemsep=0ex},
+    vbar={enumerate=true},
+    enummarker={\int_use:N \l_terms_int)\hskip\l_terms_markersep} 
 }
 
 \cs_new:Npn \terms_leftmargin:n #1
@@ -3413,7 +3421,8 @@
     {
         \bool_if:NT \l_terms_enumerate_bool
         {
-            \tl_set:Nn \l_terms_marker_i {\int_use:N \l_terms_int)\hskip\l_terms_markersep}
+            %\tl_set:Nn \l_terms_marker_i {\int_use:N \l_terms_int)\hskip\l_terms_markersep}
+            \tl_set:Nn \l_terms_marker_i { \l_terms_enummarker_tl }
             \int_gzero:N \l_terms_int
         }
         \terms_set_spaces:
@@ -3519,13 +3528,13 @@
 }
 
 \tl_new:N \l_symbol_options
-\NewDocumentCommand \SymbolSetup { m }
+\NewDocumentCommand \SymbolsSetup { m }
 {
     \tl_set:Nn \l_symbol_options {#1}
 }
 
 % a variant of the terms environment
-\NewDocumentEnvironment { Symbol } { s o } 
+\NewDocumentEnvironment { Symbols } { s o } 
 {
     \group_begin:
     \IfBooleanT {#1}
@@ -3547,7 +3556,7 @@
     \group_end:
 }
 
-\SymbolSetup{itemsep=1ex, delimiter=\hfill}
+\SymbolsSetup{itemsep=1ex, delimiter=\hfill}
 
 % option list
 \int_new:N \l_opt_cnt_int
