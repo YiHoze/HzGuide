@@ -17,7 +17,7 @@
 % IV. For those of designer interface level:
 %     Follow clause II. However, it is allowed to use lowercase with compound words.
 
-\ProvidesClass{hzguide}[2018/03/15]
+\ProvidesClass{hzguide}[2018/04/12]
 
 \LoadClassWithOptions{memoir}
 
@@ -34,11 +34,12 @@
 \RequirePackage[svgnames,x11names,dvipsnames,hyperref,table]{xcolor}
 \RequirePackage{graphicx}
 \RequirePackage{eso-pic}
-\RequirePackage{tikz}
+\RequirePackage{tikz, tikzpagenodes}
 \RequirePackage{tcolorbox}
 \RequirePackage{tabu, longtable, multirow}
 \RequirePackage{hyperref}
 \RequirePackage{bookmark}
+\RequirePackage{calc}
 
 \hypersetup{colorlinks=true, bookmarksnumbered=true, pdfauthor={hzguide.cls}} % allcolors=darkgray
 
@@ -451,8 +452,6 @@
         % \setsanshangulfont{NanumGothic}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*}, BoldFont={*Bold}]
     %\setmainhangulfont{NotoSerifCJKkr}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Regular}, BoldFont={*-Bold}]
     %\setsanshangulfont{NotoSansCJKkr}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Regular}, BoldFont={*-Bold}]
-    %\setmainhangulfont{NotoSerifCJKkr}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Light}, BoldFont={*-SemiBold}]
-    %\setsanshangulfont{NotoSansCJKkr}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Light}, BoldFont={*-SemiBold}]
     \setmainhangulfont{KoPubBatang}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PL}, BoldFont={*PB}]
     \setsanshangulfont{KoPubDotum}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PL}, BoldFont={*PB}]
     \AtBeginDocument{
@@ -778,12 +777,12 @@
     \cover_before_back
     \begin{IfVartwoEnlarge}			
         \AtPageBottom
-        \setSpacing{1}    
+        \setSpacing{1}        
         \tl_if_empty:NF \cover_image_logo_back
         {
-            \includegraphics[scale=\l_image_scale]{\cover_image_logo_back}
-        } 
-        \nil \hfill \cover_note \\       
+            \includegraphics[scale=\l_image_scale]{\cover_image_logo_back}\\
+        }
+        \cover_note \\
         \IfVartwo{ 
             \raisebox{0.5ex}{\rule{\headwidth}{0.5pt}} 
         }[ 
@@ -1158,9 +1157,9 @@
     \dim_gset:Nn \stockheight {297mm}
     \dim_gset:Nn \paperwidth {176mm}
     \dim_gset:Nn \paperheight {250mm}
-    \dim_gset:Nn \ulmargin {24mm} % 28 mm
-    \dim_gset:Nn \lrmargin {22mm} % 28 mm
-    \dim_gset:Nn \vartwomargin {14mm}
+    \dim_gset:Nn \ulmargin {29mm} % textheight = 192 mm = 120 mm * 1.6
+    \dim_gset:Nn \lrmargin {28mm} % textwidth: 120 mm
+    \dim_gset:Nn \vartwomargin {14mm} 
 }
 
 % A5
@@ -2766,7 +2765,7 @@
     }
 }
 
-\NewDocumentCommand \listimage { m }
+\NewDocumentCommand \listimg { m }
 {
     \par\lineimg[0pt]{#1}
 }
@@ -2932,7 +2931,7 @@
 
 \NewEnviron{spectable}{
     \placetable{
-        \begin{tabu}{X[lm]X[lm]}
+        \begin{tabu}{X[lm]X[1.5lm]}
         \hline\BODY\hline
         \end{tabu}
     }
@@ -3066,7 +3065,8 @@
 \ior_new:N \l_txt_io
 
 \NewDocumentCommand \MakeAlbum { s O {0.5} m }
-{    
+{   
+    \int_zero:N \l_tmpa_int
     \ImageSetup{scale=#2, fitline=true}
     \IfBooleanTF{#1}
     { 
@@ -3081,7 +3081,9 @@
         \tl_set:Nn \l_tmpa_tl { ##1 }
         \tl_trim_spaces:N \l_tmpa_tl
         \tl_if_empty:NF { \l_tmpa_tl }
-        {
+        {            
+            \int_incr:N \l_tmpa_int
+            \pdfbookmark[1]{\tl_to_str:N \l_tmpa_tl}{\int_use:N \l_tmpa_int}
             \image{\l_tmpa_tl}\par
         }
     }
@@ -3598,6 +3600,7 @@
 {
     beforeskip  .skip_set:N = \l_callout_before_skip,
     afterskip   .skip_set:N = \l_callout_after_skip,
+    rule        .bool_set:N = \l_callout_rule_bool,
     column      .int_set:N = \l_callout_column,
     font        .tl_set:N = \l_callout_font,
     label       .tl_set:N = \l_callout_label,
@@ -3630,12 +3633,9 @@
     \int_compare:nTF { \l_callout_int > 1 }
     {
         \int_set:Nn \l_tmpa_int {\int_mod:nn {\l_callout_int} {\l_callout_column} }
-        \int_compare:nT { \l_tmpa_int = 1 }
-            {\newline}
-            {\tab}
-    }
-    {
-        \noindent
+        \int_compare:nTF { \l_tmpa_int = 1 }{\newline}{\tab}
+    }{
+        \unskip
     }
     \l_callout_label
 }
@@ -3650,10 +3650,9 @@
 \NewDocumentEnvironment {callout} { s o }
 {  
     \object_skip_before:n {\l_callout_before_skip}
-    \begin{RuleBox}
-    \setfootnoterule{0pt}{0pt}{0pt}
-    \l_callout_font
-    %\IfBooleanT {#1} { \int_set:Nn \l_callout_column {1}  }
+    \bool_if:NT \l_callout_rule_bool { \begin{RuleBox} }
+    %\setfootnoterule{0pt}{0pt}{0pt}
+    \l_callout_font    
     \IfBooleanTF {#1}
     {
         \renewcommand\labelenumi{\l_callout_label_enum}
@@ -3670,9 +3669,8 @@
 }
 {
     \IfBooleanT {#1} { \end{enumerate}  }
-    \end{RuleBox}
+    \bool_if:NT \l_callout_rule_bool { \end{RuleBox} }
     \object_skip_after:n {\l_callout_after_skip}
-
 }
 
 % circled number
@@ -4476,7 +4474,7 @@
     }
 }
 
-%\exp_args:No \ItemizeOnRight{\csv}[\font]
+%\exp_args:No \ItemizeOnRight{..., ..., ...}[\font]
 \NewDocumentCommand \ItemizeOnRight { m O{} }
 {
     \tl_if_empty:nF {#1}
@@ -4622,7 +4620,7 @@
 
 \NewDocumentCommand \scenetasks { O{5} }
 {
-    \int_set:Nn \l_tmpa_int {0}
+    \int_zero:N \l_tmpa_int 
     \int_set:Nn \l_tmpb_int {#1}
     \int_do_while:nNnn {\l_tmpa_int} < {\l_tmpb_int}
     {
@@ -4674,7 +4672,7 @@
 \NewDocumentCommand \sceneproblems { O{3} }
 {
     %\listofproblems*
-    \int_set:Nn \l_tmpa_int {0}
+    \int_zero:N \l_tmpa_int 
     \int_set:Nn \l_tmpb_int {#1}
     \int_do_while:nNnn {\l_tmpa_int} < {\l_tmpb_int}
     {
@@ -4883,6 +4881,130 @@
     \patchcmd{\FV@ListVSpace}{\@topsepadd\topsep}{\vspace{.25\baselineskip}}{}{}
 }{}
 
+% page layout thanks to https://www.kockoc.com/newgari/1119255
+
+\makeatletter
+\newlength\memoirPleftodd \newlength\memoirPrightodd
+\newlength\memoirPlefteven \newlength\memoirPrighteven
+\newlength\memoirPtop \newlength\memoirPbottom
+\newlength\memoirTleftodd \newlength\memoirTrightodd
+\newlength\memoirTlefteven \newlength\memoirTrighteven
+\newlength\memoirTtop \newlength\memoirTbottom
+\newlength\memoirHleftodd \newlength\memoirHrightodd
+\newlength\memoirHlefteven \newlength\memoirHrighteven
+\newlength\memoirHtop \newlength\memoirHbottom
+\newlength\memoirFleftodd \newlength\memoirFrightodd
+\newlength\memoirFlefteven \newlength\memoirFrighteven
+\newlength\memoirFtop \newlength\memoirFbottom
+\newlength\memoirMleftodd \newlength\memoirMrightodd
+\newlength\memoirMlefteven \newlength\memoirMrighteven
+\newlength\memoirMtop \newlength\memoirMbottom
+\def\calculatetrims{
+    \setlength\memoirPbottom{\stockheight-\paperheight-\trimtop}
+    \setlength\memoirPleftodd{\stockwidth-\paperwidth-\trimedge}
+    \setlength\memoirPlefteven{\trimedge}
+    \setlength\memoirPtop{\memoirPbottom+\paperheight}
+    \setlength\memoirPrightodd{\memoirPleftodd+\paperwidth}
+    \setlength\memoirPrighteven{\memoirPlefteven+\paperwidth}
+    \setlength\memoirTbottom{\memoirPbottom+\lowermargin}
+    \setlength\memoirTleftodd{\memoirPleftodd+\spinemargin}
+    \setlength\memoirTlefteven{\memoirPlefteven+\foremargin}
+    \setlength\memoirTtop{\memoirPtop-\uppermargin}
+    \setlength\memoirTrightodd{\memoirPrightodd-\foremargin}
+    \setlength\memoirTrighteven{\memoirPrighteven-\spinemargin}
+    \setlength\memoirHbottom{\memoirTtop+\headsep}
+    \setlength\memoirHleftodd{\memoirTleftodd}
+    \setlength\memoirHlefteven{\memoirTlefteven}
+    \setlength\memoirHtop{\memoirHbottom+\headheight}
+    \setlength\memoirHrightodd{\memoirTrightodd}
+    \setlength\memoirHrighteven{\memoirTrighteven}
+    \setlength\memoirFbottom{\memoirTbottom-\footskip}
+    \setlength\memoirFleftodd{\memoirTleftodd}
+    \setlength\memoirFlefteven{\memoirTlefteven}
+    \setlength\memoirFtop{\memoirFbottom+\headheight}
+    \setlength\memoirFrightodd{\memoirTrightodd}
+    \setlength\memoirFrighteven{\memoirTrighteven}
+    \setlength\memoirMbottom{\memoirTbottom}
+    \setlength\memoirMleftodd{\memoirTrightodd+\marginparsep}
+    \setlength\memoirMlefteven{\memoirTlefteven-\marginparsep-\marginparwidth}
+    \setlength\memoirMtop{\memoirTtop}
+    \setlength\memoirMrightodd{\memoirMleftodd+\marginparwidth}
+    \setlength\memoirMrighteven{\memoirMlefteven+\marginparwidth}}
+
+\expandafter\def\csname pgf@sh@ns@memoir page\endcsname{rectangle}
+\expandafter\def\csname pgf@sh@np@memoir page\endcsname{%
+    \def\southwest{\checkoddpage\pgfqpoint{
+        \ifoddpage\memoirPleftodd\else\memoirPlefteven\fi}{\memoirPbottom}}%
+    \def\northeast{\checkoddpage\pgfqpoint{
+        \ifoddpage\memoirPrightodd\else\memoirPrighteven\fi}{\memoirPtop}}
+}
+\expandafter\def\csname pgf@sh@nt@memoir page\endcsname{{1}{0}{0}{1}{0pt}{0pt}}
+\expandafter\def\csname pgf@sh@pi@memoir page\endcsname{pgfpageorigin}
+
+% (Brent's additional code goes here)
+\expandafter\def\csname pgf@sh@ns@memoir stock\endcsname{rectangle}
+\expandafter\def\csname pgf@sh@np@memoir stock\endcsname{%
+  \def\southwest{\pgfqpoint{0pt}{0pt}}%
+  \def\northeast{\pgfqpoint{\stockwidth}{\stockheight}}%
+}
+\expandafter\def\csname pgf@sh@nt@memoir stock\endcsname{{1}{0}{0}{1}{0pt}{0pt}}
+\expandafter\def\csname pgf@sh@pi@memoir stock\endcsname{pgfpageorigin}
+% (Kriss's additional code goes here)
+\expandafter\def\csname pgf@sh@ns@memoir text area\endcsname{rectangle}
+\expandafter\def\csname pgf@sh@np@memoir text area\endcsname{%
+    \def\southwest{\checkoddpage\pgfqpoint{
+      \ifoddpage\memoirTleftodd\else\memoirTlefteven\fi}{\memoirTbottom}}%
+    \def\northeast{\checkoddpage\pgfqpoint{
+      \ifoddpage\memoirTrightodd\else\memoirTrighteven\fi}{\memoirTtop}}
+}
+\expandafter\def\csname pgf@sh@nt@memoir text area\endcsname{{1}{0}{0}{1}{0pt}{0pt}}
+\expandafter\def\csname pgf@sh@pi@memoir text area\endcsname{pgfpageorigin}
+
+\expandafter\def\csname pgf@sh@ns@memoir header area\endcsname{rectangle}
+\expandafter\def\csname pgf@sh@np@memoir header area\endcsname{%
+    \def\southwest{\checkoddpage\pgfqpoint{
+      \ifoddpage\memoirHleftodd\else\memoirHlefteven\fi}{\memoirHbottom}}%
+    \def\northeast{\checkoddpage\pgfqpoint{
+      \ifoddpage\memoirHrightodd\else\memoirHrighteven\fi}{\memoirHtop}}
+}
+\expandafter\def\csname pgf@sh@nt@memoir header area\endcsname{{1}{0}{0}{1}{0pt}{0pt}}
+\expandafter\def\csname pgf@sh@pi@memoir header area\endcsname{pgfpageorigin}
+
+\expandafter\def\csname pgf@sh@ns@memoir footer area\endcsname{rectangle}
+\expandafter\def\csname pgf@sh@np@memoir footer area\endcsname{%
+    \def\southwest{\checkoddpage\pgfqpoint{
+      \ifoddpage\memoirFleftodd\else\memoirFlefteven\fi}{\memoirFbottom}}%
+    \def\northeast{\checkoddpage\pgfqpoint{
+      \ifoddpage\memoirFrightodd\else\memoirFrighteven\fi}{\memoirFtop}}
+}
+\expandafter\def\csname pgf@sh@nt@memoir footer area\endcsname{{1}{0}{0}{1}{0pt}{0pt}}
+\expandafter\def\csname pgf@sh@pi@memoir footer area\endcsname{pgfpageorigin}
+
+
+\expandafter\def\csname pgf@sh@ns@memoir marginpar area\endcsname{rectangle}
+\expandafter\def\csname pgf@sh@np@memoir marginpar area\endcsname{%
+    \def\southwest{\checkoddpage\pgfqpoint{
+      \ifoddpage\memoirMleftodd\else\memoirMlefteven\fi}{\memoirMbottom}}%
+    \def\northeast{\checkoddpage\pgfqpoint{
+      \ifoddpage\memoirMrightodd\else\memoirMrighteven\fi}{\memoirMtop}}
+}
+\expandafter\def\csname pgf@sh@nt@memoir marginpar area\endcsname{{1}{0}{0}{1}{0pt}{0pt}}
+\expandafter\def\csname pgf@sh@pi@memoir marginpar area\endcsname{pgfpageorigin}
+\makeatother
+
+\NewDocumentCommand \DisplayPageLayout { }
+{
+    \calculatetrims
+    \AddToShipoutPictureBG{
+        \begin{tikzpicture}[remember picture, overlay, line width=1pt]
+            \draw[red] (memoir page.south west) rectangle (memoir page.north east);
+            \draw[magenta] (memoir header area.south west) rectangle (memoir header area.north east);
+            \draw[blue] (memoir text area.south west) rectangle (memoir text area.north east);    
+            \draw[yellow] (memoir footer area.south west) rectangle (memoir footer area.north east);
+            \draw[violet] (memoir marginpar area.south west) rectangle (memoir marginpar area.north east);
+    \end{tikzpicture}
+    }
+}
 \endinput
 
 --------------------------------------------------------------------------------
