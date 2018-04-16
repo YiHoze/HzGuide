@@ -1,7 +1,7 @@
 % For xelatex to use truetype and opentype fonts:
 % #> fc-cache -f -v 
 % For lualatex to use truetype and opentype fonts:
-% #> luaotfload-tools -update 
+% #> luaotfload-tool -u 
 
 % Obey these naming rules for command macros, environment macros, variables, and parameter keys.
 % I. Minimize use of acronyms and abbreviations 
@@ -21,11 +21,13 @@
 
 \LoadClassWithOptions{memoir}
 
-%\RequirePackage{iftex}
+\RequirePackage{iftex}
 \RequirePackage{expl3,xparse,l3keys2e}
 \RequirePackage{environ}
 \RequirePackage{fontspec}
-\RequirePackage{xunicode} %xltxtra
+\ifXeTeX
+    \RequirePackage{xunicode} %xltxtra
+\fi
 \RequirePackage{ragged2e}
 \RequirePackage{xspace}
 \RequirePackage{enumitem}
@@ -41,7 +43,7 @@
 \RequirePackage{bookmark}
 \RequirePackage{calc}
 
-\hypersetup{colorlinks=true, bookmarksnumbered=true, pdfauthor={hzguide.cls}} % allcolors=darkgray
+\hypersetup{pdfencoding=auto, colorlinks=true, bookmarksnumbered=true, pdfauthor={hzguide.cls}} % allcolors=darkgray
 
 % TeX: ^^b7
 % XeTeX: ^^^^ac00 ^^^^^^020000  \char44032 \char"AC00 \char'126000 \char`가 \char`^^^^ac00
@@ -443,7 +445,14 @@
 
 \IfLang{kor}
 {
-    \usepackage[hangul]{xetexko}  
+    %\usepackage[hangul]{xetexko}  
+    \ifXeTeX
+        \usepackage{xetexko}
+    \else
+        \ifLuaTeX
+            \usepackage[hangul]{luatexko}
+        \fi
+    \fi
     %\xetexkofontregime{hangul}
     %\XeTeXcharclass"201C = \XKlatinopening
     %\XeTeXcharclass"201D = \XKlatinclosing
@@ -453,7 +462,7 @@
     %\setmainhangulfont{NotoSerifCJKkr}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Regular}, BoldFont={*-Bold}]
     %\setsanshangulfont{NotoSansCJKkr}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Regular}, BoldFont={*-Bold}]
     \setmainhangulfont{KoPubBatang}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PL}, BoldFont={*PB}]
-    \setsanshangulfont{KoPubDotum}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PL}, BoldFont={*PB}]
+    \setsanshangulfont{KoPubDotum}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PM}, BoldFont={*PB}]
     \AtBeginDocument{
         \renewcommand*{\contentsname}{차례}
         \AdmonitionSetup {
@@ -944,11 +953,23 @@
 
 % \foreign[Arial]{Philanthropy}
 % \foreign*{263A}
-\NewDocumentCommand \SetForeignFonts { m m }
-{
-    \newfontfamily\foreignrmfamily{#1}[AutoFakeBold=1.5]
-    \newfontfamily\foreignsffamily{#2}[AutoFakeBold=1.5]
-}
+
+\ifXeTeX
+    \NewDocumentCommand \SetForeignFonts { m m }
+    {
+        \newfontfamily\foreignrmfamily{#1}[AutoFakeBold=1.5]
+        \newfontfamily\foreignsffamily{#2}[AutoFakeBold=1.5]
+    }
+\else
+    \ifLuaTeX
+        \NewDocumentCommand \SetForeignFonts { m m }
+        {
+            \newfontfamily\foreignrmfamily{#1}
+            \newfontfamily\foreignsffamily{#2}
+        }
+    \fi
+\fi
+
 
 \SetForeignFonts{HCR Batang}{HCR Dotum}
 
@@ -1484,17 +1505,22 @@
     ulratio         .tl_gset:N = \ulratio, % specify after column
     lrmargin        .dim_gset:N = \lrmargin,
     vartwomargin    .dim_gset:N = \vartwomargin,
-    showtrim        .bool_gset:N = \g_layout_showtrim_bool,
+    showtrims       .bool_gset:N = \g_layout_showtrims_bool,
+    showlayout      .bool_gset:N = \g_layout_showlayout_bool,
     hook            .tl_gset:N = \g_layout_hook
 }
 
-\bool_set_false:N \g_layout_showtrim_bool
+\bool_set_false:N \g_layout_showtrims_bool
 
 \NewDocumentCommand \LayoutSetup { s m }
 {
     \keys_set:nn { hzlayout } { #2 }
     \IfBooleanF{#1}{
         \layout_settle:
+    }
+    \bool_if:NT \g_layout_showlayout_bool
+    {
+        \AtBeginDocument{ \ShowPageLayout }
     }
 }
 \LayoutSetup*{paper=A4, column=one}
@@ -1504,7 +1530,7 @@
     \bool_if:NT \g_layout_landscape_bool
         { \layout_turn_tolandscape: }
 
-    \bool_if:NTF \g_layout_showtrim_bool
+    \bool_if:NTF \g_layout_showtrims_bool
         {
             \showtrimson
             \setstocksize{\stockheight}{\stockwidth}
@@ -2082,38 +2108,38 @@
     framecolor=gray
 }
 
-% tasks
+% actions
 
-\keys_define:nn { task }
+\keys_define:nn { action }
 {
-    beforeskip  .skip_set:N = \l_task_before_skip,
-    afterskip   .skip_set:N = \l_task_after_skip,
-    font        .tl_set:N = \l_task_font,
-    delimiter   .tl_set:N = \l_task_delimiter,
-    inline      .bool_set:N = \l_task_inline_bool
+    beforeskip  .skip_set:N = \l_action_before_skip,
+    afterskip   .skip_set:N = \l_action_after_skip,
+    font        .tl_set:N = \l_action_font,
+    delimiter   .tl_set:N = \l_action_delimiter,
+    inline      .bool_set:N = \l_action_inline_bool
 }
 
-\NewDocumentCommand \TaskSetup { m }
+\NewDocumentCommand \ActionSetup { m }
 {
-    \keys_set:nn {task} {#1}
+    \keys_set:nn {action} {#1}
 }
 
-\TaskSetup {
-    beforeskip = 0.25\hzparskip,
-    afterskip = -0.25\hzparskip,
+\ActionSetup {
+    beforeskip = 0.5\hzparskip,
+    afterskip = -\hzparskip,
     font = \bfseries,
     inline = true
 }
 
-\NewDocumentCommand \task { m }
+\NewDocumentCommand \action { m }
 {
-    \object_skip_before:n {\l_task_before_skip}
+    \object_skip_before:n {\l_action_before_skip}
     \group_begin:
-        \l_task_font #1
+        \l_action_font #1
     \group_end:
-    \bool_if:NTF \l_task_inline_bool
-        { \l_task_delimiter \space }
-        { \nopagebreak\par\object_skip_after:n {\l_task_after_skip} }
+    \bool_if:NTF \l_action_inline_bool
+        { \l_action_delimiter \space }
+        { \nopagebreak\par\object_skip_after:n {\l_action_after_skip} }
 }
 
 % hyperlinks
@@ -2121,7 +2147,7 @@
 \NewDocumentCommand \DecolorHyperlinks { O {darkgray} O {\bfseries} }
 {
     \hypersetup{colorlinks=false,pdfborder={0 0 0}}    
-    \renewcommand{\theTitleReference}[2]{\textcolor{#1}{#2 ##1}}
+    \renewcommand{\theTitleReference}[2]{\textcolor{#1}{#2 ##2}}
 }
 
 % graphics * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -3165,12 +3191,12 @@
     star    .tl_set:N = \l_UI_star,
     vbar    .tl_set:N = \l_UI_vbar
 }
-\NewDocumentCommand \UISetup { m }
+\NewDocumentCommand \uisetup { m }
 {
     \keys_set:nn {ui} {#1}
 }
 
-\UISetup{
+\uisetup{
     color=black,
     font=\sffamily\mdseries,
     default={color=\l_ui_color, font=\l_ui_font}
@@ -4618,7 +4644,7 @@
         }
 }
 
-\NewDocumentCommand \scenetasks { O{5} }
+\NewDocumentCommand \sceneactions { O{5} }
 {
     \int_zero:N \l_tmpa_int 
     \int_set:Nn \l_tmpb_int {#1}
@@ -4626,7 +4652,7 @@
     {
         \int_incr:N \l_tmpa_int
         \str_set:Nx \l_tmpa_str { \int_to_Alph:n \l_tmpa_int }
-        \section{Task~\l_tmpa_str}
+        \section{action~\l_tmpa_str}
         \scenelist*
 
     }
@@ -4669,7 +4695,7 @@
     \problem{Problem} \scenepara
 }
 
-\NewDocumentCommand \sceneproblems { O{3} }
+\NewDocumentCommand \sceneproblems { O{2} }
 {
     %\listofproblems*
     \int_zero:N \l_tmpa_int 
@@ -4992,7 +5018,7 @@
 \expandafter\def\csname pgf@sh@pi@memoir marginpar area\endcsname{pgfpageorigin}
 \makeatother
 
-\NewDocumentCommand \DisplayPageLayout { }
+\NewDocumentCommand \ShowPageLayout { }
 {
     \calculatetrims
     \AddToShipoutPictureBG{
