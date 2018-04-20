@@ -17,7 +17,7 @@
 % IV. For those of designer interface level:
 %     Follow clause II. However, it is allowed to use lowercase with compound words.
 
-\ProvidesClass{hzguide}[2018/04/12]
+\ProvidesClass{hzguide}[2018/04/20]
 
 \LoadClassWithOptions{memoir}
 
@@ -25,9 +25,9 @@
 \RequirePackage{expl3,xparse,l3keys2e}
 \RequirePackage{environ}
 \RequirePackage{fontspec}
-\ifXeTeX
-    \RequirePackage{xunicode} %xltxtra
-\fi
+% \ifXeTeX
+%     \RequirePackage{xunicode} %xltxtra
+% \fi
 \RequirePackage{ragged2e}
 \RequirePackage{xspace}
 \RequirePackage{enumitem}
@@ -39,6 +39,9 @@
 \RequirePackage{tikz, tikzpagenodes}
 \RequirePackage{tcolorbox}
 \RequirePackage{tabu, longtable, multirow}
+\RequirePackage[obeyspaces, spaces]{url} %\path{file path}
+% when using \path, redefine \flushleft like below if don't want spaces above and below it.
+%\def\flushleft{\setlength\topsep{0pt}\trivlist \raggedright\item\relax}
 \RequirePackage{hyperref}
 \RequirePackage{bookmark}
 \RequirePackage{calc}
@@ -855,39 +858,44 @@
 
 % editing  --------------------------------------------------------------------
 
-\keys_define:nn { alter }
+\keys_define:nn { pending }
 {
-    beforecolor .tl_set:N = \l_alter_beforecolor,
-    aftercolor  .tl_set:N = \l_alter_aftercolor,
-    font        .tl_set:N = \l_alter_font,
-    hide        .bool_set:N = \l_alter_hide_bool
+    beforecolor .tl_set:N = \l_pending_beforecolor,
+    aftercolor  .tl_set:N = \l_pending_aftercolor,
+    font        .tl_set:N = \l_pending_font,
+    hide        .bool_set:N = \l_pending_hide_bool
 }
 
-\NewDocumentCommand \AlterSetup { m }
+\NewDocumentCommand \PendingSetup { m }
 {
-    \keys_set:nn { alter } { #1 }
+    \keys_set:nn { pending } { #1 }
 }
 
-\AlterSetup{
+\PendingSetup{
     beforecolor=red,
     aftercolor=blue,
     font=\foreignrmfamily,
     hide=false
 }
 
-\NewDocumentCommand \alter { +m }
+\NewDocumentCommand \pending { +m }
 {
-    \bool_if:NF \l_alter_hide_bool
+    \bool_if:NF \l_pending_hide_bool
     {
-        \textcolor{\l_alter_beforecolor}{\l_alter_font #1}
+        \textcolor{\l_pending_beforecolor}{\l_pending_font #1}
     }
 }
 
-\NewEnviron{Alter}{\alter{\BODY}}
+\NewEnviron{Pending}{\pending{\BODY}}
 
-\NewDocumentCommand \HideAlter {}
+\NewDocumentCommand \HidePending {}
 {
-    \bool_set_true:N \l_alter_hide_bool
+    \bool_set_true:N \l_pending_hide_bool
+}
+
+\NewDocumentCommand \ShowPending {}
+{
+    \bool_set_false:N \l_pending_hide_bool
 }
 
 \newlistof{listofqueries}{loq}{Queries}
@@ -896,10 +904,10 @@
 
 \NewDocumentCommand \query { +m o }
 {
-    \alter{#1}
+    \pending{#1}
     \IfNoValueTF {#2}
-        { \addcontentsline{loq}{query}{\l_alter_font #1} }
-        { \addcontentsline{loq}{query}{\l_alter_font #2} }
+        { \addcontentsline{loq}{query}{\l_pending_font #1} }
+        { \addcontentsline{loq}{query}{\l_pending_font #2} }
 }
 
 \cs_set_eq:NN \orglistofqueries \listofqueries
@@ -907,36 +915,39 @@
 \RenewDocumentCommand \listofqueries { s }
 {
     \group_begin:
-    \bool_if:NF \l_alter_hide_bool
+    \bool_if:NF \l_pending_hide_bool
         {
-            \color{\l_alter_beforecolor}
+            \color{\l_pending_beforecolor}
             \IfBooleanTF {#1} {\orglistofqueries*} {\orglistofqueries}
         }
     \group_end:
 }
 
+% deleted: \change*{}
+% added: \change{}
+% changed: \change[before]{after}
 \NewDocumentCommand \change { s o m }
 {
-    \bool_if:NTF \l_alter_hide_bool
+    \bool_if:NTF \l_pending_hide_bool
     {
         \IfBooleanTF {#1} {\ignorespaces} {#3}
     }{
         \IfBooleanTF {#1}
         {
-            \textcolor{\l_alter_beforecolor}{\sout{#3}}
+            \textcolor{\l_pending_beforecolor}{\sout{#3}}
         }{
             \IfNoValueTF {#2}
             {
-                \textcolor{\l_alter_aftercolor}{#3}
+                \textcolor{\l_pending_aftercolor}{#3}
             }{
-                \textcolor{\l_alter_beforecolor}{\sout{#2}}\,
-                \textcolor{\l_alter_aftercolor}{#3}
+                \textcolor{\l_pending_beforecolor}{\sout{#2}}\,
+                \textcolor{\l_pending_aftercolor}{#3}
             }
         }
     }
 }
 
-\cs_set_eq:NN \HideChanges \HideAlter
+\cs_set_eq:NN \HideChanges \HidePending
 
 % letters  --------------------------------------------------------------------
 
@@ -969,7 +980,6 @@
         }
     \fi
 \fi
-
 
 \SetForeignFonts{HCR Batang}{HCR Dotum}
 
@@ -1166,8 +1176,8 @@
     \dim_gset:Nn \stockheight {353mm}
     \dim_gset:Nn \paperwidth {210mm}
     \dim_gset:Nn \paperheight {297mm}
-    \dim_gset:Nn \ulmargin {30mm}
-    \dim_gset:Nn \lrmargin {25mm}
+    \dim_gset:Nn \ulmargin {36mm} % textheight: 297 - 72 = 225 mm (= 140 * 1.6)
+    \dim_gset:Nn \lrmargin {35mm} % textwidth: 140 mm (= 210 - 70)
     \dim_gset:Nn \vartwomargin {20mm}
 }
 
@@ -1178,8 +1188,8 @@
     \dim_gset:Nn \stockheight {297mm}
     \dim_gset:Nn \paperwidth {176mm}
     \dim_gset:Nn \paperheight {250mm}
-    \dim_gset:Nn \ulmargin {29mm} % textheight = 192 mm = 120 mm * 1.6
-    \dim_gset:Nn \lrmargin {28mm} % textwidth: 120 mm
+    \dim_gset:Nn \ulmargin {29mm} % textheight: 250 - 58 = 192 mm (= 120 * 1.6)
+    \dim_gset:Nn \lrmargin {28mm} % textwidth: 120 mm (= 176 - 56)
     \dim_gset:Nn \vartwomargin {14mm} 
 }
 
@@ -1249,12 +1259,12 @@
         { one } {
                 \bool_set_false:N \g_column_vartwo_bool
                 \tl_gset:Nn \g_layout_type {common}
-                \tl_gset:Nn \ulratio {1.2}
+                \tl_gset:Nn \ulratio {1}
             }
         { vartwo } {
                 \bool_set_true:N \g_column_vartwo_bool
                 \tl_gset:Nn \g_layout_type {vartwo}
-                \tl_gset:Nn \ulratio {1.1}
+                \tl_gset:Nn \ulratio {1}
             }
     }
 }
@@ -1264,8 +1274,8 @@
 \cs_new:Nn \layout_column_one:
 {
     \setulmarginsandblock{\ulmargin}{*}{\ulratio}
-    \setheadfoot{0.4\ulmargin}{0.6\ulmargin}
-    \setheaderspaces{*}{*}{0.5}  % HeaderSep = 0.5 * HeaderDrop
+    \setheadfoot{0.33\ulmargin}{0.33\ulmargin}
+    \setheaderspaces{*}{*}{0.5}  % headsep = 0.5 * headdrop
     \setlrmarginsandblock{\lrmargin}{\lrmargin}{*}
     \g_layout_hook
     \checkandfixthelayout
@@ -1274,7 +1284,7 @@
 \cs_new:Nn \layout_column_vartwo:
 {
     \setulmarginsandblock{\ulmargin}{*}{\ulratio}
-    \setheadfoot{0.4\ulmargin}{0.6\ulmargin}
+    \setheadfoot{0.33\ulmargin}{0.33\ulmargin}
     \setheaderspaces{*}{*}{0.5}
     \setlrmarginsandblock{3\vartwomargin}{\vartwomargin}{*}
     \setmarginnotes{.25\vartwomargin}{1.75\vartwomargin}{1ex}
@@ -1901,9 +1911,9 @@
     sectionalign=\raggedright, %\memRTLraggedright,
     sectionfont=\normalfont\bfseries,
     sectioncolor=black,
-    sectionsize=\Large,
-    subsectionsize=\large,
-    subsubsectionsize=\normalsize,
+    sectionsize=\LARGE,
+    subsectionsize=\Large,
+    subsubsectionsize=\large,
     parskip=.25\baselineskip,
     parindent=1em
 }
@@ -2050,6 +2060,8 @@
 \NewDocumentEnvironment {SectionNewpage} {}
     { \SectionNewpageOn }
     { \SectionNewPageOff}
+
+% flushleft
 
 % objects ---------------------------------------------------------------------
 
@@ -2336,41 +2348,6 @@
      }
 }
 
-% \cs_new:Npn \image_save:nn #1 #2
-% {
-%     \bool_if:NTF \l_image_frame_bool
-%     {
-%         \bool_if:NTF \l_image_extra_bool {
-%             \hbox_set:Nn \l_image_box{
-%                 \objectframe{
-%                     \includegraphics[scale=\l_image_scale]{#1}
-%                     \hspace{\l_image_extra_skip}
-%                     \includegraphics[scale=\l_image_scale]{#2}
-%                 }
-%             }
-%         }{
-%             \hbox_set:Nn \l_image_box{
-%                 \objectframe{
-%                     \includegraphics[scale=\l_image_scale]{#1}
-%                 }
-%             }
-%         }
-%      }
-%      {
-%          \bool_if:NTF \l_image_extra_bool {
-%             \hbox_set:Nn \l_image_box{
-%                     \includegraphics[scale=\l_image_scale]{#1}
-%                     \hspace{\l_image_extra_skip}
-%                     \includegraphics[scale=\l_image_scale]{#2}
-%             }
-%         }{
-%             \hbox_set:Nn \l_image_box{
-%                     \includegraphics[scale=\l_image_scale]{#1}
-%             }
-%         }
-%      }
-% }
-
 \cs_new:Nn \image_put:
 {
     \bool_if:NTF \l_image_landscape_bool
@@ -2451,11 +2428,11 @@
     beforeskip      .skip_set:N = \l_illustimage_before_skip,
     afterskip       .skip_set:N = \l_illustimage_after_skip,
     frame           .bool_set:N = \l_illustimage_frame_bool,
-    gap             .dim_set:N = \l_illustimage_gap,
-    scale           .tl_set:N = \l_illustimage_scale,
-    position        .tl_set:N = \l_illustimage_position,
-    verticaloffset  .tl_set:N = \l_illustimage_voffset,
-    verticalalign   .tl_set:N = \l_illustimage_valign,
+    gap             .dim_set:N = \l_illustimage_gap_dim,
+    scale           .tl_set:N = \l_illustimage_scale_tl,
+    position        .tl_set:N = \l_illustimage_position_tl,
+    voffset         .skip_set:N = \l_illustimage_voffset_skip,
+    valign          .tl_set:N = \l_illustimage_valign_tl,
     caption         .tl_set:N = \l_illustimage_caption,
     label           .tl_set:N = \l_illustimage_label,
     legend          .bool_set:N = \l_illustimage_legend_bool,
@@ -2463,8 +2440,9 @@
     broad           .bool_set:N = \l_illustimage_broad_bool, % take the full width in case of vartwo
     flush           .bool_set:N = \l_illustimage_flush_bool,
     showfilename    .bool_set:N = \l_illustimage_showfilename_bool,
-    textstyle       .tl_set:N = \l_illustimage_textstyle,
-    star            .tl_set:N = \l_illustimage_star
+    textstyle       .tl_set:N = \l_illustimage_textstyle_tl,
+    star            .tl_set:N = \l_illustimage_star_tl,
+    enum            .tl_set:N = \l_illustimage_enum_tl
 }
 
 \NewDocumentCommand \IllustImageSetup { m }
@@ -2476,12 +2454,12 @@
     first=false,  
     beforeskip=.15\baselineskip,
     afterskip=.15\baselineskip,
-    firstskip=1pt,
+    firstskip=.5\baselineskip,
     frame=false,
     width=0pt,
     position=left,
-    verticaloffset=0pt,
-    verticalalign=t,
+    voffset=0pt,
+    valign=t,
     scale=1,
     legend=false,
     showfilename=false,
@@ -2494,9 +2472,8 @@
 {
     \group_begin:
     \bool_set_true:N \in_illustimage
-    %\illustimage_clear:
     \IfBooleanT {#1}
-        { \exp_args:No \IllustImageSetup{\l_illustimage_star} }
+        { \exp_args:No \IllustImageSetup{\l_illustimage_star_tl} }
     \IfBooleanT {#2}
         { \IllustImageSetup{first=true} }
     \IllustImageSetup{#3}
@@ -2514,11 +2491,11 @@
     \bool_if:NTF \l_illustimage_frame_bool
     {
         \hbox_set:Nn \l_image_box
-            { \objectframe{\includegraphics[scale=\l_illustimage_scale]{#4}} }
+            { \objectframe{\includegraphics[scale=\l_illustimage_scale_tl]{#4}} }
      }
      {
          \hbox_set:Nn \l_image_box
-             { \includegraphics[scale=\l_illustimage_scale]{#4} }
+             { \includegraphics[scale=\l_illustimage_scale_tl]{#4} }
      }
     % save text
     \dim_compare:nTF { \l_illustimage_width_dim > 0pt }
@@ -2531,11 +2508,11 @@
     {
         \dim_set_towidth:Nn \l_tmpa_dim { \box_use:N \l_image_box }
     }
-    \dim_set:Nn \l_tmpb_dim { \linewidth - \l_tmpa_dim - \l_illustimage_gap }
+    \dim_set:Nn \l_tmpb_dim { \linewidth - \l_tmpa_dim - \l_illustimage_gap_dim }
     \hbox_set:Nn \l_text_box
     {
         \begin{minipage}{\l_tmpb_dim}
-            \HzJustification\l_illustimage_textstyle #6
+            \HzJustification\l_illustimage_textstyle_tl #6
         \end{minipage}
     }
     \illustimage_put:
@@ -2550,7 +2527,7 @@
 
 \cs_new:Nn \illustimage_put:
 {
-    \str_case_x:nn { \l_illustimage_position }
+    \str_case_x:nn { \l_illustimage_position_tl }
     {
         {left}   { \illustimage_put_left: }
         {right}  { \illustimage_put_right: }
@@ -2566,7 +2543,7 @@
         \object_skip_before:n {\l_illustimage_before_skip}
     }
     \begin{minipage}{\linewidth} 
-        \begin{minipage}[\l_illustimage_valign]{\l_tmpa_dim}
+        \begin{minipage}[\l_illustimage_valign_tl]{\l_tmpa_dim}
             \vspace{0pt}
             \bool_if:NT \l_illustimage_broad_bool
             {
@@ -2576,10 +2553,10 @@
             \illustimage_caption:      
         \end{minipage}
         \hfill 
-        \begin{minipage}[\l_illustimage_valign]{\l_tmpb_dim}
+        \begin{minipage}[\l_illustimage_valign_tl]{\l_tmpb_dim}
             \vspace{0pt}
             \begin{minipage}{\linewidth}        
-                \vspace{\l_illustimage_voffset}
+                \vspace{\l_illustimage_voffset_skip}
                 \box_use:N \l_text_box        
             \end{minipage}
             \vspace{0pt}
@@ -2597,16 +2574,16 @@
         \object_skip_before:n {\l_illustimage_before_skip}
     }
     \begin{minipage}{\linewidth}
-        \begin{minipage}[\l_illustimage_valign]{\l_tmpb_dim}
+        \begin{minipage}[\l_illustimage_valign_tl]{\l_tmpb_dim}
             \vspace{0pt}
             \begin{minipage}{\linewidth}        
-                \vspace{\l_illustimage_voffset}
+                \vspace{\l_illustimage_voffset_skip}
                 \box_use:N \l_text_box        
             \end{minipage}
             \vspace{0pt}
         \end{minipage}
         \hfill
-        \begin{minipage}[\l_illustimage_valign]{\l_tmpa_dim}
+        \begin{minipage}[\l_illustimage_valign_tl]{\l_tmpa_dim}
             \vspace{0pt}
             \bool_if:NT \l_illustimage_broad_bool
             {
@@ -2643,7 +2620,7 @@
 \NewDocumentEnvironment {IllustImage} { s t^ o m d() }
 {
     \IfBooleanT {#1} { 
-        \exp_args:No \IllustImageSetup{\l_illustimage_star} 
+        \exp_args:No \IllustImageSetup{\l_illustimage_star_tl} 
     }
     \IfBooleanT {#2} { 
         \IllustImageSetup{first=true} 
@@ -2662,7 +2639,7 @@
 % as environment for symbol
 \NewDocumentEnvironment { IllustSymbol } { O{} m }
 {
-    \IllustImageSetup{frame=false, verticaloffset=0.75ex, verticalalign=m, #1} 
+    \IllustImageSetup{frame=false, voffset=0.75ex, valign=m, #1} 
     \IllustratedImage{#2}
 }{
     \endIllustratedImage
@@ -2703,9 +2680,10 @@
 {
     \IfBooleanT {#1} {
         \IllustImageSetup{first=true}
+        \exp_args:No \IllustImageSetup{\l_illustimage_enum_tl}
     }
     \IfBooleanT {#2} {
-        \exp_args:No \IllustImageSetup{\l_illustimage_star}
+        \exp_args:No \IllustImageSetup{\l_illustimage_star_tl}
     }
     \IfValueT {#3} { 
         \IllustImageSetup{#3} 
@@ -2774,7 +2752,7 @@
 
 \LineImageSetup{
     scale=1,
-    raise=-.25ex,
+    raise=-.35ex,
     showfilename=false
 }
 
@@ -3066,14 +3044,14 @@
     \IfNoValueTF {#2}
     {
         \tl_set:Nn \l_image_scale {#1}
-        \tl_set:Nn \l_illustimage_scale {#1}
+        \tl_set:Nn \l_illustimage_scale_tl {#1}
         \tl_set:Nn \l_lineimg_scale {#1}
     }
     {
         \str_case:nn {#2}
         {
             {\image}   { \tl_set:Nn \l_image_scale {#1} }
-            {\illustimage}  { \tl_set:Nn \l_illustimage_scale {#1} }
+            {\illustimage}  { \tl_set:Nn \l_illustimage_scale_tl {#1} }
             {\lineimg}      { \tl_set:Nn \l_lineimg_scale {#1} }
         }
     }
@@ -3360,7 +3338,7 @@
     index=true,
     newline=false,
     star={itemsep=0ex},
-    vbar={enumerate=true},
+    vbar={delimiter=\hfill},
     enummarker={\int_use:N \l_terms_int)\hskip\l_terms_markersep} 
 }
 
@@ -3743,14 +3721,12 @@
     font=\sffamily\footnotesize\bfseries,
     fgcolor=white,
     bgcolor=black,
-    sep=0.1pt,
+    sep=1pt,
     raise=-.5ex,
-    base=10
+    base=9
 }
 
 \CirnumSetup{fontfeature={\addfontfeature{LetterSpace=-3}}}
-
-%\cs_new_eq:NN \cirnumsetup \CirnumSetup
 
 \NewDocumentCommand \cirnum {m}
 {
