@@ -17,7 +17,7 @@
 % IV. For those of designer interface level:
 %     Follow clause II. However, it is allowed to use lowercase with compound words.
 
-\ProvidesClass{hzguide}[2018/04/20]
+\ProvidesClass{hzguide}[2018/05/03]
 
 \LoadClassWithOptions{memoir}
 
@@ -25,9 +25,6 @@
 \RequirePackage{expl3,xparse,l3keys2e}
 \RequirePackage{environ}
 \RequirePackage{fontspec}
-% \ifXeTeX
-%     \RequirePackage{xunicode} %xltxtra
-% \fi
 \RequirePackage{ragged2e}
 \RequirePackage{xspace}
 \RequirePackage{enumitem}
@@ -49,7 +46,7 @@
 \hypersetup{pdfencoding=auto, colorlinks=true, bookmarksnumbered=true, pdfauthor={hzguide.cls}} % allcolors=darkgray
 
 % TeX: ^^b7
-% XeTeX: ^^^^ac00 ^^^^^^020000  \char44032 \char"AC00 \char'126000 \char`가 \char`^^^^ac00
+% LaTeX: ^^^^ac00 ^^^^^^020000  \char44032 \char"AC00 \char'126000 \char`가 \char`^^^^ac00
 % \let\cleardoublepage\relax to inhibit \mainmatter from producing a blank page
 % \patchcommand\tableofcontents{\clearpage}{}
 
@@ -201,7 +198,7 @@
 
 \NewDocumentCommand \PrioritizeVector {}
 {
-    \DeclareGraphicsExtensions{.pdf,.png,.jpg}
+    \DeclareGraphicsExtensions{.pdf,.jpg,.png}
 }
 
 \bool_if:NTF \g_bitmap_bool
@@ -448,9 +445,8 @@
 
 \IfLang{kor}
 {
-    %\usepackage[hangul]{xetexko}  
     \ifXeTeX
-        \usepackage{xetexko}
+        \usepackage[hangul]{xetexko}
     \else
         \ifLuaTeX
             \usepackage[hangul]{luatexko}
@@ -1178,7 +1174,7 @@
     \dim_gset:Nn \paperheight {297mm}
     \dim_gset:Nn \ulmargin {36mm} % textheight: 297 - 72 = 225 mm (= 140 * 1.6)
     \dim_gset:Nn \lrmargin {35mm} % textwidth: 140 mm (= 210 - 70)
-    \dim_gset:Nn \vartwomargin {20mm}
+    \dim_gset:Nn \vartwomargin {20mm} % textwidth: 130 mm
 }
 
 % B5
@@ -1257,12 +1253,12 @@
     \str_case:nnT { #1 }
     {
         { one } {
-                \bool_set_false:N \g_column_vartwo_bool
+                \bool_gset_false:N \g_column_vartwo_bool
                 \tl_gset:Nn \g_layout_type {common}
                 \tl_gset:Nn \ulratio {1}
             }
         { vartwo } {
-                \bool_set_true:N \g_column_vartwo_bool
+                \bool_gset_true:N \g_column_vartwo_bool
                 \tl_gset:Nn \g_layout_type {vartwo}
                 \tl_gset:Nn \ulratio {1}
             }
@@ -1642,15 +1638,32 @@
     \color{\chaptercolor}
 }
 
-\NewDocumentCommand \SectionRule {m}
+\NewDocumentCommand \SectionRule { m }
+{
+    \secstyle #1
+    \nopagebreak\vskip-\onelineskip
+    \hspace*{-\vartwosecindent}
+    \IfVartwo
+    {
+        \rule{\headwidth}{0.75pt}
+    }
+    [
+        \if@twocolumn
+            \rule{\columnwidth}{0.75pt}
+        \else
+            \rule{\textwidth}{0.75pt}
+        \fi
+    ]
+}
+
+\NewDocumentCommand \SectionMultilineRule { m }
 {
     \SectionMultiline { #1
-        \nopagebreak\vskip-1.2\onelineskip
-        \IfVartwo
-        {
+        \nopagebreak\vskip-1\onelineskip
+        \IfVartwo        {
+            
             \rule{\headwidth}{0.75pt}
-        }
-        [
+        }[
             \if@twocolumn
                 \rule{\columnwidth}{0.75pt}
             \else
@@ -1661,41 +1674,34 @@
 }
 
 \NewDocumentCommand \SectionMultiline { m }
-{
-    \noindent\hspace*{-\dimexpr\vartwosecindent\relax}
+{    
+    \hspace*{-\vartwosecindent}
     \makebox[0pt][l]{
-        \parbox[t]{\dimexpr\textwidth+\vartwosecindent\relax}{\secstyle #1}
+        \parbox[t]{\textwidth+\vartwosecindent}{\secstyle #1}
     }
 }
 
 \NewDocumentCommand \SubsectionMultiline { m }
-{
-    \noindent\hspace*{-\dimexpr\vartwosecindent\relax}
+{    
+    \hspace*{-\vartwosecindent}
     \makebox[0pt][l]{
-        \parbox[t]{\dimexpr\textwidth+\vartwosecindent\relax}{\subsecstyle #1}
-    }
-}
-
-\NewDocumentCommand \SubsubsectionMultiline { m }
-{
-    \noindent\hspace*{-\dimexpr\vartwosecindent\relax}%
-    \makebox[0pt][l]{%
-        \parbox[t]{\dimexpr\textwidth+\vartwosecindent\relax}{\subsubsecstyle #1}%
+            \parbox[t]{\textwidth+\vartwosecindent}{\subsecstyle #1}
     }
 }
 
 \NewDocumentCommand \sectionline {}
 {
-    \sectionalign \sectionfont \nobreak \color{\sectioncolor}
+    \sectionalign 
+    \sectionfont 
+    \color{\sectioncolor}
 }
 
-\NewDocumentCommand \secstyle {} { \sectionline\secfontsize }
-\NewDocumentCommand \subsecstyle {} { \sectionline\subsecfontsize }
-\NewDocumentCommand \subsubsecstyle {} { \sectionline\subsubsecfontsize }
-\setsecheadstyle { \SectionMultiline }
-\setsubsecheadstyle { \SubsectionMultiline }
-%\setsubsubsecheadstyle { \SubsubsectionMultiline }
-\setsubsubsecheadstyle { \subsubsecstyle }
+\NewDocumentCommand\secstyle{}{ \sectionline\secfontsize }
+\NewDocumentCommand\subsecstyle{}{ \sectionline\subsecfontsize }
+\NewDocumentCommand\subsubsecstyle{}{ \sectionline\subsubsecfontsize }
+\setsecheadstyle{ \secstyle }
+\setsubsecheadstyle{ \subsecstyle }
+\setsubsubsecheadstyle{ \subsubsecstyle }
 
 % style configuration --------------------------------------------------------
 
@@ -1746,7 +1752,7 @@
 {
     \str_case:nn {#1}
     {
-        {section}  { \style_cft_section:}
+        {section}  { \style_cft_section: }
         {none}     { \addtodef {\tableofcontents} {\markboth{}{}} {} }
     }
 }
@@ -1772,16 +1778,18 @@
     \chapterstyle{#1}
 }
 
+% multiline: 
 \cs_new:Npn \style_section_configure:n #1
 {
     \clist_map_variable:nNn {#1} \l_tmpa_tl
     {
         \str_case_x:nn { \l_tmpa_tl }
         {
-            {firm}    { \style_section_firm: }
-            {sparse}  { \style_section_sparse: }
-            {tight}   { \style_section_tight: }
-            {rule}    { \setsecheadstyle { \SectionRule } }
+            { firm }      { \style_section_firm: }
+            { sparse }    { \style_section_sparse: }
+            { tight }     { \style_section_tight: }
+            { multiline } { \style_section_multiline: }
+            { rule }      { \style_section_rule: }
         }
     }
 }
@@ -1807,9 +1815,6 @@
 
 \cs_new:Nn \style_section_sparse:
 {
-    \tl_set:Nn \secfontsize { \LARGE }
-    \tl_set:Nn \subsecfontsize { \Large }
-    \tl_set:Nn \subsubsecfontsize { \large }
     \setbeforesecskip{-4ex \@plus -.5ex \@minus -.1ex}
     \setbeforesubsecskip{-3.5ex \@plus -.5ex \@minus -.1ex}
     \setbeforesubsubsecskip{-3.25ex \@plus -.5ex \@minus -.1ex}
@@ -1826,6 +1831,26 @@
     \setaftersecskip{1.5ex \@plus .1ex}
     \setaftersubsecskip{1.25ex \@plus .1ex}
     \setaftersubsubsecskip{1ex \@plus .1ex}
+}
+
+\cs_new:Nn \style_section_multiline:
+{
+    \bool_if:NT \g_column_vartwo_bool
+    {
+        \bool_gset_true:N \g_section_multiline_bool    
+        \setsecheadstyle{ \SectionMultiline }
+        \setsubsecheadstyle{ \SubsectionMultiline }
+    }
+}
+
+\cs_new:Nn \style_section_rule:
+{
+    \bool_if:NTF \g_section_multiline_bool
+    {
+        \setsecheadstyle{ \SectionMultilineRule }    
+    }{
+        \setsecheadstyle{ \SectionRule }
+    }
 }
 
 \cs_new:Npn \style_paragraph_configure:n #1
@@ -1858,6 +1883,7 @@
     \TermsSetup{topsep=0.5ex,itemsep=.25ex}
 }
 
+\bool_new:N \g_section_multiline_bool
 \keys_define:nn {hzheading}
 {
     linespacing           .code:n = { \setSpacing {#1} },
@@ -1872,6 +1898,7 @@
     chaptertitlesize      .tl_set:N = \chaptertitlesize,
     chapterstyle          .code:n = { \style_chapter_configure:n {#1} },
     nochaptername         .bool_set:N = \g_style_nochaptername_bool,
+    chaptercontents       .bool_set:N = \g_chapter_contents_bool,
     sectionalign          .tl_set:N = \sectionalign,
     sectionfont           .tl_set:N = \sectionfont,
     sectioncolor          .tl_set:N = \sectioncolor,
@@ -1900,7 +1927,20 @@
                 {\begin{adjustwidth}{-\vartwosecindent}{0pt}}{\end{adjustwidth}}
             \patchcommand{\@makeschapterhead}
                 {\begin{adjustwidth}{-\vartwosecindent}{0pt}}{\end{adjustwidth}}
+            \patchcommand\printtoctitle{\hspace*{-\vartwosecindent}}{}
+        }  
+        \bool_if:NTF \g_section_multiline_bool
+        {
+            \setsecindent{0pt}
+            \setsubsecindent{0pt}
+        }{
+            \setsecindent{-\vartwosecindent}
+            \setsubsecindent{-\vartwosecindent}
         }
+    }
+    \bool_if:NT \g_ps_chaptermark_bool
+    {
+        \EnableChapterContents
     }
 }
 
@@ -1911,9 +1951,9 @@
     sectionalign=\raggedright, %\memRTLraggedright,
     sectionfont=\normalfont\bfseries,
     sectioncolor=black,
-    sectionsize=\LARGE,
-    subsectionsize=\Large,
-    subsubsectionsize=\large,
+    sectionsize=\Large,
+    subsectionsize=\large,
+    subsubsectionsize=\normalsize,
     parskip=.25\baselineskip,
     parindent=1em
 }
@@ -2921,7 +2961,7 @@
     }
 }
 
-%\NewEnviron{PlaceTable}[1][]{\placetable[#1]{\BODY}}
+\NewEnviron{PlaceTable}[1][]{\placetable[#1]{\BODY}}
 
 \NewDocumentEnvironment { Table } { o d() d<> }
 {
@@ -2960,7 +3000,7 @@
     \IfBooleanTF{#1}{\endspectablex}{\endspectable}
 }
 
-\NewEnviron{imagetable}{
+\NewEnviron{imagetableiii}{
     \placetable[stretch=1.3]{
         \taburowcolors{}
         \begin{tabu}{X[c]X[c]X[c]}
@@ -2969,13 +3009,32 @@
     }
 }
 
-\NewDocumentEnvironment { ImageTable } { d<> }
+\NewEnviron{imagetableii}{
+    \placetable[stretch=1.3]{
+        \taburowcolors{}
+        \begin{tabu}{X[c]X[c]}
+        \BODY
+        \end{tabu}
+    }
+}
+
+\NewDocumentEnvironment { ImageTable } { s d<> }
 {
-    \IfValueT{#1} { \tl_set:Nn \l_table_footnote {#1} }
-    \imagetable
+    \IfValueT{#2} { \tl_set:Nn \l_table_footnote {#2} }
+    \IfBooleanTF{#1}
+    {
+        \imagetableii
+    }{
+        \imagetableiii
+    }
 }
 {
-    \endimagetable
+    \IfBooleanTF{#1}
+    {
+        \endimagetableii
+    }{
+        \endimagetableiii
+    }
 }
 
 \NewDocumentCommand \TableCommon { O{} }
@@ -3050,7 +3109,7 @@
     {
         \str_case:nn {#2}
         {
-            {\image}   { \tl_set:Nn \l_image_scale {#1} }
+            {\image}        { \tl_set:Nn \l_image_scale {#1} }
             {\illustimage}  { \tl_set:Nn \l_illustimage_scale_tl {#1} }
             {\lineimg}      { \tl_set:Nn \l_lineimg_scale {#1} }
         }
@@ -3115,11 +3174,12 @@
 % Use \IndexingOff disable the indexing function of term-related macros including \term.
 
 \bool_new:N \g_indexing_bool
-\NewDocumentCommand \IndexingEnable {}
+\NewDocumentCommand \IndexingEnable { s }
 {
     \makeindex
     \bool_gset_true:N \g_indexing_bool
     \bool_gset_true:N \l_terms_indexing_bool
+    \IfBooleanT {#1} { \BookmarkIndexHead }
 }
 \NewDocumentCommand \IndexingDisable {}
 {
@@ -3127,6 +3187,16 @@
     \bool_gset_false:N \l_terms_indexing_bool
 }
 \IndexingDisable
+
+\NewDocumentCommand \IfIndexing { m o }
+{
+    \bool_if:NTF \g_indexing_bool
+    {
+        #1
+    }{
+        \IfValueT{#2}{#2}
+    }
+}
 
 \NewDocumentCommand \hz_indexing {o m}
 {
@@ -3335,7 +3405,7 @@
     color=black,
     delimiter=:\hfill,
     labelsep=0.5em,
-    index=true,
+    index=false,
     newline=false,
     star={itemsep=0ex},
     vbar={delimiter=\hfill},
@@ -4292,7 +4362,7 @@
 }
 
 \ProblemSetup{
-%  name = {List~of~Problems},
+    name = {List~of~Problems},
     style = \section*{\ProblemListName}
 }
 
@@ -4502,42 +4572,42 @@
 
 % scenario
 \seq_new:N \g_scenario_text_seq
-\cs_new:Npn \scenario_add_text:n #1
+\cs_new:Npn \template_add_text:n #1
 {
     \seq_gput_right:Nn \g_scenario_text_seq {#1}
 }
 
 \group_begin:
 \char_set_catcode_space:n {`\ }
-\scenario_add_text:n {Lorem ipsum dolor sit amet, consectetuer adipiscing elit. }
-\scenario_add_text:n {Etiam lobortis facilisis sem. Nullam nec mi et neque pharetra sollicitudin. Praesent imperdiet mi nec ante. }
-\scenario_add_text:n {Donec ullamcorper, felis non sodales commodo, lectus velit ultrices augue, a dignissim nibh lectus placerat pede. Vivamus nunc nunc, molestie ut, ultricies vel, semper in, velit. Ut porttitor. Praesent in sapien. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Duis fringilla tristique neque. }
-\scenario_add_text:n {Sed interdum libero ut metus. Pellentesque placerat. Nam rutrum augue a leo. Morbi sed elit sit amet ante lobortis sollicitudin. Praesent blandit blandit mauris. Praesent lectus tellus, aliquet aliquam, luctus a, egestas a, turpis. Mauris lacinia lorem sit amet ipsum. Nunc quis urna dictum turpis accumsan semper.}
+\template_add_text:n {Lorem ipsum dolor sit amet, consectetuer adipiscing elit. }
+\template_add_text:n {Etiam lobortis facilisis sem. Nullam nec mi et neque pharetra sollicitudin. Praesent imperdiet mi nec ante. }
+\template_add_text:n {Donec ullamcorper, felis non sodales commodo, lectus velit ultrices augue, a dignissim nibh lectus placerat pede. Vivamus nunc nunc, molestie ut, ultricies vel, semper in, velit. Ut porttitor. Praesent in sapien. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Duis fringilla tristique neque. }
+\template_add_text:n {Sed interdum libero ut metus. Pellentesque placerat. Nam rutrum augue a leo. Morbi sed elit sit amet ante lobortis sollicitudin. Praesent blandit blandit mauris. Praesent lectus tellus, aliquet aliquam, luctus a, egestas a, turpis. Mauris lacinia lorem sit amet ipsum. Nunc quis urna dictum turpis accumsan semper.}
 \group_end:
 
-\cs_new:Npn \scenario_print_text:n #1
+\cs_new:Npn \template_print_text:n #1
 {
     \seq_item:Nn \g_scenario_text_seq {#1}
 }
 
-\NewDocumentCommand \scenetext { O{1} }
+\NewDocumentCommand \tpltext { O{1} }
 {
-    \int_step_function:nnnN {1}{1}{#1} \scenario_print_text:n
+    \int_step_function:nnnN {1}{1}{#1} \template_print_text:n
 }
 
-\NewDocumentCommand \scenepara { s }
+\NewDocumentCommand \tplpara { s }
 {
     \IfBooleanTF {#1}
-        { \scenetext[3] }
-        { \scenetext[2]  }
+        { \tpltext[3] }
+        { \tpltext[2]  }
     \par
 }
 
-% \scenelist*[terms][enumerate]
+% \tpllist*[terms][enumerate]
 
-\NewDocumentCommand \scenelist { s o o }
+\NewDocumentCommand \tpllist { s o o }
 {
-    \scenepara
+    \tplpara
     \IfValueTF {#2}
     {
         \str_set:Nn \l_tmpa_str { #2 }
@@ -4548,11 +4618,11 @@
             { \str_set:Nn \l_tmpa_str { itemize } }
     }
     \IfValueTF {#3}
-        { \scenario_list:nn {\l_tmpa_str}{#3} }
-        { \scenario_list:nn {\l_tmpa_str}{} }
+        { \template_list:nn {\l_tmpa_str}{#3} }
+        { \template_list:nn {\l_tmpa_str}{} }
 }
 
-\cs_new:Npn \scenario_list:nn #1 #2
+\cs_new:Npn \template_list:nn #1 #2
 {
     \begin{#1}
     \int_zero:N \l_tmpa_int
@@ -4560,67 +4630,67 @@
     {
         \int_incr:N \l_tmpa_int
         \str_if_eq_x:nnTF {terms} {#1}
-            { \scenario_item_label: {#2} }
-            { \scenario_item: {#2} }
+            { \template_item_label: {#2} }
+            { \template_item: {#2} }
     }
     \end{#1}
 }
 
-\cs_new:Npn \scenario_item_label: #1
+\cs_new:Npn \template_item_label: #1
 {
     \tl_set:Nn \l_tmpa_tl {Term~\int_to_Alph:n {\l_tmpa_int}}
-    \item[\l_tmpa_tl] \scenetext
-    \tl_if_empty:nF {#1} { \scenario_list:nn {#1}{} }
+    \item[\l_tmpa_tl] \tpltext
+    \tl_if_empty:nF {#1} { \template_list:nn {#1}{} }
 }
 
-\cs_new:Npn \scenario_item: #1
+\cs_new:Npn \template_item: #1
 {
-    \item \scenetext
-    \tl_if_empty:nF {#1} { \scenario_list:nn {#1}{} }
+    \item \tpltext
+    \tl_if_empty:nF {#1} { \template_list:nn {#1}{} }
 }
 
-\NewDocumentCommand \sceneimage {}
+\NewDocumentCommand \tplimage {}
 {
     \par\image{uncertain}
 }
 
-\NewDocumentCommand \scenelineimg {}
+\NewDocumentCommand \tpllineimg {}
 {
     \lineimg{uncertain}
 }
 
-\NewDocumentCommand \sceneimagetable {}
+\NewDocumentCommand \tplimagetable {}
 {
-    \scenepara
+    \tplpara
     \par
     \begin{ImageTable}
-        \scenelineimg & \scenelineimg & \scenelineimg \\
+        \tpllineimg & \tpllineimg & \tpllineimg \\
         First~item & Second~item & Third~item \\
-        \scenelineimg & \scenelineimg & \scenelineimg \\
+        \tpllineimg & \tpllineimg & \tpllineimg \\
         Fourth~item & Fifth~item & Sixth~item \\
     \end{ImageTable}
 }
 
-\NewDocumentCommand \sceneprocedure { O{3} }
+\NewDocumentCommand \tplprocedure { O{3} }
 {
     \int_set:Nn \l_tmpa_int {1}
     \int_set:Nn \l_tmpb_int {#1}
-    \scenepara
+    \tplpara
     \par
     \begin{IllustEnum}*{uncertain}
-        \item \scenepara
+        \item \tplpara
     \end{IllustEnum}
     \int_do_while:nNnn {\l_tmpa_int} < {\l_tmpb_int}
         {
             \int_incr:N \l_tmpa_int
             \par
             \begin{IllustEnum}{uncertain}
-                \item \scenepara
+                \item \tplpara
             \end{IllustEnum}
         }
 }
 
-\NewDocumentCommand \sceneactions { O{5} }
+\NewDocumentCommand \tplactions { O{5} }
 {
     \int_zero:N \l_tmpa_int 
     \int_set:Nn \l_tmpb_int {#1}
@@ -4629,12 +4699,12 @@
         \int_incr:N \l_tmpa_int
         \str_set:Nx \l_tmpa_str { \int_to_Alph:n \l_tmpa_int }
         \section{action~\l_tmpa_str}
-        \scenelist*
+        \tpllist*
 
     }
 }
 
-\NewDocumentCommand \scenespectable {}
+\NewDocumentCommand \tplspectable {}
 {
     \par
     \begin{SpecTable}
@@ -4646,12 +4716,12 @@
     \end{SpecTable}
 }
 
-\NewDocumentCommand \scenespectables { O{3} }
+\NewDocumentCommand \tplspectables { O{3} }
 {
-    \int_step_inline:nnnn {1}{1}{#1}{ \scenespectable }
+    \int_step_inline:nnnn {1}{1}{#1}{ \tplspectable }
 }
 
-\NewDocumentCommand \scenetable {}
+\NewDocumentCommand \tpltable {}
 {
     \par
     \begin{PlaceTable}
@@ -4666,12 +4736,12 @@
     \end{PlaceTable}
 }
 
-\NewDocumentCommand \sceneproblem {}
+\NewDocumentCommand \tplproblem {}
 {
-    \problem{Problem} \scenepara
+    \problem{Problem} \tplpara
 }
 
-\NewDocumentCommand \sceneproblems { O{2} }
+\NewDocumentCommand \tplproblems { O{2} }
 {
     %\listofproblems*
     \int_zero:N \l_tmpa_int 
@@ -4690,8 +4760,8 @@
                     \int_incr:N \l_tmpa_int
                     \str_set:Nx \l_tmpa_str { \int_to_alph:n \l_tmpa_int }
                     \problem{Problem~\l_tmpa_str}
-                    \scenepara*
-                    \scenelist*
+                    \tplpara*
+                    \tpllist*
                 }
             \group_end:
         }
@@ -4865,7 +4935,7 @@
 
 % justification & alignment
 % Use \RaggedRight instead of \raggedright when using bidi
-\sloppy
+% \sloppy
 \raggedbottom
 
 % colors
@@ -4885,7 +4955,7 @@
 
 % page layout thanks to https://www.kockoc.com/newgari/1119255
 
-\makeatletter
+%\makeatletter
 \newlength\memoirPleftodd \newlength\memoirPrightodd
 \newlength\memoirPlefteven \newlength\memoirPrighteven
 \newlength\memoirPtop \newlength\memoirPbottom
@@ -4901,37 +4971,75 @@
 \newlength\memoirMleftodd \newlength\memoirMrightodd
 \newlength\memoirMlefteven \newlength\memoirMrighteven
 \newlength\memoirMtop \newlength\memoirMbottom
-\def\calculatetrims{
+
+\NewDocumentCommand\calculatetrims{}
+{
     \setlength\memoirPbottom{\stockheight-\paperheight-\trimtop}
-    \setlength\memoirPleftodd{\stockwidth-\paperwidth-\trimedge}
-    \setlength\memoirPlefteven{\trimedge}
     \setlength\memoirPtop{\memoirPbottom+\paperheight}
-    \setlength\memoirPrightodd{\memoirPleftodd+\paperwidth}
-    \setlength\memoirPrighteven{\memoirPlefteven+\paperwidth}
+    \IfVartwo{
+        \setlength\memoirPleftodd{\stockwidth-\paperwidth-\trimedge}
+        \setlength\memoirPrightodd{\memoirPleftodd+\paperwidth}
+        \setlength\memoirPlefteven{\memoirPleftodd}        
+        \setlength\memoirPrighteven{\memoirPrightodd}
+    }[
+        \setlength\memoirPleftodd{\stockwidth-\paperwidth-\trimedge}
+        \setlength\memoirPlefteven{\trimedge}    
+        \setlength\memoirPrightodd{\memoirPleftodd+\paperwidth}
+        \setlength\memoirPrighteven{\memoirPlefteven+\paperwidth}
+    ]    
     \setlength\memoirTbottom{\memoirPbottom+\lowermargin}
-    \setlength\memoirTleftodd{\memoirPleftodd+\spinemargin}
-    \setlength\memoirTlefteven{\memoirPlefteven+\foremargin}
     \setlength\memoirTtop{\memoirPtop-\uppermargin}
-    \setlength\memoirTrightodd{\memoirPrightodd-\foremargin}
-    \setlength\memoirTrighteven{\memoirPrighteven-\spinemargin}
+    \IfVartwo{
+        \setlength\memoirTleftodd{\memoirPleftodd+\spinemargin}
+        \setlength\memoirTrightodd{\memoirPrightodd-\foremargin}
+        \setlength\memoirTlefteven{\memoirTleftodd}
+        \setlength\memoirTrighteven{\memoirTrightodd}
+    }[
+        \setlength\memoirTleftodd{\memoirPleftodd+\spinemargin}
+        \setlength\memoirTlefteven{\memoirPlefteven+\foremargin}
+        \setlength\memoirTrightodd{\memoirPrightodd-\foremargin}
+        \setlength\memoirTrighteven{\memoirPrighteven-\spinemargin}
+    ]    
     \setlength\memoirHbottom{\memoirTtop+\headsep}
-    \setlength\memoirHleftodd{\memoirTleftodd}
-    \setlength\memoirHlefteven{\memoirTlefteven}
     \setlength\memoirHtop{\memoirHbottom+\headheight}
-    \setlength\memoirHrightodd{\memoirTrightodd}
-    \setlength\memoirHrighteven{\memoirTrighteven}
+    \IfVartwo{
+        \setlength\memoirHleftodd{\memoirTleftodd}
+        \setlength\memoirHrightodd{\memoirTrightodd}
+        \setlength\memoirHlefteven{\memoirHleftodd}        
+        \setlength\memoirHrighteven{\memoirHrightodd}
+    }[
+        \setlength\memoirHleftodd{\memoirTleftodd}
+        \setlength\memoirHlefteven{\memoirTlefteven}
+        \setlength\memoirHrightodd{\memoirTrightodd}
+        \setlength\memoirHrighteven{\memoirTrighteven}
+    ]
     \setlength\memoirFbottom{\memoirTbottom-\footskip}
-    \setlength\memoirFleftodd{\memoirTleftodd}
-    \setlength\memoirFlefteven{\memoirTlefteven}
     \setlength\memoirFtop{\memoirFbottom+\headheight}
-    \setlength\memoirFrightodd{\memoirTrightodd}
-    \setlength\memoirFrighteven{\memoirTrighteven}
+    \IfVartwo{
+        \setlength\memoirFleftodd{\memoirTleftodd}
+        \setlength\memoirFrightodd{\memoirTrightodd}
+        \setlength\memoirFlefteven{\memoirFleftodd}       
+        \setlength\memoirFrighteven{\memoirFrightodd}
+    }[
+        \setlength\memoirFleftodd{\memoirTleftodd}
+        \setlength\memoirFlefteven{\memoirTlefteven}    
+        \setlength\memoirFrightodd{\memoirTrightodd}
+        \setlength\memoirFrighteven{\memoirTrighteven}
+    ]
     \setlength\memoirMbottom{\memoirTbottom}
-    \setlength\memoirMleftodd{\memoirTrightodd+\marginparsep}
-    \setlength\memoirMlefteven{\memoirTlefteven-\marginparsep-\marginparwidth}
     \setlength\memoirMtop{\memoirTtop}
-    \setlength\memoirMrightodd{\memoirMleftodd+\marginparwidth}
-    \setlength\memoirMrighteven{\memoirMlefteven+\marginparwidth}}
+    \IfVartwo{
+        \setlength\memoirMleftodd{\memoirTleftodd-\marginparsep-\marginparwidth}
+        \setlength\memoirMrightodd{\memoirMleftodd+\marginparwidth}    
+        \setlength\memoirMlefteven{\memoirMleftodd}
+        \setlength\memoirMrighteven{\memoirMrightodd}
+    }[
+        \setlength\memoirMleftodd{\memoirTrightodd+\marginparsep}
+        \setlength\memoirMlefteven{\memoirTlefteven-\marginparsep-\marginparwidth}        
+        \setlength\memoirMrightodd{\memoirMleftodd+\marginparwidth}
+        \setlength\memoirMrighteven{\memoirMlefteven+\marginparwidth}
+    ]
+}
 
 \expandafter\def\csname pgf@sh@ns@memoir page\endcsname{rectangle}
 \expandafter\def\csname pgf@sh@np@memoir page\endcsname{%
@@ -4943,7 +5051,6 @@
 \expandafter\def\csname pgf@sh@nt@memoir page\endcsname{{1}{0}{0}{1}{0pt}{0pt}}
 \expandafter\def\csname pgf@sh@pi@memoir page\endcsname{pgfpageorigin}
 
-% (Brent's additional code goes here)
 \expandafter\def\csname pgf@sh@ns@memoir stock\endcsname{rectangle}
 \expandafter\def\csname pgf@sh@np@memoir stock\endcsname{%
   \def\southwest{\pgfqpoint{0pt}{0pt}}%
@@ -4951,7 +5058,7 @@
 }
 \expandafter\def\csname pgf@sh@nt@memoir stock\endcsname{{1}{0}{0}{1}{0pt}{0pt}}
 \expandafter\def\csname pgf@sh@pi@memoir stock\endcsname{pgfpageorigin}
-% (Kriss's additional code goes here)
+
 \expandafter\def\csname pgf@sh@ns@memoir text area\endcsname{rectangle}
 \expandafter\def\csname pgf@sh@np@memoir text area\endcsname{%
     \def\southwest{\checkoddpage\pgfqpoint{
@@ -4982,19 +5089,17 @@
 \expandafter\def\csname pgf@sh@nt@memoir footer area\endcsname{{1}{0}{0}{1}{0pt}{0pt}}
 \expandafter\def\csname pgf@sh@pi@memoir footer area\endcsname{pgfpageorigin}
 
-
-\expandafter\def\csname pgf@sh@ns@memoir marginpar area\endcsname{rectangle}
-\expandafter\def\csname pgf@sh@np@memoir marginpar area\endcsname{%
+\expandafter\def\csname pgf@sh@ns@memoir margin area\endcsname{rectangle}
+\expandafter\def\csname pgf@sh@np@memoir margin area\endcsname{%
     \def\southwest{\checkoddpage\pgfqpoint{
       \ifoddpage\memoirMleftodd\else\memoirMlefteven\fi}{\memoirMbottom}}%
     \def\northeast{\checkoddpage\pgfqpoint{
       \ifoddpage\memoirMrightodd\else\memoirMrighteven\fi}{\memoirMtop}}
 }
-\expandafter\def\csname pgf@sh@nt@memoir marginpar area\endcsname{{1}{0}{0}{1}{0pt}{0pt}}
-\expandafter\def\csname pgf@sh@pi@memoir marginpar area\endcsname{pgfpageorigin}
-\makeatother
+\expandafter\def\csname pgf@sh@nt@memoir margin area\endcsname{{1}{0}{0}{1}{0pt}{0pt}}
+\expandafter\def\csname pgf@sh@pi@memoir margin area\endcsname{pgfpageorigin}
 
-\NewDocumentCommand \ShowPageLayout { }
+\NewDocumentCommand\ShowPageLayout{}
 {
     \calculatetrims
     \AddToShipoutPictureBG{
@@ -5003,8 +5108,8 @@
             \draw[magenta] (memoir header area.south west) rectangle (memoir header area.north east);
             \draw[blue] (memoir text area.south west) rectangle (memoir text area.north east);    
             \draw[yellow] (memoir footer area.south west) rectangle (memoir footer area.north east);
-            \draw[violet] (memoir marginpar area.south west) rectangle (memoir marginpar area.north east);
-    \end{tikzpicture}
+            \draw[violet] (memoir margin area.south west) rectangle (memoir margin area.north east);            
+        \end{tikzpicture}
     }
 }
 \endinput
