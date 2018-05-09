@@ -1923,10 +1923,8 @@
     {
         \bool_if:NT \g_style_chapterwider_bool
         {
-            \patchcommand{\@makechapterhead}
-                {\begin{adjustwidth}{-\vartwosecindent}{0pt}}{\end{adjustwidth}}
-            \patchcommand{\@makeschapterhead}
-                {\begin{adjustwidth}{-\vartwosecindent}{0pt}}{\end{adjustwidth}}
+            \patchcommand{\@makechapterhead}{\begin{adjustwidth}{-\vartwosecindent}{0pt}}{\end{adjustwidth}}
+            \patchcommand{\@makeschapterhead}{\begin{adjustwidth}{-\vartwosecindent}{0pt}}{\end{adjustwidth}}
             \patchcommand\printtoctitle{\hspace*{-\vartwosecindent}}{}
         }  
         \bool_if:NTF \g_section_multiline_bool
@@ -1938,7 +1936,7 @@
             \setsubsecindent{-\vartwosecindent}
         }
     }
-    \bool_if:NT \g_ps_chaptermark_bool
+    \bool_if:NT \g_chapter_contents_bool
     {
         \EnableChapterContents
     }
