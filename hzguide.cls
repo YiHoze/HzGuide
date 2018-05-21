@@ -22,7 +22,7 @@
 % IV. For those of designer interface level:
 %     Follow clause II. However, it is allowed to use lowercase with compound words.
 
-\ProvidesClass{hzguide}[2018/05/03]
+\ProvidesClass{hzguide}[2018/05/21]
 
 \LoadClassWithOptions{memoir}
 
@@ -71,7 +71,7 @@
     verbatim    .bool_set:N = \g_verbatim_bool,
     pairquote   .bool_set:N = \g_pairquote_bool,
     uprightmath .bool_set:N = \g_upright_math_bool,
-    bitmap      .bool_set:N = \g_bitmap_bool
+    %bitmap      .bool_set:N = \g_bitmap_bool
 }
 
 \tl_new:N \HzLang
@@ -125,41 +125,56 @@
     \clist_gput_right:Nn \g_doc_type {#1}
 }
 
-\NewDocumentCommand \IfDocType { m +m o }
+
+\cs_new:Npn \doc_type_check:n #1
 {
-    \bool_set_false:N \g_tmpa_bool
+    \bool_gset_false:N \g_tmpa_bool
     \clist_map_inline:Nn \g_doc_type
     {
-        \str_if_eq:nnT {##1} {#1}
-        { \bool_set_true:N \g_tmpa_bool }
+        \str_if_eq:nnT { ##1 }{ #1 }
+        {
+            \bool_gset_true:N \g_tmpa_bool 
+        }
     }
+}
+
+\NewDocumentCommand \IfDocType { m +m o }
+{
+    \doc_type_check:n #1
     \bool_if:NTF \g_tmpa_bool
-    { #2 }
-    { \IfValueT { #3 } { #3 } }
+    {
+        #2 
+    }{ 
+        \IfValueT { #3 }{ #3 } 
+    }
 }
 
 \NewDocumentCommand \IfNotDocType { m +m o }
 {
-    \bool_set_false:N \g_tmpa_bool
-    \clist_map_inline:Nn \g_doc_type
-    {
-        \str_if_eq:nnT {##1} {#1}
-        { \bool_set_true:N \g_tmpa_bool }
-    }
+    \doc_type_check:n #1
     \bool_if:NTF \g_tmpa_bool
-    { \IfValueT { #3 } { #3 } }
-    { #2 }
+    { 
+        \IfValueT { #3 }{ #3 } 
+    }{ 
+        #2 
+    }
 }
 
-\NewEnviron{IfDoc}[1]{\IfDocType{#1}{\BODY}}
-\NewEnviron{IfNotDoc}[1]{\IfNotDocType{#1}{\BODY}}
+\NewEnviron{IfDoc}[1]
+{
+    \IfDocType{ #1 }{ \BODY }
+}
+\NewEnviron{IfNotDoc}[1]
+{
+    \IfNotDocType{ #1 }{ \BODY }
+}
 
 \keys_set:nn { HzGuide }
 {
-    verbatim = false,
-    bitmap = false,
+    verbatim = false,    
     language = english,
     pairquote = true,
+    %bitmap = false,
 }
 
 \ProcessKeysOptions { HzGuide }
@@ -196,19 +211,20 @@
     \setmathfont[math-style=upright]{TeX~Gyre~Pagella}
 }
 
-\NewDocumentCommand \PrioritizeBitmap {}
-{
-    \DeclareGraphicsExtensions{.png,.jpg,.pdf}
-}
-
-\NewDocumentCommand \PrioritizeVector {}
-{
-    \DeclareGraphicsExtensions{.pdf,.jpg,.png}
-}
-
-\bool_if:NTF \g_bitmap_bool
-    { \PrioritizeBitmap }
-    { \PrioritizeVector }
+% \NewDocumentCommand \PrioritizeBitmap {}
+% {
+%     \DeclareGraphicsExtensions{.png,.jpg,.pdf}
+% }
+% \NewDocumentCommand \PrioritizeVector {}
+% {
+%     \DeclareGraphicsExtensions{.pdf,.jpg,.png}
+% }
+% \bool_if:NTF \g_bitmap_bool
+% { 
+%     \PrioritizeBitmap 
+% }{ 
+%     \PrioritizeVector 
+% }
 
 \cs_set_eq:NN \Sup \textsuperscript
 \cs_set_eq:NN \Sub \textsubscript
@@ -232,7 +248,9 @@
 }
 
 \ExplSyntaxOff
+
 % language settings -----------------------------------------------------------
+
 \IfLang{chi}
 {
     \RequirePackage{xeCJK}
@@ -678,8 +696,8 @@
 {
     \str_case:nn { #1 }
     {
-        {layout}  { \bool_if:NF \g_adhoc_layout_bool {#2} }
-        {heading}  { \bool_if:NF \g_adhoc_heading_bool {#2} }
+        { layout }  { \bool_if:NF \g_adhoc_layout_bool {#2} }
+        { heading } { \bool_if:NF \g_adhoc_heading_bool {#2} }
     }
 }
 
@@ -734,55 +752,55 @@
 
 \NewDocumentCommand \CoverFontSize { m }
 {
-        \str_case:nn {#1}
-        {
-                { 1 } { \cover_font_size_i }
-                { 2 } { \cover_font_size_ii }
-                { 3 } { \cover_font_size_iii }
-                { 4 } { \cover_font_size_iv }
-        }
+    \str_case:nn {#1}
+    {
+        { 1 }{ \cover_font_size_i }
+        { 2 }{ \cover_font_size_ii }
+        { 3 }{ \cover_font_size_iii }
+        { 4 }{ \cover_font_size_iv }
+    }
 }
 
 \NewDocumentCommand \FrontCover {}
 {
-        \thispagestyle{empty}
-        \tl_if_empty:NF \cover_image_background
+    \thispagestyle{empty}
+    \tl_if_empty:NF \cover_image_background
+    {
+        \watermark{x=0, y=0, image=\cover_image_background}
+    }
+    \begin{IfVartwoEnlarge}
+        \setSpacing{1}
+        \tl_if_empty:NF \cover_image_logo_front
         {
-            \watermark{x=0, y=0, image=\cover_image_background}
+            \includegraphics[scale=\l_image_scale]{\cover_image_logo_front}
         }
-        \begin{IfVartwoEnlarge}
-            \setSpacing{1}
-            \tl_if_empty:NF \cover_image_logo_front
-            {
-                \includegraphics[scale=\l_image_scale]{\cover_image_logo_front}
-            }
-            \nil\par\vspace{\cover_top_skip}
-            \begin{minipage}{\linewidth}
-                 \cover_title_align\cover_font_i
-                 \CoverFontSize{1} \cover_title
-                 \par\medskip
-                 \CoverFontSize{2} \cover_subtitle
-            \end{minipage}      
-            \tl_if_empty:NF \cover_image_product
-            {
-                \par\vspace{1cm}
-                \begin{center}
-                        \includegraphics[scale=\l_image_scale]{\cover_image_product}
-                \end{center}
-            }
-            \vfill
-            \begin{flushright}
-                 \cover_font_ii
-                 \CoverFontSize{3} \cover_doc_type
-                 \par
-                \CoverFontSize{4} \cover_pub_year \hspace{0.5em}|\hspace{0.5em} \cover_revision
-                \end{flushright}        
-        \end{IfVartwoEnlarge}        
-        \cover_after_front
-        \tl_if_empty:NF \cover_image_background
+        \nil\par\vspace{\cover_top_skip}
+        \begin{minipage}{\linewidth}
+                \cover_title_align\cover_font_i
+                \CoverFontSize{1} \cover_title
+                \par\medskip
+                \CoverFontSize{2} \cover_subtitle
+        \end{minipage}      
+        \tl_if_empty:NF \cover_image_product
         {
-            \ClearWatermark
-        }    
+            \par\vspace{1cm}
+            \begin{center}
+                    \includegraphics[scale=\l_image_scale]{\cover_image_product}
+            \end{center}
+        }
+        \vfill
+        \begin{flushright}
+                \cover_font_ii
+                \CoverFontSize{3} \cover_doc_type
+                \par
+            \CoverFontSize{4} \cover_pub_year \hspace{0.5em}|\hspace{0.5em} \cover_revision
+            \end{flushright}        
+    \end{IfVartwoEnlarge}        
+    \cover_after_front
+    \tl_if_empty:NF \cover_image_background
+    {
+        \ClearWatermark
+    }    
 }
 
 \NewDocumentCommand \BackCover {}
@@ -807,21 +825,25 @@
 }
 
 % extra style set  ------------------------------------------------------------
-\NewDocumentCommand \LoadStyleset {}{
-\tl_if_empty:NF \g_style_set {\input{\g_style_set}}
+\NewDocumentCommand \LoadStyleset {}
+{
+    \tl_if_empty:NF \g_style_set 
+    {
+        \input{\g_style_set}
+    }
 }
 
 \NewDocumentCommand \styleinput { m }
 {
-    \InputIfFileExists {../#1} {} {}
-    \InputIfFileExists {#1} {} {}
+    \IfFileExists{ ../#1 }{ \input{../#1} }{}
+    \IfFileExists{ #1 }{ \input{#1} }{}
 }
 
 % commonly used content -------------------------------------------------------
 \keys_define:nn { commonpath }
 {
-    root    .tl_set:N = \g_common_path_root,
-    language  .code:n = { \LanguagePathSetup{#1} }
+    root        .tl_set:N = \g_common_path_root,
+    language    .code:n = { \LanguagePathSetup{#1} }
 }
 
 \NewDocumentCommand \CommonPathSetup { m }
@@ -835,14 +857,13 @@
     \IfBooleanTF {#1}
     {
         \tl_set:Nn \g_common_path_language { #2 }
-    }
-    {
-        \tl_set:No  \g_common_path_language { \g_common_path_root #2 / }
+    }{
+        \tl_set:No  \g_common_path_language { \g_common_path_root #2/ }
     }
 }
 
 \CommonPathSetup{
-    root = {../../../Common/},
+    root = { ../../../Common/ },
     language = \HzLang
 }
 
@@ -985,31 +1006,37 @@
 \SetForeignFonts{HCR Batang}{HCR Dotum}
 
 \tl_new:N \WithHangul
-\IfLang{kor}{ \tl_set:Nn \WithHangul {\disablekoreanfonts} }
+\IfLang{kor}
+{ 
+    \tl_set:Nn \WithHangul { \disablekoreanfonts }
+}
 
 \NewDocumentCommand \foreign {s o m}
 {
     \group_begin:
         \WithHangul
         \ifx\f@family\rmdefault
-            \IfNoValueTF {#2} {\foreignrmfamily} {\fontspec{#2}}
+            \IfNoValueTF { #2 }{ \foreignrmfamily }{ \fontspec{#2} }
         \else
-            \IfNoValueTF {#2} {\foreignsffamily} {\fontspec{#2}}
+            \IfNoValueTF { #2 }{ \foreignsffamily }{ \fontspec{#2} }
         \fi
-        \IfBooleanTF {#1} {\char"#3} {#3}
+        \IfBooleanTF { #1 }{ \char"#3 }{ #3 }
     \group_end:
 }
 
 % symbols
-\NewDocumentCommand \yea {s}
+\NewDocumentCommand \yea { s }
 {
     \IfBooleanTF {#1}
-        { \foreign*{25B3} }
-        { \foreign*{2713} }
+    { 
+        \foreign*{25B3} %△
+    }{ 
+        \foreign*{2713} %✓
+    }
 }
 \NewDocumentCommand \nay {}
 {
-    \foreign*{2716}
+    \foreign*{2716} %✖
 }
 
 % alphanumeric segment display
@@ -1024,7 +1051,7 @@
 
 \NewDocumentCommand \SegmentSetup { m }
 {
-    \keys_set:nn { segment } { #1 }
+    \keys_set:nn { segment }{ #1 }
 }
 
 \SegmentSetup{
@@ -1048,18 +1075,18 @@
     \seq_map_inline:Nn \l_tempa_seq
     {
         \mbox{
-            \seq_set_split:Nnn \l_tempb_seq { } { ##1 }
+            \seq_set_split:Nnn \l_tempb_seq {}{ ##1 }
             \seq_map_inline:Nn \l_tempb_seq
             {
                 \str_case:nnF { ####1 }
                 {
-                    {m} { \segment_include:n {M_} }
-                    {o} { \segment_include:n {O_} }
-                    {r} { \segment_include:n {R_} }
-                    {-} { \segment_include:n {minus} }
-                    {_} { \segment_include:n {space} }
-                    {.} { \segment_include:n {dot} }
-                    {?} { \segment_include:n {QuestionMark} }
+                    { m }{ \segment_include:n {M_} }
+                    { o }{ \segment_include:n {O_} }
+                    { r }{ \segment_include:n {R_} }
+                    { - }{ \segment_include:n {minus} }
+                    { _ }{ \segment_include:n {space} }
+                    { . }{ \segment_include:n {dot} }
+                    { ? }{ \segment_include:n {QuestionMark} }
                 }{ 
                     \segment_include:n {####1} 
                 }
@@ -1075,12 +1102,18 @@
     \bool_if:NTF \l_segment_break_bool
     {
         \IfBooleanTF {#1}
-            { \mbox{\segment_parse:n {#2}} }
-            { \segment_parse:n {#2} }
+        { 
+            \mbox{\segment_parse:n {#2}} 
+        }{ 
+            \segment_parse:n {#2} 
+        }
     }{
         \IfBooleanTF {#1}
-            { \segment_parse:n {#2} }
-            { \mbox{\segment_parse:n {#2}} }
+        { 
+            \segment_parse:n {#2} 
+        }{ 
+            \mbox{\segment_parse:n {#2}} 
+        }
     }
 }
 
@@ -1107,37 +1140,35 @@
     {
         \begin{adjustwidth}{#1}{0pt}
     }
-}
-{
+}{
     \bool_if:NT \g_column_vartwo_bool
     {
         \end{adjustwidth}
     }
 }
 
-\NewDocumentEnvironment { WidenThisPage } { o o }
-{
-    \IfNoValueTF {#1}
-    {
-        \bool_if:NTF \g_column_vartwo_bool
-        {
-            \tl_set:Nn \l_tmpa_tl {-2.25\vartwomargin}
-            \tl_set:Nn \l_tmpb_tl {-0.25\vartwomargin}
-        }
-        {
-            \tl_set:Nn \l_tmpa_tl {-1cm}
-            \tl_set:Nn \l_tmpb_tl {-1cm}
-        }
-    }
-    {
-        \tl_set:Nn \l_tmpa_tl {-1cm}
-        \tl_set:Nn \l_tmpb_tl {-1cm}
-    }
-    \begin{adjustwidth}{\l_tmpa_tl}{\l_tmpb_tl}
-}
-{
-    \end{adjustwidth}
-}
+% \NewDocumentEnvironment { WidenThisPage } { o o }
+% {
+%     \IfNoValueTF {#1}
+%     {
+%         \bool_if:NTF \g_column_vartwo_bool
+%         {
+%             \tl_set:Nn \l_tmpa_tl {-2.25\vartwomargin}
+%             \tl_set:Nn \l_tmpb_tl {-0.25\vartwomargin}
+%         }
+%         {
+%             \tl_set:Nn \l_tmpa_tl {-1cm}
+%             \tl_set:Nn \l_tmpb_tl {-1cm}
+%         }
+%     }
+%     {
+%         \tl_set:Nn \l_tmpa_tl {-1cm}
+%         \tl_set:Nn \l_tmpb_tl {-1cm}
+%     }
+%     \begin{adjustwidth}{\l_tmpa_tl}{\l_tmpb_tl}
+% }{
+%     \end{adjustwidth}
+% }
 
 %% paper configuration --------------------------------------------------------
 
@@ -1539,24 +1570,24 @@
 \cs_new:Nn \layout_settle:
 {
     \bool_if:NT \g_layout_landscape_bool
-        { \layout_turn_tolandscape: }
-
+    { 
+        \layout_turn_tolandscape: 
+    }
     \bool_if:NTF \g_layout_showtrims_bool
-        {
-            \showtrimson
-            \setstocksize{\stockheight}{\stockwidth}
-            \settrimmedsize{\paperheight}{\paperwidth}{*}
-            \dim_set:Nn \trimtop {\stockheight-\paperheight}
-            \dim_set:Nn \trimedge {\stockwidth-\paperwidth}
-            \settrims{.5\trimtop}{.5\trimedge}
-            \renewcommand*{\shipout}{\afterassignment\mem@shipi\setbox\@cclv=}
-            \trimLmarks
-        }{
-            \showtrimsoff
-            \setstocksize{\paperheight}{\paperwidth}
-            \settrimmedsize{\paperheight}{\paperwidth}{*}
-        }
-
+    {
+        \showtrimson
+        \setstocksize{\stockheight}{\stockwidth}
+        \settrimmedsize{\paperheight}{\paperwidth}{*}
+        \dim_set:Nn \trimtop {\stockheight-\paperheight}
+        \dim_set:Nn \trimedge {\stockwidth-\paperwidth}
+        \settrims{.5\trimtop}{.5\trimedge}
+        \renewcommand*{\shipout}{\afterassignment\mem@shipi\setbox\@cclv=}
+        \trimLmarks
+    }{
+        \showtrimsoff
+        \setstocksize{\paperheight}{\paperwidth}
+        \settrimmedsize{\paperheight}{\paperwidth}{*}
+    }
     \str_case_x:nnF { \g_layout_type }
     {
         { common }    { \layout_settle_common: }
@@ -1584,7 +1615,7 @@
     \layout_column_one:
     \folio_common:
     \SetObjectAlign{\raggedright}
- }
+}
 
 \cs_new:Nn \layout_settle_vartwo:
 {
@@ -1651,8 +1682,7 @@
     \IfVartwo
     {
         \rule{\headwidth}{0.75pt}
-    }
-    [
+    }[
         \if@twocolumn
             \rule{\columnwidth}{0.75pt}
         \else
@@ -1663,7 +1693,9 @@
 
 \NewDocumentCommand \SectionMultilineRule { m }
 {
-    \SectionMultiline { #1
+    \SectionMultiline 
+    { 
+        #1
         \nopagebreak\vskip-1\onelineskip
         \IfVartwo        {
             
@@ -1713,17 +1745,20 @@
 \cs_new:Npn \style_type_configure:n #1
 {
     \str_case:nn {#1}
-        {
-            {report}     { \style_type_report: }
-            {smartphone}  { \style_type_smartphone: }
-        }
+    {
+        {report}     { \style_type_report: }
+        {smartphone}  { \style_type_smartphone: }
+    }
 }
 
 \cs_new:Nn \style_type_report:
 {
     \IfVartwo
-        { \copypagestyle{report}{vartwo} }
-        [ \copypagestyle{report}{plain} ]
+    { 
+        \copypagestyle{report}{vartwo} 
+    }[ 
+        \copypagestyle{report}{plain} 
+    ]
     \makeheadrule{report}{0pt}{0pt}
     \makeoddhead{report}{}{}{}
     \makeoddfoot{report}{}{\hffont\thepage}{}
@@ -1758,7 +1793,7 @@
     \str_case:nn {#1}
     {
         {section}  { \style_cft_section: }
-        {none}     { \addtodef {\tableofcontents} {\markboth{}{}} {} }
+        {none}     { \addtodef{ \tableofcontents }{ \markboth{}{} }{} }
     }
 }
 
@@ -2050,7 +2085,6 @@
 \newcounter{unsec}[chapter] % when \setsecnumdepth{chapter} is declared
 \newcounter{unsubsec}[unsec]
 
-
 \tl_new:N \HzJustification
 \NewDocumentCommand \SetJustification { m }
 {
@@ -2072,17 +2106,18 @@
             \int_compare:nT { \value{unsec} > 0 } { \newpage }
             \stepcounter{unsec}
         }
-    }
-    {
+    }{
         \setsechook {
             \int_compare:nT { \value{section} > 0 } { \newpage }
         }
     }
 }
+\NewDocumentCommand \SectionNewpageOff {}
+{  
+    \setsechook{} 
+}
 
-\NewDocumentCommand \SectionNewpageOff {} {  \setsechook{} }
-
-\NewDocumentCommand \SubsectionNewpageOn { }
+\NewDocumentCommand \SubsectionNewpageOn {}
 {
     \int_compare:nTF { \value{secnumdepth} < 2 }
     {
@@ -2097,14 +2132,17 @@
         }
     }
 }
-
-\NewDocumentCommand \SubsectionNewpageOff {} {\setsubsechook{} }
+\NewDocumentCommand \SubsectionNewpageOff {}
+{
+    \setsubsechook{} 
+}
 
 \NewDocumentEnvironment {SectionNewpage} {}
-    { \SectionNewpageOn }
-    { \SectionNewPageOff}
-
-% flushleft
+{ 
+    \SectionNewpageOn 
+}{ 
+    \SectionNewPageOff
+}
 
 % objects ---------------------------------------------------------------------
 
@@ -2132,16 +2170,22 @@
 \cs_new:Npn \object_skip_before:n #1
 {
     \dim_compare:nTF { #1 != 0pt }
-        { \skip_set:Nn \l_tmpa_skip {#1} }
-        { \skip_set:Nn \l_tmpa_skip {\g_object_before_skip} }
+    { 
+        \skip_set:Nn \l_tmpa_skip {#1} 
+    }{ 
+        \skip_set:Nn \l_tmpa_skip {\g_object_before_skip} 
+    }
     \vspace{\l_tmpa_skip}\noindent
 }
 
 \cs_new:Npn \object_skip_after:n #1
 {
     \dim_compare:nTF { #1 != 0pt }
-        { \skip_set:Nn \l_tmpa_skip {#1} }
-        { \skip_set:Nn \l_tmpa_skip {\g_object_after_skip} }
+    { 
+        \skip_set:Nn \l_tmpa_skip {#1} 
+    }{ 
+        \skip_set:Nn \l_tmpa_skip {\g_object_after_skip} 
+    }
     \vspace{\l_tmpa_skip}
 }
 
@@ -2193,8 +2237,11 @@
         \l_action_font #1
     \group_end:
     \bool_if:NTF \l_action_inline_bool
-        { \l_action_delimiter \space }
-        { \nopagebreak\par\object_skip_after:n {\l_action_after_skip} }
+    { 
+        \l_action_delimiter \space 
+    }{ 
+        \nopagebreak\par\object_skip_after:n {\l_action_after_skip} 
+    }
 }
 
 % hyperlinks
@@ -2207,7 +2254,7 @@
 
 % graphics * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-\graphicspath{{images/}{../images/}{../../images/}}
+\graphicspath{ {images/}{../images/}{../../images/} }
 
 \NewDocumentCommand \ShowGraphicspath {}
 {
@@ -2659,7 +2706,7 @@
 }
 
 % as environment
-\NewEnviron{IllustratedImage}[1]{\illustimage{#1}{\BODY}}
+\NewEnviron{IllustratedImage}[1]{ \illustimage{ #1 }{ \BODY } }
 \NewDocumentEnvironment {IllustImage} { s t^ o m d() }
 {
     \IfBooleanT {#1} { 
@@ -2885,8 +2932,7 @@
         \begin{table}
         \table_put:
         \end{table}
-    }
-    {
+    }{
         \object_skip_before:n {\l_table_before_skip}
         \table_put:
         \object_skip_after:n {\l_table_after_skip}
@@ -2897,8 +2943,11 @@
 \cs_new:Nn \table_put:
 {
     \bool_if:NTF \l_table_landscape_bool
-        { \table_put_landscape: }
-        { \table_put_portrait: }
+    { 
+        \table_put_landscape: 
+    }{ 
+        \table_put_portrait: 
+    }
 }
 
 \cs_new:Nn \table_put_portrait:
@@ -2964,8 +3013,7 @@
     }
 }
 
-\NewEnviron{PlaceTable}[1][]{\placetable[#1]{\BODY}}
-
+\NewEnviron{PlaceTable}[1][]{ \placetable[#1]{\BODY} }
 \NewDocumentEnvironment { Table } { o d() d<> }
 {
     \IfValueT{#1} { \TableSetup{#1} }
@@ -2998,8 +3046,7 @@
     \IfValueT{#3} { \tl_set:Nn \l_table_caption {#3} }
     \IfValueT{#4} { \tl_set:Nn \l_table_footnote {#4} }
     \IfBooleanTF{#1}{\spectablex}{\spectable}
-}
-{
+}{
     \IfBooleanTF{#1}{\endspectablex}{\endspectable}
 }
 
@@ -3054,12 +3101,11 @@
     \rowcolor{white}\rowfont{\bfseries}
 }
 
-%\NewDocumentEnvironment {LongTable} { O{} }
+%\NewDocumentEnvironment { LongTable }{ O{} }
 %{
 %  \group_begin:
 %  \TableCommon
-%}
-%{
+%}{
 %  \group_end:
 %}
 
@@ -3108,8 +3154,7 @@
         \tl_set:Nn \l_image_scale {#1}
         \tl_set:Nn \l_illustimage_scale_tl {#1}
         \tl_set:Nn \l_lineimg_scale {#1}
-    }
-    {
+    }{
         \str_case:nn {#2}
         {
             {\image}        { \tl_set:Nn \l_image_scale {#1} }
@@ -3123,8 +3168,7 @@
 {
     \group_begin:
     \imagescale{#1}{#2}
-}
-{
+}{
     \group_end:
 }
 
@@ -3229,8 +3273,11 @@
 {
     \hzindexing [#2] {#3}
     \IfBooleanTF {#1}
-        { \textcolor{\l_term_color}{\l_term_emphfont #3} }
-        { \textcolor{\l_term_color}{#3} }
+    { 
+        \textcolor{\l_term_color}{\l_term_emphfont #3} 
+    }{ 
+        \textcolor{\l_term_color}{#3} 
+    }
 }
 
 % \ui[sort]{Open}: use the starred version not to index the arguments.
@@ -3279,18 +3326,22 @@
 }
 
 \newcommand\ucfont{\ttfamily\bfseries}
-
-\NewDocumentCommand \uc { s t{|} v }
+\NewDocumentCommand \uc { v }
 {
-    \IfBooleanTF{#1}
-    {
-        ``{\ucfont #3}''
-    }
-    {  \IfBooleanTF{#2}
-        { `{\ucfont #3}' }
-        { {\ucfont #3} }
-    }
+    \group_begin:
+        \ucfont #1
+    \group_end:
 }
+% \NewDocumentCommand \uc { s t| v }
+% {
+%     \IfBooleanTF{#1}
+%     {
+%         ``{\ucfont #3}''
+%     }{  \IfBooleanTF{#2}
+%         { `{\ucfont #3}' }
+%         { {\ucfont #3} }
+%     }
+% }
 
 \NewDocumentCommand \vitem { v }
 {
@@ -3300,8 +3351,7 @@
 \NewDocumentEnvironment { UC } {}
 {
     \begin{terms}[font=\ttfamily]
-}
-{
+}{
     \end{terms}
 }
 
@@ -3314,7 +3364,7 @@
 
 \NewDocumentCommand \SetListStyle { m }
 {
-    \keys_set:nn {hzlist} {#1}
+    \keys_set:nn { hzlist }{ #1 }
 }
 
 \RenewDocumentEnvironment {enumerate} { s O{} }
@@ -3353,24 +3403,24 @@
     {
         \int_case:nn {\l_tmpa_int}
         {
-             {0} {
+            {0} {
                  \tl_if_empty:nTF {##1}
                      { \tl_set:Nn \l_terms_marker_i {} }
                      { \tl_set:Nn \l_terms_marker_i {##1\hskip\l_terms_markersep} }
-             }
-             {1} {
+                }
+            {1} {
                  \tl_if_empty:nTF {##1}
                      { \tl_set:Nn \l_terms_marker_ii {} }
                      { \tl_set:Nn \l_terms_marker_ii {##1\hskip\l_terms_markersep} }
-             }
+                }
          }
         \int_incr:N \l_tmpa_int
     }
 }
 
 \tl_set:Nn \l_terms_marker {
-    \int_compare:nT { \@listdepth = 1 }  {\l_terms_marker_i}
-    \int_compare:nT { \@listdepth = 2 }  {\l_terms_marker_ii}
+    \int_compare:nT { \@listdepth = 1 }  { \l_terms_marker_i }
+    \int_compare:nT { \@listdepth = 2 }  { \l_terms_marker_ii }
 }
 
 \keys_define:nn { terms }
@@ -3396,7 +3446,7 @@
 }
 \NewDocumentCommand \TermsSetup {m}
 {
-    \keys_set:nn {terms} {#1}
+    \keys_set:nn { terms }{ #1 }
 }
 
 \TermsSetup{
@@ -3465,12 +3515,14 @@
 {
     \int_gincr:N \l_terms_int
     \bool_if:NT \l_terms_indexing_bool { \index{#1} }
-    \hbox_set:Nn \l_tmpa_box {
-    \parbox[t]{\labelwidth}{
-        \raggedright
-        \color{\l_terms_color}
-        \l_terms_font #1
-    }}
+    \hbox_set:Nn \l_tmpa_box 
+    {
+        \parbox[t]{\labelwidth}{
+            \raggedright
+            \color{\l_terms_color}
+            \l_terms_font #1
+        }
+    }
     \hbox_set:Nn \l_tmpb_box {\l_terms_font A}
     \dim_set:Nn \l_tmpa_dim { \box_ht:N \l_tmpb_box }
     \raisebox{\l_tmpa_dim}{ \smash{\box_use:N \l_tmpa_box} }
@@ -3491,7 +3543,7 @@
     }
 }
 
-\NewDocumentEnvironment { terms } { s t{|} o }
+\NewDocumentEnvironment { terms } { s t| o }
 {
     \IfBooleanT {#1} { \exp_args:No \TermsSetup{\l_terms_star} }
     \IfBooleanT {#2} { \exp_args:No \TermsSetup{\l_terms_vbar} }
@@ -3515,8 +3567,7 @@
             \cs_set_eq:NN \makelabel \terms_label_multiline:n
         }
     }
-}
-{
+}{
     \end{list}
 }
 
@@ -3534,8 +3585,7 @@
 {
     \begin{terms}[#1]
     \cs_set_eq:NN \makelabel \cmds_label_default:n
-}
-{
+}{
     \end{terms}
 }
 
@@ -3556,8 +3606,7 @@
         \tl_gset:Nn \l_tmpa_tl {M}
         \cs_set_eq:NN \makelabel \terms_label_tmp:n
     }
-}
-{
+}{
     \end{list}
 }
 
@@ -3576,7 +3625,7 @@
 
 \NewEnviron{Terms}[1][]{ \alignterms[#1]{\BODY} }
 
-\NewDocumentEnvironment { UI } { s t{|} } % a variant of terms
+\NewDocumentEnvironment { UI } { s t| } % a variant of terms
 {
     \group_begin:
     \exp_args:No \TermsSetup{\l_UI_default}
@@ -3587,16 +3636,14 @@
         \IfBooleanTF {#2}
             { \begin{terms}*| }
             { \begin{terms}* }
-    }
-    {
+    }{
         \IfBooleanTF {#2}
             { \begin{terms}| }
             { \begin{terms} }
     }
     \cs_set_eq:NN \uitem \item
     \cs_set_eq:NN \mitem \item
-}
-{
+}{
     \end{terms}
     \group_end:
 }
@@ -3613,7 +3660,7 @@
 }
 
 % a variant of the terms environment
-\NewDocumentEnvironment { Symbols } { s o } 
+\NewDocumentEnvironment { symbols } { s o } 
 {
     \group_begin:
     \IfBooleanT {#1}
@@ -3624,8 +3671,7 @@
     \exp_args:No \TermsSetup{\l_symbol_options}
     \IfValueT {#2} { \TermsSetup{base=\lineimg{#2}} }
     \begin{terms}[index=false]
-}
-{
+}{
     \end{terms}
     \IfBooleanT {#1}
     {
@@ -3649,7 +3695,7 @@
         {\opt_unselected:}
 }
 
-\NewDocumentEnvironment { opt } { s O{} }
+\NewDocumentEnvironment { option } { s O{} }
 {
     \clist_set:Nn \l_tmpa_clist { #2 }
     \int_zero:N \l_opt_cnt_int
@@ -3658,8 +3704,7 @@
         \IfValueT {#1} { \tightlist }
         \cs_set_eq:NN \makelabel \opt_label:
     }
-}
-{
+}{
     \end{list}
 }
 
@@ -3743,8 +3788,7 @@
             {\cs_set_eq:NN \item \callout_item_tab:}
             {\cs_set_eq:NN \item \callout_item_space:}
     }
-}
-{
+}{
     \IfBooleanT {#1} { \end{enumerate}  }
     \bool_if:NT \l_callout_rule_bool { \end{RuleBox} }
     \object_skip_after:n {\l_callout_after_skip}
@@ -3801,21 +3845,23 @@
 
 \CirnumSetup{fontfeature={\addfontfeature{LetterSpace=-3}}}
 
-\NewDocumentCommand \cirnum {m}
+\NewDocumentCommand \cirnum { m }
 {
     \cirnumdraw
-        {\l_cirnum_raise_dim}
-        {\l_cirnum_fgcolor}
-        {\l_cirnum_sep_dim}
-        {\l_cirnum_bgcolor}
-        {\l_cirnum_width_dim}
-        {\l_cirnum_font_feature\l_cirnum_font}
-        {#1}
+        { \l_cirnum_raise_dim }
+        { \l_cirnum_fgcolor }
+        { \l_cirnum_sep_dim }
+        { \l_cirnum_bgcolor }
+        { \l_cirnum_width_dim }
+        { \l_cirnum_font_feature\l_cirnum_font }
+        { #1 }
 }
 
-% tcolorbox
+% environments using one of bounded text boxes for admonition and reference
+% BoundedBox*: without linespacing before and after
+% BoundedBox|: (deprecated) the box becomes breakable when it is globally set to be unbreakable, or the other way.
 
-\tcbuselibrary{breakable,skins}
+\tcbuselibrary{breakable, skins}
 \tcbset{enhanced}
 
 \newtcolorbox{LeftBarBox}{
@@ -3880,10 +3926,6 @@
     fonttitle=\bfseries, breakable=false, title={\space #1 \space}
 }
 
-% signal words
-% BoundedBox*: without linespacing before and after
-% BoundedBox|: the frame becomes breakable when the frame option is globally set to being unbreakable, or the other way. (deprecated)
-
 \tl_new:N \l_bbox_style_tl
 \tl_new:N \l_bbox_style_common_tl
 \tl_set:Nn \l_bbox_style_tl {
@@ -3937,9 +3979,17 @@
             \cs_set_eq:NN \BBox \UnbreakableShadeBox
             \cs_set_eq:NN \endBBox \endUnbreakableShadeBox
         }
+        { shadow }{
+            \cs_set_eq:NN \BBox \ShadowBox
+            \cs_set_eq:NN \endBBox \endShadowBox
+        }
         { tab }{
             \cs_set_eq:NN \BBox \TabBox
             \cs_set_eq:NN \endBBox \endTabBox
+        }
+        { rule }{
+            \cs_set_eq:NN \BBox \RuleBox
+            \cs_set_eq:NN \endBBox \endRuleBox
         }
         { LeftBar }{
             \cs_set_eq:NN \BBox \LeftBarBox
@@ -3948,11 +3998,7 @@
         { RightBar }{
             \cs_set_eq:NN \BBox \RightBarBox
             \cs_set_eq:NN \endBBox \endRightBarBox
-        }
-        { shadow }{
-            \cs_set_eq:NN \BBox \ShadowBox
-            \cs_set_eq:NN \endBBox \endShadowBox
-        }
+        }        
     }
 }
 
@@ -3992,7 +4038,6 @@
                 \l_bbox_style_tl
                 \color{\l_bbox_font_color_tl}
                 \l_bbox_font_tl
-
     }{
                 \end{BBox}
             \IfBooleanF{##1}{
@@ -4090,8 +4135,11 @@
     \ClearWatermark
     \WatermarkSetup {#1}
     \bool_if:NTF \l_watermark_text_type
-        {\watermark_text: }
-        {\watermark_image: }
+    {
+        \watermark_text: 
+    }{
+        \watermark_image: 
+    }
 }
 
 \cs_new:Nn \watermark_text:
@@ -4198,7 +4246,6 @@
     }
     \watermark{x=\l_thumbindex_x, y=\l_thumbindex_y, text=\l_thumbindex_label}
 }
-
 \let\ClearThumbIndex\ClearWatermark
 
 % Troubleshooting
@@ -4229,8 +4276,11 @@
 \NewDocumentCommand \problem { s m }
 {
     \IfBooleanTF {#1}
-        { \subsection*{#2} }
-        { \subsubsection*{#2} }
+    { 
+        \subsection*{#2} 
+    }{ 
+        \subsubsection*{#2} 
+    }
     \addcontentsline{lop}{problem}{#2}
 }
 
@@ -4240,7 +4290,7 @@
 }
 
 \ProblemSetup{
-    name = {List~of~Problems},
+    name = {Problems},
     style = \section*{\ProblemListName}
 }
 
@@ -4280,8 +4330,11 @@
 \NewDocumentCommand \URL { s m }
 {
     \IfBooleanTF {#1}
-    { \href{http://#2}{\nolinkurl{#2}}  }
-    { \url{#2} }
+    { 
+        \href{http://#2}{\nolinkurl{#2}}
+    }{ 
+        \url{#2} 
+    }
 }
 
 \NewDocumentCommand \skiplines { O {1} }
@@ -4310,23 +4363,23 @@
 \NewDocumentCommand \wraprule { O{} m }
 {
     \group_begin:
-    \WrapruleSetup{#1}
-    \hbox_set:Nn \l_tmpa_box {\l_wraprule_gap #2 \l_wraprule_gap}
-    \dim_set:Nn \l_tmpa_dim { \box_wd:N \l_tmpa_box }
-    \dim_set:Nn \l_tmpb_dim { \linewidth - \l_tmpa_dim }
-    \noindent\raisebox{\l_wraprule_raise}{
-        \rule{.5\l_tmpb_dim}{\l_wraprule_thickness}
-        \raisebox{-\l_wraprule_raise}{\box_use:N \l_tmpa_box}
-        \rule{.5\l_tmpb_dim}{\l_wraprule_thickness}
-    }
+        \WrapruleSetup{#1}
+        \hbox_set:Nn \l_tmpa_box {\l_wraprule_gap #2 \l_wraprule_gap}
+        \dim_set:Nn \l_tmpa_dim { \box_wd:N \l_tmpa_box }
+        \dim_set:Nn \l_tmpb_dim { \linewidth - \l_tmpa_dim }
+        \noindent\raisebox{\l_wraprule_raise}{
+            \rule{.5\l_tmpb_dim}{\l_wraprule_thickness}
+            \raisebox{-\l_wraprule_raise}{\box_use:N \l_tmpa_box}
+            \rule{.5\l_tmpb_dim}{\l_wraprule_thickness}
+        }
     \group_end:
 }
 
 \NewDocumentCommand \linerule { O{} }
 {
     \group_begin:
-    \WrapruleSetup{#1}
-    \noindent\rule[\l_wraprule_raise]{\linewidth}{\l_wraprule_thickness}
+        \WrapruleSetup{#1}
+        \noindent\rule[\l_wraprule_raise]{\linewidth}{\l_wraprule_thickness}
     \group_end:
 }
 
@@ -4364,20 +4417,24 @@
     star={superscript=false, font=\scriptsize, raise=0.25ex}
 }
 
-\NewDocumentCommand \annotate { s t{|} O{} m }
+\NewDocumentCommand \annotate { s t| O{} m }
 {
     \IfBooleanT {#1}
-        { \exp_args:No \AnnotateSetup{\l_annotate_star} }
+    { 
+        \exp_args:No \AnnotateSetup{\l_annotate_star}
+    }
     \IfBooleanT {#2}
-        { \AnnotateSetup{breakable=false} }
+    { 
+        \AnnotateSetup{breakable=false} 
+    }
     \AnnotateSetup{#3}
-         \l_annotate_space
-         \bool_if:NTF \l_annotate_breakable_bool
-         {
-             \exp_args:Nx \annotate_scope:n {\l_annotate_opening #4 \l_annotate_closing}
-         }{
-             \annotate_display_unbreakable:n {\l_annotate_opening #4 \l_annotate_closing}
-         }
+    \l_annotate_space
+    \bool_if:NTF \l_annotate_breakable_bool
+    {
+        \exp_args:Nx \annotate_scope:n {\l_annotate_opening #4 \l_annotate_closing}
+    }{
+        \annotate_display_unbreakable:n {\l_annotate_opening #4 \l_annotate_closing}
+    }
 }
 
 \cs_new:Npn \annotate_scope:n #1
@@ -4407,10 +4464,13 @@
 {
     \group_begin:
         \l_annotate_font
-            \color{\l_annotate_color}
+        \color{\l_annotate_color}
         \bool_if:NTF \l_annotate_superscript_bool
-            { \raisebox{\l_annotate_raise}{#1} }
-            { \raisebox{-\l_annotate_raise}{#1} }
+        { 
+            \raisebox{\l_annotate_raise}{#1} 
+        }{ 
+            \raisebox{-\l_annotate_raise}{#1} 
+        }
     \group_end:
 }
 
@@ -4425,47 +4485,47 @@
 }
 
 %\exp_args:No \flushrightlist{..., ..., ...}[\font]
-\NewDocumentCommand \flushrightlist { m O{} }
-{
-    \tl_if_empty:nF {#1}
-    {
-        \dim_zero:N \l_tmpa_dim
-        \dim_zero:N \l_tmpb_dim
-        \tl_clear:N \l_tmpa_tl
-        \exp_args:No \clist_map_inline:nn {#1}
-        {
-            \tl_put_right:Nn \l_tmpa_tl {##1\newline}
-            \dim_set_towidth:Nn \l_tmpb_dim {#2 ##1}
-            \dim_compare:nT { \l_tmpa_dim < \l_tmpb_dim }
-            {
-                \dim_set_eq:NN \l_tmpa_dim \l_tmpb_dim
-            }
-        }
-        \hfill
-        \begin{minipage}{\l_tmpa_dim}
-            #2 \l_tmpa_tl
-        \end{minipage}
-    }
-}
+% \NewDocumentCommand \flushrightlist { m O{} }
+% {
+%     \tl_if_empty:nF {#1}
+%     {
+%         \dim_zero:N \l_tmpa_dim
+%         \dim_zero:N \l_tmpb_dim
+%         \tl_clear:N \l_tmpa_tl
+%         \exp_args:No \clist_map_inline:nn {#1}
+%         {
+%             \tl_put_right:Nn \l_tmpa_tl {##1\newline}
+%             \dim_set_towidth:Nn \l_tmpb_dim {#2 ##1}
+%             \dim_compare:nT { \l_tmpa_dim < \l_tmpb_dim }
+%             {
+%                 \dim_set_eq:NN \l_tmpa_dim \l_tmpb_dim
+%             }
+%         }
+%         \hfill
+%         \begin{minipage}{\l_tmpa_dim}
+%             #2 \l_tmpa_tl
+%         \end{minipage}
+%     }
+% }
 
-% scenario
-\seq_new:N \g_scenario_text_seq
+% templates for document elements
+\seq_new:N \g_template_text_seq
 \cs_new:Npn \template_add_text:n #1
 {
-    \seq_gput_right:Nn \g_scenario_text_seq {#1}
+    \seq_gput_right:Nn \g_template_text_seq {#1}
 }
 
 \group_begin:
-\char_set_catcode_space:n {`\ }
-\template_add_text:n {Lorem ipsum dolor sit amet, consectetuer adipiscing elit. }
-\template_add_text:n {Etiam lobortis facilisis sem. Nullam nec mi et neque pharetra sollicitudin. Praesent imperdiet mi nec ante. }
-\template_add_text:n {Donec ullamcorper, felis non sodales commodo, lectus velit ultrices augue, a dignissim nibh lectus placerat pede. Vivamus nunc nunc, molestie ut, ultricies vel, semper in, velit. Ut porttitor. Praesent in sapien. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Duis fringilla tristique neque. }
-\template_add_text:n {Sed interdum libero ut metus. Pellentesque placerat. Nam rutrum augue a leo. Morbi sed elit sit amet ante lobortis sollicitudin. Praesent blandit blandit mauris. Praesent lectus tellus, aliquet aliquam, luctus a, egestas a, turpis. Mauris lacinia lorem sit amet ipsum. Nunc quis urna dictum turpis accumsan semper.}
+    \char_set_catcode_space:n {`\ }
+    \template_add_text:n {Lorem ipsum dolor sit amet, consectetuer adipiscing elit. }
+    \template_add_text:n {Etiam lobortis facilisis sem. Nullam nec mi et neque pharetra sollicitudin. Praesent imperdiet mi nec ante. }
+    \template_add_text:n {Donec ullamcorper, felis non sodales commodo, lectus velit ultrices augue, a dignissim nibh lectus placerat pede. Vivamus nunc nunc, molestie ut, ultricies vel, semper in, velit. Ut porttitor. Praesent in sapien. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Duis fringilla tristique neque. }
+    \template_add_text:n {Sed interdum libero ut metus. Pellentesque placerat. Nam rutrum augue a leo. Morbi sed elit sit amet ante lobortis sollicitudin. Praesent blandit blandit mauris. Praesent lectus tellus, aliquet aliquam, luctus a, egestas a, turpis. Mauris lacinia lorem sit amet ipsum. Nunc quis urna dictum turpis accumsan semper.}
 \group_end:
 
 \cs_new:Npn \template_print_text:n #1
 {
-    \seq_item:Nn \g_scenario_text_seq {#1}
+    \seq_item:Nn \g_template_text_seq {#1}
 }
 
 \NewDocumentCommand \tpltext { O{1} }
@@ -4482,7 +4542,6 @@
 }
 
 % \tpllist*[terms][enumerate]
-
 \NewDocumentCommand \tpllist { s o o }
 {
     \tplpara
