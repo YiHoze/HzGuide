@@ -1,7 +1,12 @@
 % For xelatex to use truetype and opentype fonts:
 % #> fc-cache -f -v 
 % For lualatex to use truetype and opentype fonts:
-% #> luaotfload-tool -u 
+% #> luaotfload-tool --update --force
+% #> luaotfload-tool --find="Palatino Linotype" --inspect
+% To name filenames in Hangul
+% texmf.cnf: command_line_encoding=utf8 
+
+% Variables beginning with "Hz" or "hz" are intended to be effective through the entire document.
 
 % Obey these naming rules for command macros, environment macros, variables, and parameter keys.
 % I. Minimize use of acronyms and abbreviations 
@@ -57,7 +62,7 @@
 
 \ExplSyntaxOn
 
-\keys_define:nn { hzguide }
+\keys_define:nn { HzGuide }
 {
     language    .code:n = { \LanguageSetup {#1} },
     styleset    .tl_set:N = \g_style_set,
@@ -69,7 +74,7 @@
     bitmap      .bool_set:N = \g_bitmap_bool
 }
 
-\tl_new:N \hzlang
+\tl_new:N \HzLang
 \bool_new:N \g_CJK_bool
 \bool_gset_false:N \g_CJK_bool
 
@@ -77,26 +82,26 @@
 {
     \str_case:nn {#1}
     {
-        {english}     { \tl_set:Nn \hzlang {eng} } % 0  ENGLISH
-        {chinese}     { \tl_set:Nn \hzlang {chi} } % 1  中文
-        {czech}       { \tl_set:Nn \hzlang {cze} } % 2  ČEŠTINA
-        {danish}      { \tl_set:Nn \hzlang {dan} } % 3  DANSK
-        {dutch}       { \tl_set:Nn \hzlang {dut} } % 4  NEDERLANDS
-        {finnish}     { \tl_set:Nn \hzlang {fin} } % 5  SUOMI
-        {french}      { \tl_set:Nn \hzlang {fre} } % 6  FRANÇAIS
-        {german}      { \tl_set:Nn \hzlang {ger} } % 7  DEUTSCH
-        {italian}     { \tl_set:Nn \hzlang {ita} } % 8  ITALIANO
-        {japanese}    { \tl_set:Nn \hzlang {jap} } % 9  日本語
-        {korean}      { \tl_set:Nn \hzlang {kor} } % 10 한국어
-        {norwegian}   { \tl_set:Nn \hzlang {nor} } % 11 NORSK
-        {polish}      { \tl_set:Nn \hzlang {pol} } % 12 POLSKI
-        {portuguese}  { \tl_set:Nn \hzlang {por} } % 13 PORTUGUÊS
-        {russian}     { \tl_set:Nn \hzlang {rus} } % 14 РУССКИЙ ЯЗЫК
-        {slovakian}   { \tl_set:Nn \hzlang {slo} } % 15 SLOVENČINA
-        {spanish}     { \tl_set:Nn \hzlang {spa} } % 16 ESPAÑOL
-        {swedish}     { \tl_set:Nn \hzlang {swe} } % 17 SVENSKA
-        {turkish}     { \tl_set:Nn \hzlang {tur} } % 18 TÜRKÇE
-        {TC}          { \tl_set:Nn \hzlang {TC} } % traditional chinese
+        {english}     { \tl_set:Nn \HzLang {eng} } % 0  ENGLISH
+        {chinese}     { \tl_set:Nn \HzLang {chi} } % 1  中文
+        {czech}       { \tl_set:Nn \HzLang {cze} } % 2  ČEŠTINA
+        {danish}      { \tl_set:Nn \HzLang {dan} } % 3  DANSK
+        {dutch}       { \tl_set:Nn \HzLang {dut} } % 4  NEDERLANDS
+        {finnish}     { \tl_set:Nn \HzLang {fin} } % 5  SUOMI
+        {french}      { \tl_set:Nn \HzLang {fre} } % 6  FRANÇAIS
+        {german}      { \tl_set:Nn \HzLang {ger} } % 7  DEUTSCH
+        {italian}     { \tl_set:Nn \HzLang {ita} } % 8  ITALIANO
+        {japanese}    { \tl_set:Nn \HzLang {jap} } % 9  日本語
+        {korean}      { \tl_set:Nn \HzLang {kor} } % 10 한국어
+        {norwegian}   { \tl_set:Nn \HzLang {nor} } % 11 NORSK
+        {polish}      { \tl_set:Nn \HzLang {pol} } % 12 POLSKI
+        {portuguese}  { \tl_set:Nn \HzLang {por} } % 13 PORTUGUÊS
+        {russian}     { \tl_set:Nn \HzLang {rus} } % 14 РУССКИЙ ЯЗЫК
+        {slovakian}   { \tl_set:Nn \HzLang {slo} } % 15 SLOVENČINA
+        {spanish}     { \tl_set:Nn \HzLang {spa} } % 16 ESPAÑOL
+        {swedish}     { \tl_set:Nn \HzLang {swe} } % 17 SVENSKA
+        {turkish}     { \tl_set:Nn \HzLang {tur} } % 18 TÜRKÇE
+        {TC}          { \tl_set:Nn \HzLang {TC} } % traditional chinese
     }
 }
 
@@ -108,7 +113,7 @@
 
 \NewDocumentCommand \IfLang { m +m o }
 {
-    \str_if_eq:VnTF \hzlang {#1}
+    \str_if_eq:VnTF \HzLang {#1}
         { #2 }
         { \IfValueT {#3} {#3} }
 }
@@ -149,7 +154,7 @@
 \NewEnviron{IfDoc}[1]{\IfDocType{#1}{\BODY}}
 \NewEnviron{IfNotDoc}[1]{\IfNotDocType{#1}{\BODY}}
 
-\keys_set:nn { hzguide }
+\keys_set:nn { HzGuide }
 {
     verbatim = false,
     bitmap = false,
@@ -157,7 +162,7 @@
     pairquote = true,
 }
 
-\ProcessKeysOptions { hzguide }
+\ProcessKeysOptions { HzGuide }
 
 \bool_if:NT \g_smallerfont_bool %\documentclass[9pt, smallerfont]
 {
@@ -838,7 +843,7 @@
 
 \CommonPathSetup{
     root = {../../../Common/},
-    language = \hzlang
+    language = \HzLang
 }
 
 \NewDocumentCommand \commoninput { s m }
@@ -868,9 +873,9 @@
 }
 
 \PendingSetup{
-    beforecolor=red,
+    beforecolor=darkgray,
     aftercolor=blue,
-    font=\foreignrmfamily,
+    font=\foreignrmfamily\small,
     hide=false
 }
 
@@ -927,7 +932,7 @@
     \bool_if:NTF \l_pending_hide_bool
     {
         \IfBooleanTF {#1} {\ignorespaces} {#3}
-    }{
+    }{        
         \IfBooleanTF {#1}
         {
             \textcolor{\l_pending_beforecolor}{\sout{#3}}
@@ -1498,7 +1503,7 @@
 
 % setup -----------------------------------------------------------------------
 
-\keys_define:nn {hzlayout}
+\keys_define:nn { HzLayout }
 {
     paper           .code:n = { \layout_paper_configure:n {#1} },
     stockwidth      .dim_gset:N = \stockwidth,
@@ -1520,7 +1525,7 @@
 
 \NewDocumentCommand \LayoutSetup { s m }
 {
-    \keys_set:nn { hzlayout } { #2 }
+    \keys_set:nn { HzLayout } { #2 }
     \IfBooleanF{#1}{
         \layout_settle:
     }
@@ -1739,7 +1744,7 @@
         \renewcommand{\chapnumfont}{\LARGE\chapterline\chapternumbersize}
         \renewcommand{\chaptitlefont}{\LARGE\chapterline\chaptertitlesize}
     }
-    \keys_set:nn {hzheading}
+    \keys_set:nn { HzHeading }
     {
         chapterstyle=firmarticle,
         cftstyle=section,
@@ -1865,7 +1870,7 @@
 \cs_new:Nn \style_paragraph_indent:
 {
     \setlength{\parindent}{\hzparindent}
-    \tl_set:Nn \l_admonition_style_basic {\setlength\parindent{\hzparindent}}
+    \tl_set:Nn \l_admonition_style_common_tl {\setlength\parindent{\hzparindent}}
     \abnormalparskip{0pt}
     \setlist{partopsep=0pt, topsep=.25\baselineskip, itemsep=.25ex}
     \setlist[itemize]{labelindent=.5em,labelwidth=1em,labelsep=.5em}
@@ -1884,7 +1889,7 @@
 }
 
 \bool_new:N \g_section_multiline_bool
-\keys_define:nn {hzheading}
+\keys_define:nn { HzHeading }
 {
     linespacing           .code:n = { \setSpacing {#1} },
     type                  .code:n = { \style_type_configure:n {#1} },
@@ -1913,7 +1918,7 @@
 
 \NewDocumentCommand \HeadingSetup { m }
 {
-    \keys_set:nn {hzheading} {#1}
+    \keys_set:nn { HzHeading } {#1}
     \bool_if:NT \g_style_nochaptername_bool
     {
         \def\@chapapp{}
@@ -2112,7 +2117,7 @@
     top=0pt, bottom=0pt, left=0pt, right=0pt
 }
 
-\keys_define:nn { hzobject }
+\keys_define:nn { HzObject }
 {
     beforeskip  .skip_gset:N = \g_object_before_skip,
     afterskip  .skip_gset:N = \g_object_after_skip,
@@ -2121,7 +2126,7 @@
 
 \NewDocumentCommand \ObjectSetup { m }
 {
-    \keys_set:nn { hzobject } { #1 }
+    \keys_set:nn { HzObject } { #1 }
 }
 
 \cs_new:Npn \object_skip_before:n #1
@@ -2216,7 +2221,7 @@
 \newfixedcaption{\imgcaption}{figure}
 \newfixedcaption{\tabcaption}{table}
 
-\keys_define:nn  { hzcaption }{
+\keys_define:nn  { HzCaption }{
 
     beforeskip  .skip_set:N = \g_caption_before_skip,
     afterskip   .skip_set:N = \g_caption_after_skip,
@@ -2227,7 +2232,7 @@
 
 \NewDocumentCommand \CaptionSetup { m }
 {
-    \keys_set:nn { hzcaption } { #1 }
+    \keys_set:nn { HzCaption } { #1 }
     \dim_set_eq:NN \abovecaptionskip \g_caption_before_skip
     \dim_set_eq:NN \belowcaptionskip \g_caption_after_skip
     \captionnamefont{ \g_caption_font }
@@ -3001,7 +3006,7 @@
 \NewEnviron{imagetableiii}{
     \placetable[stretch=1.3]{
         \taburowcolors{}
-        \begin{tabu}{X[c]X[c]X[c]}
+        \begin{tabu}{X[cm]X[cm]X[cm]}
         \BODY
         \end{tabu}
     }
@@ -3010,7 +3015,7 @@
 \NewEnviron{imagetableii}{
     \placetable[stretch=1.3]{
         \taburowcolors{}
-        \begin{tabu}{X[c]X[c]}
+        \begin{tabu}{X[cm]X[cm]}
         \BODY
         \end{tabu}
     }
@@ -3196,7 +3201,7 @@
     }
 }
 
-\NewDocumentCommand \hz_indexing {o m}
+\NewDocumentCommand \hzindexing { o m }
 {
     \bool_if:NT \g_indexing_bool
     {
@@ -3222,7 +3227,7 @@
 
 \NewDocumentCommand \term { s o m }
 {
-    \hz_indexing [#2] {#3}
+    \hzindexing [#2] {#3}
     \IfBooleanTF {#1}
         { \textcolor{\l_term_color}{\l_term_emphfont #3} }
         { \textcolor{\l_term_color}{#3} }
@@ -3250,7 +3255,7 @@
 
 \NewDocumentCommand \ui {s o m}
 {
-    \IfBooleanF {#1} { \hz_indexing [#2] {#3} }
+    \IfBooleanF {#1} { \hzindexing [#2] {#3} }
     \textcolor{\l_ui_color}{\l_ui_font #3}
 }
 % \mi[sort][OK]: use the starred version to index the arguments.
@@ -3808,6 +3813,8 @@
         {#1}
 }
 
+% tcolorbox
+
 \tcbuselibrary{breakable,skins}
 \tcbset{enhanced}
 
@@ -3825,18 +3832,20 @@
     borderline~east={1.5pt}{0pt}{gray}
 }
 
-\newtcolorbox{ShadowBox}{
+\newtcolorbox{ShadowBox}[1][]{
     before~skip=0pt, after~skip=0pt,
     boxrule=0.5pt, colframe=darkgray, colback=white, arc=0.5ex,
-    boxsep=0.25ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
-    drop~fuzzy~shadow={scale=2}, breakable=true,
+    boxsep=0.5ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
+    titlerule=0.75pt, toptitle=0.25ex, bottomtitle=0.5ex,
+    colbacktitle=darkgray, coltitle=white,
+    drop~fuzzy~shadow={scale=2}, breakable=true, title=\textbf{#1}
 }
 
 \newtcolorbox{UnbreakableShadeBox}[1][]{
     before~skip=0pt, after~skip=0pt,
-    width=\linewidth-\l_admonition_indent_skip,
+    width=\linewidth-\l_bbox_indent_skip,
     boxrule=0.75pt, colframe=white, colback=backgray, arc=0.5ex,
-    boxsep=0.25ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
+    boxsep=0.5ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
     titlerule=0.75pt, toptitle=-0.25ex, bottomtitle=0.5ex,
     colbacktitle=lightgray, coltitle=black,
     fonttitle=\bfseries, breakable=false, title=#1
@@ -3845,7 +3854,7 @@
 \newtcolorbox{BreakableShadeBox}[1][]{
     before~skip=0pt, after~skip=0pt,
     boxrule=0.75pt, colframe=white, colback=backgray, arc=0.5ex,
-    boxsep=0.25ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
+    boxsep=0.5ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
     titlerule=0.75pt, toptitle=0.5ex, bottomtitle=0.5ex,
     colbacktitle=lightgray, coltitle=black,
     fonttitle=\bfseries, breakable=true, title=#1
@@ -3868,295 +3877,166 @@
     colbacktitle=white, coltitle=black,
     attach~boxed~title~to~top~left={xshift=.5cm, yshift=-1.75mm},
     boxed~title~style={size=minimal, enhanced, boxrule=0.25pt, colframe=white},
-    fonttitle=\bfseries, breakable=\FrameBreakable, title={\space #1 \space}
+    fonttitle=\bfseries, breakable=false, title={\space #1 \space}
 }
 
 % signal words
-% Admonition*: without linespacing before and after
-% Admonition|: the frame becomes breakable when the frame option is globally set to being unbreakable, or the other way.
+% BoundedBox*: without linespacing before and after
+% BoundedBox|: the frame becomes breakable when the frame option is globally set to being unbreakable, or the other way. (deprecated)
 
-\NewDocumentEnvironment { admonition } { s t{|} m o }
-{
-    \group_begin:
-    \IfBooleanT {#2}
-    {
-        \str_if_eq:VnTF \l_admonition_type {BreakableShade}
-            { \AdmonitionSetup{type=UnBreakableShade} }
-            { \AdmonitionSetup{type=BreakableShade} }
-    }
-    \IfValueT {#4} { \AdmonitionSetup{#4} }
-    \IfBooleanF {#1} { \object_skip_before:n {\l_admonition_before_skip} }
-    \begin{AdmonBox} [#3] \l_admonition_style \l_admonition_font
-}
-{
-    \end{AdmonBox}
-    \IfBooleanF {#1} { \object_skip_after:n {\l_admonition_after_skip} }
-    \group_end:
-}
-
-\tl_new:N \l_admonition_type
-\cs_new:Npn \admonition_type:n #1
-{
-    \tl_set:Nn \l_admonition_type {#1}
-    \str_case:nn {#1}
-    {
-        {BreakableShade}  {
-            \cs_set_eq:NN \AdmonBox \BreakableShadeBox
-            \cs_set_eq:NN \endAdmonBox \endBreakableShadeBox
-        }
-        {UnbreakableShade}  {
-            \cs_set_eq:NN \AdmonBox \UnbreakableShadeBox
-            \cs_set_eq:NN \endAdmonBox \endUnbreakableShadeBox
-        }
-        {tab}   {
-            \cs_set_eq:NN \AdmonBox \TabBox
-            \cs_set_eq:NN \endAdmonBox \endTabBox
-        }
-    }
-}
-
-\tl_new:N \l_admonition_style
-\tl_new:N \l_admonition_style_basic
-\tl_set:Nn \l_admonition_style {
+\tl_new:N \l_bbox_style_tl
+\tl_new:N \l_bbox_style_common_tl
+\tl_set:Nn \l_bbox_style_tl {
     \HzJustification
-    \l_admonition_style_basic
-    \l_admonition_style_extra
+    \l_bbox_style_common_tl
+    \l_bbox_style_extra_tl
 }
 
-\keys_define:nn {admonition}
+\keys_define:nn { BoundedBox }
 {
-    beforeskip  .skip_set:N = \l_admonition_before_skip,
-    afterskip   .skip_set:N = \l_admonition_after_skip,
-    indent      .skip_set:N = \l_admonition_indent_skip,
-    type        .code:n = { \admonition_type:n {#1} },
-    symbol      .tl_set:N = \l_admonition_symbol,
-    danger      .tl_set:N = \l_admonition_danger,
-    warning     .tl_set:N = \l_admonition_warning,
-    caution     .tl_set:N = \l_admonition_caution,
-    notice      .tl_set:N = \l_admonition_notice,
-    note        .tl_set:N = \l_admonition_note,
-    style       .tl_set:N = \l_admonition_style_extra,
-    font        .tl_set:N = \l_admonition_font
+    before-skip .skip_set:N = \l_bbox_before_skip,
+    after-skip  .skip_set:N = \l_bbox_after_skip,
+    indent      .skip_set:N = \l_bbox_indent_skip,
+    type        .tl_set:N = \l_bbox_type_tl,
+    symbol      .tl_set:N = \l_bbox_symbol_tl,
+    signal      .tl_set:N = \l_bbox_signal_tl,
+    style       .tl_set:N = \l_bbox_style_extra_tl,
+    font        .tl_set:N = \l_bbox_font_tl,
+    font-color  .tl_set:N = \l_bbox_font_color_tl,
+    wrapping    .bool_set:N = \l_bbox_wrapping_bool
 }
+
+\NewDocumentCommand \BoundedBoxInitialize { m }
+{
+    \keys_set:nn { BoundedBox }{ #1 }
+}
+
+\BoundedBoxInitialize {
+    before-skip = 0pt,
+    after-skip = 0pt,
+    indent = 0pt,
+    type = UnbreakableShade,
+    font-color = black
+}
+
+\tl_new:N \g_bounded_box_options_tl
+\NewDocumentCommand \BoundedBoxSetup { m }
+{
+    \tl_set:Nn \g_bounded_box_options_tl { #1 }    
+}
+
+\cs_new:Npn \bbox_type_set:n #1
+{
+    \str_case_x:nn { #1 }
+    {
+        { BreakableShade }{
+            \cs_set_eq:NN \BBox \BreakableShadeBox
+            \cs_set_eq:NN \endBBox \endBreakableShadeBox
+        }
+        { UnbreakableShade }{
+            \cs_set_eq:NN \BBox \UnbreakableShadeBox
+            \cs_set_eq:NN \endBBox \endUnbreakableShadeBox
+        }
+        { tab }{
+            \cs_set_eq:NN \BBox \TabBox
+            \cs_set_eq:NN \endBBox \endTabBox
+        }
+        { LeftBar }{
+            \cs_set_eq:NN \BBox \LeftBarBox
+            \cs_set_eq:NN \endBBox \endLeftBarBox
+        }
+        { RightBar }{
+            \cs_set_eq:NN \BBox \RightBarBox
+            \cs_set_eq:NN \endBBox \endRightBarBox
+        }
+        { shadow }{
+            \cs_set_eq:NN \BBox \ShadowBox
+            \cs_set_eq:NN \endBBox \endShadowBox
+        }
+    }
+}
+
+\NewDocumentCommand \NewBoundedBox { s m m }
+{
+    \IfBooleanTF{#1}{
+        \RenewDocumentEnvironment
+    }{
+        \NewDocumentEnvironment
+    }
+    { #2 } { s O{} }
+    {
+        \keys_set:nn { BoundedBox }{ #3 }
+        \exp_args:Nnf \keys_set:nn { BoundedBox} { \g_bounded_box_options_tl }
+        \group_begin:
+            \keys_set:nn { BoundedBox }{ ##2 } 
+            % \IfBooleanT {#2}
+            % {
+            %    \str_if_eq:VnTF \l_admonition_type {BreakableShade}
+            %    { 
+            %         \keys_set:nn { BoundedBox }{ type=UnBreakableShade }
+            %     }{ 
+            %         \keys_set:nn { BoundedBox }{ type=BreakableShade } 
+            %     }
+            % }
+            \bbox_type_set:n { \l_bbox_type_tl }
+            \IfBooleanF{##1}{ 
+                \object_skip_before:n { \l_bbox_before_skip }
+            }
+            \tl_if_empty:NTF \l_bbox_signal_tl    
+            {
+                \begin{BBox}
+            }{
+                \begin{BBox}[\l_bbox_symbol_tl\l_bbox_signal_tl]
+            }
+                \bool_if:NT \l_bbox_wrapping_bool { \wrappingon }
+                \l_bbox_style_tl
+                \color{\l_bbox_font_color_tl}
+                \l_bbox_font_tl
+
+    }{
+                \end{BBox}
+            \IfBooleanF{##1}{
+                \object_skip_after:n { \l_bbox_after_skip }
+            }
+        \group_end:
+    }
+}
+
+\NewDocumentCommand \RenewBoundedBox { m m }
+{
+    \NewBoundedBox*{#1}{#2}
+}
+
+\keys_define:nn { admonition }
+{
+    danger      .tl_set:N = \g_admonition_danger_tl,
+    warning     .tl_set:N = \g_admonition_warning_tl,
+    caution     .tl_set:N = \g_admonition_caution_tl,
+    notice      .tl_set:N = \g_admonition_notice_tl,
+    note        .tl_set:N = \g_admonition_note_tl,
+}
+
 
 \NewDocumentCommand \AdmonitionSetup { m }
 {
-    \keys_set:nn {admonition} {#1}
+    \keys_set:nn { admonition } {#1}
 }
 
-\AdmonitionSetup {
-    beforeskip=0pt,
-    afterskip=0pt,
-    indent=0pt,
-    type=UnbreakableShade,
-    symbol = {\lineimg{AlertSymbol}~},
+\AdmonitionSetup{
     danger = DANGER,
     warning = WARNING,
     caution = CAUTION,
     notice = NOTICE,
-    note = NOTE,
+    note = NOTE
 }
 
-\tl_new:N \l_reference_style
-
-\NewDocumentCommand \ReferenceSetup { m }
-{
-    \tl_set:Nn \l_reference_style { #1 }
-}
-
-\NewDocumentEnvironment { reference } { s t{|} }
-{
-    \group_begin:
-    \IfBooleanT {#2} { \wrappingon } % for verbatim
-    \exp_args:No \AdmonitionSetup{ \l_reference_style }
-    \IfBooleanTF {#1}
-    {
-        \begin{IfVartwoEnlarge}
-    }{
-        \object_skip_before:n {\l_admonition_before_skip}
-    }
-    \begin{AdmonBox}
-    \l_admonition_style \l_admonition_font
-}{
-    \end{AdmonBox}
-    \IfBooleanTF {#1}
-    {
-        \end{IfVartwoEnlarge}
-    }{
-        \object_skip_after:n {\l_admonition_after_skip}        
-    }
-    \group_end:
-}
-
-
-\NewDocumentEnvironment { Danger } { s t{|} }
-{
-    \IfBooleanTF{#1}
-    {
-        \IfBooleanTF{#2}
-        { \begin{admonition}*|{\l_admonition_symbol\l_admonition_danger} }
-        { \begin{admonition}*{\l_admonition_symbol\l_admonition_danger} }
-    }{
-    \IfBooleanTF{#2}
-        { \begin{admonition}|{\l_admonition_symbol\l_admonition_danger} }
-        { \begin{admonition}{\l_admonition_symbol\l_admonition_danger} }
-    }
-}{
-    \end{admonition}
-}
-
-
-\NewDocumentEnvironment { Warning } { s t{|} }
-{
-    \IfBooleanTF{#1}
-    {
-        \IfBooleanTF{#2}
-        { \begin{admonition}*|{\l_admonition_symbol\l_admonition_warning} }
-        { \begin{admonition}*{\l_admonition_symbol\l_admonition_warning} }
-    }{
-    \IfBooleanTF{#2}
-        { \begin{admonition}|{\l_admonition_symbol\l_admonition_warning} }
-        { \begin{admonition}{\l_admonition_symbol\l_admonition_warning} }
-    }
-}{
-    \end{admonition}
-}
-
-\NewDocumentEnvironment { Caution } { s t{|} }
-{
-    \IfBooleanTF{#1}
-    {
-        \IfBooleanTF{#2}
-        { \begin{admonition}*|{\l_admonition_symbol\l_admonition_caution} }
-        { \begin{admonition}*{\l_admonition_symbol\l_admonition_caution} }
-    }{
-    \IfBooleanTF{#2}
-        { \begin{admonition}|{\l_admonition_symbol\l_admonition_caution} }
-        { \begin{admonition}{\l_admonition_symbol\l_admonition_caution} }
-    }
-}
-{
-    \end{admonition}
-}
-
-
-\NewDocumentEnvironment { Notice } { s t{|} }
-{
-    \IfBooleanTF{#1}
-    {
-        \IfBooleanTF{#2}
-        { \begin{admonition}*|{\l_admonition_notice} }
-        { \begin{admonition}*{\l_admonition_notice} }
-    }{
-    \IfBooleanTF{#2}
-        { \begin{admonition}|{\l_admonition_notice} }
-        { \begin{admonition}{\l_admonition_notice} }
-    }
-}{
-    \end{admonition}
-}
-
-
-\NewDocumentEnvironment { Note } { s t{|} }
-{
-    \IfBooleanTF{#1}
-    {
-        \IfBooleanTF{#2}
-        { \begin{admonition}*|{\l_admonition_note} }
-        { \begin{admonition}*{\l_admonition_note} }
-    }{
-    \IfBooleanTF{#2}
-        { \begin{admonition}|{\l_admonition_note} }
-        { \begin{admonition}{\l_admonition_note} }
-    }
-}{
-    \end{admonition}
-}
-
-\cs_set_eq:NN \danger \Danger
-\cs_set_eq:NN \enddanger \endDanger
-\cs_set_eq:NN \warning \Warning
-\cs_set_eq:NN \endwarning \endWarning
-\cs_set_eq:NN \caution \Caution
-\cs_set_eq:NN \endcaution \endCaution
-\cs_set_eq:NN \notice \Notice
-\cs_set_eq:NN \endnotice \endNotice
-\cs_set_eq:NN \note \Note
-\cs_set_eq:NN \endnote \endNote
-
-\keys_define:nn {instance}
-{
-    beforeskip  .dim_set:N = \l_instance_before_skip,
-    afterskip   .dim_set:N = \l_instance_after_skip,
-    type        .code:n = { \instance_type:n {#1} },
-    font        .tl_set:N = \l_instance_font,
-    fontcolor   .tl_set:N = \l_instance_fontcolor,
-    style       .tl_set:N = \l_instance_style
-}
-
-\NewDocumentCommand \InstanceSetup { m }
-{
-    \keys_set:nn {instance} {#1}
-}
-
-\tl_new:N \l_instance_type
-\cs_new:Npn \instance_type:n #1
-{
-    \tl_set:Nn \l_instance_type {#1}
-    \str_case:nn {#1}
-    {
-        {LeftBar}  {
-            \cs_set_eq:NN \InstanceBox \LeftBarBox
-            \cs_set_eq:NN \endInstanceBox \endLeftBarBox
-        }
-        {RightBar}  {
-            \cs_set_eq:NN \InstanceBox \RightBarBox
-            \cs_set_eq:NN \endInstanceBox \endRightBarBox
-        }
-        {Shadow}  {
-            \cs_set_eq:NN \InstanceBox \ShadowBox
-            \cs_set_eq:NN \endInstanceBox \endShadowBox
-        }
-    }
-}
-
-\InstanceSetup{
-    beforeskip = 1.25\baselineskip,
-    afterskip = 1.25\baselineskip,
-    type = RightBar,
-    fontcolor = black
-}
-
-\NewDocumentEnvironment {instance} {}
-{
-    \object_skip_before:n {\l_instance_before_skip}
-    \begin{InstanceBox}
-    \color{\l_instance_fontcolor}\l_instance_font
-    \l_instance_style
-}{
-    \end{InstanceBox}
-    \object_skip_after:n {\l_instance_after_skip}
-}
-
-% \cs_set_eq:NN \Reference \reference
-% \cs_set_eq:NN \endReference \endreference
-% \cs_set_eq:NN \Instance \instance
-% \cs_set_eq:NN \endInstance \endinstance
-
-\NewDocumentCommand \SetEmphasisAs { m }
-{
-    \str_case:nn {#1}
-    {
-        { reference } {
-            \cs_set_eq:NN \emphasis \reference
-            \cs_set_eq:NN \endemphasis \endreference
-        }
-        { instance} {
-            \cs_set_eq:NN \emphasis \instance
-            \cs_set_eq:NN \endemphasis \endinstance
-        }
-    }
-}
+\NewBoundedBox{danger}{signal=\g_admonition_danger_tl, symbol={\lineimg{AlertSymbol}~}}
+\NewBoundedBox{warning}{signal=\g_admonition_warning_tl, symbol={\lineimg{AlertSymbol}~}}
+\NewBoundedBox{caution}{signal=\g_admonition_caution_tl, symbol={}}
+\NewBoundedBox{notice}{signal=\g_admonition_notice_tl, symbol={}}
+\NewBoundedBox{note}{signal=\g_admonition_note_tl, symbol={}}
+\NewBoundedBox{instance}{signal={}, type=RightBar}
+\NewBoundedBox{reference}{signal={}}
 
 %\watermark{x=30,y=30,fontsize=90,color=red,text={...},image=foo,rotate=50}
 % when both text and image are specified, the former is ignored.
@@ -4544,8 +4424,8 @@
     }
 }
 
-%\exp_args:No \ItemizeOnRight{..., ..., ...}[\font]
-\NewDocumentCommand \ItemizeOnRight { m O{} }
+%\exp_args:No \flushrightlist{..., ..., ...}[\font]
+\NewDocumentCommand \flushrightlist { m O{} }
 {
     \tl_if_empty:nF {#1}
     {
