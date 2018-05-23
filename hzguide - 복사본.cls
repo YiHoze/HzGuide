@@ -22,7 +22,7 @@
 % IV. For those of designer interface level:
 %     Follow clause II. However, it is allowed to use lowercase with compound words.
 
-\ProvidesClass{hzguide}[2018/05/23]
+\ProvidesClass{hzguide}[2018/05/21]
 
 \LoadClassWithOptions{memoir}
 
@@ -1910,7 +1910,7 @@
     \setlist{partopsep=0pt, topsep=.25\baselineskip, itemsep=.25ex}
     \setlist[itemize]{labelindent=.5em,labelwidth=1em,labelsep=.5em}
     \setlist[enumerate]{labelindent=.5em,labelwidth=1.25em,labelsep=.5em}
-    \TermsInitialize{top-sep=0.5\baselineskip,item-sep=.5ex}
+    \TermsSetup{topsep=0.5\baselineskip,itemsep=.5ex}
 }
 
 \cs_new:Nn \style_paragraph_interval:
@@ -1920,7 +1920,7 @@
     \setlist{partopsep=0pt, topsep=.5ex, itemsep=0pt}
     \setlist[itemize]{labelindent=0em,labelwidth=1em,labelsep=.5em}
     \setlist[enumerate]{labelindent=0em,labelwidth=1.25em,labelsep=.5em}
-    \TermsInitialize{top-sep=0.5ex,item-sep=.25ex}
+    \TermsSetup{topsep=0.5ex,itemsep=.25ex}
 }
 
 \bool_new:N \g_section_multiline_bool
@@ -2350,25 +2350,17 @@
 \NewDocumentCommand \image { s t| O{} m o d() }
 {
     \group_begin:
-    \IfValueTF{ #5 } 
-    {
+    \IfValueTF{#5} {
         \bool_set_true:N \l_image_extra_bool
     }{
         \bool_set_false:N \l_image_extra_bool
     }
-    \IfBooleanT{ #1 }
-    { 
-        \exp_args:No \ImageSetup{\l_image_star} 
-    }
-    \IfBooleanT{ #2 }
-    { 
-        \exp_args:No \ImageSetup{\l_image_vbar} 
-    }
+    \IfBooleanT {#1}
+        { \exp_args:No \ImageSetup{\l_image_star} }
+    \IfBooleanT {#2}
+        { \exp_args:No \ImageSetup{\l_image_vbar} }
     \ImageSetup{#3}
-    \IfValueT{ #6 }
-    { 
-        \tl_set:Nn \l_image_caption {#6} 
-    }
+    \IfValueT{#6} { \tl_set:Nn \l_image_caption {#6} }
     \tl_if_empty:NT \l_image_label
     {
         \IfValueTF{#5} {
@@ -3233,114 +3225,139 @@
 {
     \makeindex
     \bool_gset_true:N \g_indexing_bool
-    \TermSetup{ index = true }
-    \bool_gset_true:N \l_terms_index_bool
-    \IfBooleanT{ #1 }{ \BookmarkIndexHead }
+    \bool_gset_true:N \l_terms_indexing_bool
+    \IfBooleanT {#1} { \BookmarkIndexHead }
 }
 \NewDocumentCommand \IndexingDisable {}
 {
     \bool_gset_false:N \g_indexing_bool
-    \TermSetup{ index = false }
-    \bool_gset_false:N \l_terms_index_bool
+    \bool_gset_false:N \l_terms_indexing_bool
 }
-% \NewDocumentCommand \IfIndexing { m o }
-% {
-%     \bool_if:NTF \g_indexing_bool
-%     {
-%         #1
-%     }{
-%         \IfValueT{#2}{#2}
-%     }
-% }
+\IndexingDisable
 
-% \term*|[index position]{\LaTeX}
-\tl_new:N \g_term_options_tl
-\keys_define:nn { term }
+\NewDocumentCommand \IfIndexing { m o }
 {
-    color       .tl_set:N = \l_term_color_tl,
-    font        .tl_set:N = \l_term_font_tl,
-    star        .tl_set:N = \l_term_star_tl,
-    vbar        .tl_set:N = \l_term_vbar_tl,
-    index       .bool_set:N = \l_term_index_bool
+    \bool_if:NTF \g_indexing_bool
+    {
+        #1
+    }{
+        \IfValueT{#2}{#2}
+    }
 }
-\NewDocumentCommand \TermInitialize { m }
+
+\NewDocumentCommand \hzindexing { o m }
 {
-    \keys_set:nn { term }{ #1 }
+    \bool_if:NT \g_indexing_bool
+    {
+        \IfNoValueTF {#1} 
+        { 
+            \index{#2} 
+        }{ 
+            \index{#1@#2} 
+        }
+    }
 }
-\TermInitialize{
-    color = black    
+
+% \term[sort]{\LaTeX}: use the starred version to emphasize the argument.
+\keys_define:nn {term}
+{
+    color    .tl_set:N = \l_term_color,
+    emphfont  .tl_set:N = \l_term_emphfont
 }
 \NewDocumentCommand \TermSetup { m }
 {
-    \tl_set:Nn \g_term_options_tl { #1 }
+    \keys_set:nn {term} {#1}
 }
 
-\NewDocumentCommand \NewTerm { s m m }
-{
-    \IfBooleanTF{#1}{
-        \RenewDocumentCommand 
-    }{
-        \NewDocumentCommand 
-    } #2 { s t| o m }
-    {
-        \keys_set:nn { term }{ #3 }
-        \exp_args:Nno \keys_set:nn { term }{ \g_term_options_tl }        
-        \IfBooleanT{ ##1 }
-        {
-            \exp_args:Nno \keys_set:nn { term }{ \l_term_star_tl }
-        }
-        \IfBooleanTF{ ##2 }
-        {
-            \exp_args:Nno \keys_set:nn { term }{ \l_term_vbar_tl }
-        }
-        \bool_if:NT \l_term_index_bool
-        {
-            \IfValueTF{ ##3 }
-            {
-                \index{##3@##4}                
-            }{
-                \index{##4}
-            }
-        }
-        \textcolor{ \l_term_color_tl }{ \l_term_font_tl ##4 }
-    }    
-}
-\NewDocumentCommand \RenewTerm { m m }
-{
-    \NewTerm*{ #1 }{ #2 }
+\TermSetup{
+    color=black,
+    emphfont=\itshape
 }
 
-\NewTerm{ \term }{
-    font = {},
-    index = true,
-    star = { font=\itshape }
-}
-
-\NewTerm{ \ui } % user interface
+\NewDocumentCommand \term { s o m }
 {
-    font = \sffamily,
-    index = false,
-    star = { index=true }
-}
-\NewTerm{ \mi } % machine interface
-{
-    font = \sffamily\mdseries,
-    index = false,
-    star = { index=true }
-}
-
-\NewDocumentCommand \menu { s o o m m }
-{
-    \IfBooleanTF{ #1 }
-    {
-        \IfValueT{ #2 }{ \ui*{#2} ~ > ~ }
-        \IfValueT{ #3 }{ \ui*{#3} ~ > ~ }
-        \ui*{#4} ~ > ~ \ui*{#5}
-    }{
-        \IfValueT{ #2 }{ \ui{#2} ~ > ~ }
-        \IfValueT{ #3 }{ \ui{#3} ~ > ~ }
-        \ui{#4} ~ > ~ \ui{#5}
+    \hzindexing [#2] {#3}
+    \IfBooleanTF {#1}
+    { 
+        \textcolor{\l_term_color}{\l_term_emphfont #3} 
+    }{ 
+        \textcolor{\l_term_color}{#3} 
     }
+}
+
+% \ui[sort]{Open}: use the starred version not to index the arguments.
+\keys_define:nn {ui}
+{
+    color   .tl_set:N = \l_ui_color,
+    font    .tl_set:N = \l_ui_font,
+    default .tl_set:N = \l_UI_default,
+    star    .tl_set:N = \l_UI_star,
+    vbar    .tl_set:N = \l_UI_vbar
+}
+\NewDocumentCommand \uisetup { m }
+{
+    \keys_set:nn {ui} {#1}
+}
+
+\uisetup{
+    color=black,
+    font=\sffamily\mdseries,
+    default={color=\l_ui_color, font=\l_ui_font}
+}
+
+\NewDocumentCommand \ui {s o m}
+{
+    \IfBooleanF {#1} { \hzindexing [#2] {#3} }
+    \textcolor{\l_ui_color}{\l_ui_font #3}
+}
+% \mi[sort][OK]: use the starred version to index the arguments.
+\NewDocumentCommand \mi {s o m }
+{
+    \IfBooleanTF {#1} { \ui[#2]{#3} } { \ui*[#2]{#3} }
+}
+
+\NewDocumentCommand \menu {s o o m m }
+{
+    \IfBooleanTF {#1}
+    {
+        \IfValueT {#2} { \ui{#2} ~ > ~ }
+        \IfValueT {#3} { \ui{#3} ~ > ~ }
+        \ui{#4} ~ > ~ \ui{#5}
+    }{
+        \IfValueT {#2} { \ui*{#2} ~ > ~ }
+        \IfValueT {#3} { \ui*{#3} ~ > ~ }
+        \ui*{#4} ~ > ~ \ui{#5}
+    }
+}
+
+\newcommand\ucfont{\ttfamily\bfseries}
+\NewDocumentCommand \uc { v }
+{
+    \group_begin:
+        \ucfont #1
+    \group_end:
+}
+% \NewDocumentCommand \uc { s t| v }
+% {
+%     \IfBooleanTF{#1}
+%     {
+%         ``{\ucfont #3}''
+%     }{  \IfBooleanTF{#2}
+%         { `{\ucfont #3}' }
+%         { {\ucfont #3} }
+%     }
+% }
+
+\NewDocumentCommand \vitem { v }
+{
+    \item[#1]
+}
+
+\NewDocumentEnvironment { UC } {}
+{
+    \begin{terms}[font=\ttfamily]
+}{
+    \end{terms}
 }
 
 % lists  -------------------------------------------------------
@@ -3379,9 +3396,7 @@
     \enit@enditemize
 }
 
-% definition list
-% \begin{terms}*|[options](base)
-\tl_new:N \g_terms_options_tl
+% terms list
 \int_new:N \l_terms_int
 \tl_new:N \l_terms_marker
 \tl_new:N \l_terms_marker_i
@@ -3396,17 +3411,18 @@
             {0} {
                  \tl_if_empty:nTF {##1}
                      { \tl_set:Nn \l_terms_marker_i {} }
-                     { \tl_set:Nn \l_terms_marker_i {##1\hskip\l_terms_marker_sep_skip} }
+                     { \tl_set:Nn \l_terms_marker_i {##1\hskip\l_terms_markersep} }
                 }
             {1} {
                  \tl_if_empty:nTF {##1}
                      { \tl_set:Nn \l_terms_marker_ii {} }
-                     { \tl_set:Nn \l_terms_marker_ii {##1\hskip\l_terms_marker_sep_skip} }
+                     { \tl_set:Nn \l_terms_marker_ii {##1\hskip\l_terms_markersep} }
                 }
          }
         \int_incr:N \l_tmpa_int
     }
 }
+
 \tl_set:Nn \l_terms_marker {
     \int_compare:nT { \@listdepth = 1 }  { \l_terms_marker_i }
     \int_compare:nT { \@listdepth = 2 }  { \l_terms_marker_ii }
@@ -3414,191 +3430,168 @@
 
 \keys_define:nn { terms }
 {
-    label-type  .tl_set:N = \l_terms_label_type_tl,
-    offset      .skip_set:N = \l_terms_offset_skip,
+    offset      .skip_set:N = \l_terms_offset,
     marker      .code:n = { \terms_define_marker:n {#1} },
-    marker-sep  .skip_set:N = \l_terms_marker_sep_skip,
+    markersep   .skip_set:N = \l_terms_markersep,
     enumerate   .bool_set:N = \l_terms_enumerate_bool,
-    enum-marker .tl_set:N = \l_terms_enummarker_tl,
-    base        .tl_set:N = \l_terms_base_tl,
-    font        .tl_set:N = \l_terms_font_tl,
-    color       .tl_set:N = \l_terms_color_tl,
-    delimiter   .tl_set:N = \l_terms_delimiter_tl,
-    label-width .dim_set:N = \l_terms_label_width_dim,
-    label-sep   .skip_set:N = \l_terms_label_sep_skip,
-    index       .bool_set:N = \l_terms_index_bool,
-    top-sep     .skip_set:N = \l_terms_top_sep_skip,
-    item-sep    .skip_set:N  = \l_terms_item_sep_skip,
-    before-list .tl_set:N = \l_terms_before_list_tl,
-    after-list  .tl_set:N = \l_terms_after_list_tl,
-    star        .tl_set:N = \l_terms_star_tl,
-    vbar        .tl_set:N = \l_terms_vbar_tl
-}
-\NewDocumentCommand \TermsInitialize { m }
-{
-    \keys_set:nn { terms }{ #1 }    
-}
-\TermsInitialize{
-    label-type = default,
-    offset = 0em,
-    marker = {{},\textbullet},
-    marker-sep = 0.25em,
-    base = MM,
-    font = \bfseries,
-    color = black,
-    delimiter = :\hfill,
-    label-sep = 0.5em,
-    star = { item-sep=0ex },
-    vbar = { delimiter=\hfill },
-    enum-marker = { \int_use:N \l_terms_int)\hskip\l_terms_marker_sep_skip }
+    enummarker   .tl_set:N = \l_terms_enummarker_tl,
+    base        .tl_set:N = \l_terms_base,
+    font        .tl_set:N = \l_terms_font,
+    color       .tl_set:N = \l_terms_color,
+    delimiter   .tl_set:N = \l_terms_delimiter,
+    labelwidth  .dim_set:N = \l_terms_labelwidth,
+    labelsep    .skip_set:N = \l_terms_labelsep,
+    index       .bool_set:N = \l_terms_indexing_bool,
+    multiline   .bool_set:N = \l_terms_multiline_bool,
+    newline     .bool_set:N = \l_terms_newline_bool,
+    topsep      .skip_set:N = \l_terms_topsep,
+    itemsep     .skip_set:N  = \l_terms_itemsep,
+    star        .tl_set:N = \l_terms_star,
+    vbar        .tl_set:N = \l_terms_vbar
 }
 \NewDocumentCommand \TermsSetup {m}
 {
-    \tl_set:Nn \g_terms_options_tl { #1 }
+    \keys_set:nn { terms }{ #1 }
+}
+
+\TermsSetup{
+    offset=0em,
+    marker={{},\textbullet},
+    markersep=0.25em,
+    base=MM,
+    font=\bfseries,
+    color=black,
+    delimiter=:\hfill,
+    labelsep=0.5em,
+    index=false,
+    newline=false,
+    star={itemsep=0ex},
+    vbar={delimiter=\hfill},
+    enummarker={\int_use:N \l_terms_int)\hskip\l_terms_markersep} 
+}
+
+\cs_new:Npn \terms_leftmargin:n #1
+{
+    \dim_set:Nn \leftmargin { \labelwidth+\labelsep }
+    \int_compare:nT { \@listdepth = 1 }
+    {
+        \tl_if_blank:nF { #1 } { \addtolength\leftmargin{#1} }
+    }
+}
+
+\cs_new:Nn \terms_set_spaces:
+{
+    \skip_set:Nn \partopsep { 0pt }
+    \skip_set_eq:NN \topsep \l_terms_topsep
+    \skip_set_eq:NN \itemsep \l_terms_itemsep
+    \skip_set:Nn \listparindent { 0pt }
+    \bool_if:NTF \l_terms_newline_bool
+    {
+        %\dim_set:Nn \labelwidth { 0pt }
+        \dim_set_towidth:Nn \labelwidth {\l_terms_marker}
+        \skip_set_eq:NN \partopsep \hzparskip
+    }
+    {
+        \bool_if:NTF \l_terms_multiline_bool
+        {
+            \dim_set_eq:NN \labelwidth \l_terms_labelwidth
+        }
+        {
+            \dim_set_towidth:Nn \labelwidth {\l_terms_marker\l_terms_font\l_terms_base\l_terms_delimiter}
+        }
+    }
+    \skip_set_eq:NN \labelsep \l_terms_labelsep
+    \terms_leftmargin:n {\l_terms_offset}
 }
 
 \cs_new:Npn \terms_label_default:n #1
 {
     \int_gincr:N \l_terms_int
-    \bool_if:NT \l_terms_index_bool { \index{#1} }
+    \bool_if:NT \l_terms_indexing_bool { \index{#1} }
     \group_begin:
-        \color{\l_terms_color_tl}
+        \color{\l_terms_color}
         \l_terms_marker
-        \l_terms_font_tl #1
+        \l_terms_font #1
     \group_end:
-    \l_terms_delimiter_tl
+    \l_terms_delimiter
 }
-\cs_new:Npn \terms_label_newline:n #1
-{
-    \int_gincr:N \l_terms_int
-    \bool_if:NT \l_terms_index_bool { \index{#1} }
-    \parbox[b]{\labelwidth}{
-        \makebox[0pt][l]{
-            \color{\l_terms_color_tl}
-            \l_terms_marker
-            \l_terms_font_tl #1
-            \l_terms_delimiter_tl
-        }
-        \newline
-    }
-}
+
 \cs_new:Npn \terms_label_multiline:n #1
 {
     \int_gincr:N \l_terms_int
-    \bool_if:NT \l_terms_index_bool { \index{#1} }
+    \bool_if:NT \l_terms_indexing_bool { \index{#1} }
     \hbox_set:Nn \l_tmpa_box 
     {
         \parbox[t]{\labelwidth}{
             \raggedright
-            \color{\l_terms_color_tl}
-            \l_terms_font_tl #1
+            \color{\l_terms_color}
+            \l_terms_font #1
         }
     }
-    \hbox_set:Nn \l_tmpb_box {\l_terms_font_tl A}
+    \hbox_set:Nn \l_tmpb_box {\l_terms_font A}
     \dim_set:Nn \l_tmpa_dim { \box_ht:N \l_tmpb_box }
     \raisebox{\l_tmpa_dim}{ \smash{\box_use:N \l_tmpa_box} }
 }
 
-\cs_new:Npn \terms_label_type_set:n #1
+\cs_new:Npn \terms_label_newline:n #1
 {
-    \skip_set:Nn \partopsep { 0pt }
-    \skip_set_eq:NN \topsep \l_terms_top_sep_skip
-    \skip_set_eq:NN \itemsep \l_terms_item_sep_skip
-    \skip_set:Nn \listparindent { 0pt }
-    \str_case_x:nn { #1 }
-    {
-        { default }{
-            \dim_set_towidth:Nn \labelwidth { \l_terms_marker\l_terms_font_tl\l_terms_base_tl\l_terms_delimiter_tl }
-            \cs_set_eq:NN \makelabel \terms_label_default:n
+    \int_gincr:N \l_terms_int
+    \bool_if:NT \l_terms_indexing_bool { \index{#1} }
+    \parbox[b]{\labelwidth}{
+        \makebox[0pt][l]{
+            \color{\l_terms_color}
+            \l_terms_marker
+            \l_terms_font #1
+            \l_terms_delimiter
         }
-        { newline }{
-            \dim_set_towidth:Nn \labelwidth { \l_terms_marker }
-            \skip_set_eq:NN \partopsep \hzparskip
+        \newline
+    }
+}
+
+\NewDocumentEnvironment { terms } { s t| o }
+{
+    \IfBooleanT {#1} { \exp_args:No \TermsSetup{\l_terms_star} }
+    \IfBooleanT {#2} { \exp_args:No \TermsSetup{\l_terms_vbar} }
+    \IfValueT {#3} { \TermsSetup{#3} }
+    \begin{list}{}
+    {
+        \bool_if:NT \l_terms_enumerate_bool
+        {
+            %\tl_set:Nn \l_terms_marker_i {\int_use:N \l_terms_int)\hskip\l_terms_markersep}
+            \tl_set:Nn \l_terms_marker_i { \l_terms_enummarker_tl }
+            \int_gzero:N \l_terms_int
+        }
+        \terms_set_spaces:
+        \cs_set_eq:NN \makelabel \terms_label_default:n
+        \bool_if:NT \l_terms_newline_bool
+        {
             \cs_set_eq:NN \makelabel \terms_label_newline:n
         }
-        { multiline }{
-            \dim_set_eq:NN \labelwidth \l_terms_label_width_dim
+        \bool_if:NT \l_terms_multiline_bool
+        {
             \cs_set_eq:NN \makelabel \terms_label_multiline:n
         }
     }
-    \skip_set_eq:NN \labelsep \l_terms_label_sep_skip
-    \dim_set:Nn \leftmargin { \labelwidth+\labelsep }
-    \int_compare:nT { \@listdepth = 1 }
-    {
-        \addtolength\leftmargin{ \l_terms_offset_skip } 
-    }
+}{
+    \end{list}
 }
 
-\NewDocumentCommand \NewTerms { s m m }
+\cs_new:Npn \cmds_label_default:n #1
 {
-    \IfBooleanTF{ #1 }{
-        \RenewDocumentEnvironment
-    }{
-        \NewDocumentEnvironment
-    }{ #2 }{ s t| O{} d() }
-    {
-        \keys_set:nn { terms }{ #3 }
-        \exp_args:Nno \keys_set:nn { terms }{ \g_terms_options_tl }
-        \IfBooleanT{ ##1 }
-        {
-            \exp_args:Nno \keys_set:nn { terms }{ \l_terms_star_tl }            
-        }
-        \IfBooleanT{ ##2 }
-        {
-            \exp_args:Nno \keys_set:nn { terms }{ \l_terms_vbar_tl }
-        }
-        \l_terms_before_list_tl
-        \begin{list}{}
-        {
-            \keys_set:nn { terms }{ ##3 }
-            \bool_if:NT \l_terms_enumerate_bool
-            {
-                %\tl_set:Nn \l_terms_marker_i {\int_use:N \l_terms_int)\hskip\l_terms_markersep}
-                \tl_set:Nn \l_terms_marker_i { \l_terms_enummarker_tl }
-                \int_gzero:N \l_terms_int
-            }
-            \IfValueT{ ##4 }
-            {
-                \tl_set:Nn \l_terms_base_tl { ##4 }
-            }
-            \terms_label_type_set:n { \l_terms_label_type_tl }
-        }
-    }{
-        \cs_set_eq:NN \uitem \item
-        \cs_set_eq:NN \mitem \item
-        \end{list}
-        \l_terms_after_list_tl
-    }
-    
+    \group_begin:
+        \color{\l_terms_color}
+        \l_terms_marker
+        \texui{#1}
+    \group_end:
+    \l_terms_delimiter
 }
 
-\NewDocumentCommand \RenewTerms { m m }
+\NewDocumentEnvironment {cmds} { O{} }
 {
-    \NewTerms*{ #1 }{ #2 }
-}
-
-\NewTerms{ terms }
-{
-    index = false
-}
-\NewTerms{ UI }
-{
-    index = true,
-    font = \sffamily    
-}
-\NewTerms{ Symbols }
-{
-    label-type = multiline,
-    label-width = 3em,
-    index = false,
-    before-list = \RuleBox,
-    after-list = \endRuleBox,
-    delimiter = \hfill,
-    item-sep = 1ex, 
-}
-\NewDocumentCommand \imgitem { m }
-{
-    \item[\lineimg{#1}]
+    \begin{terms}[#1]
+    \cs_set_eq:NN \makelabel \cmds_label_default:n
+}{
+    \end{terms}
 }
 
 \cs_new:Npn \terms_label_tmp:n #1
@@ -3610,6 +3603,7 @@
         \tl_gset:Nn \l_tmpa_tl {#1}
     }
 }
+
 \NewDocumentEnvironment { termstmp } {}
 {
     \begin{list}{}
@@ -3620,6 +3614,7 @@
 }{
     \end{list}
 }
+
 \NewDocumentCommand \alignterms { o m }
 {
     \hbox_set:Nn \l_tmpa_box
@@ -3632,8 +3627,36 @@
     #2
     \end{terms}
 }
+
 \NewEnviron{Terms}[1][]{ \alignterms[#1]{\BODY} }
 
+\NewDocumentEnvironment { UI } { s t| } % a variant of terms
+{
+    \group_begin:
+    \exp_args:No \TermsSetup{\l_UI_default}
+    \IfBooleanT {#1} { \exp_args:No \TermsSetup{\l_UI_star} }
+    \IfBooleanT {#2} { \exp_args:No \TermsSetup{\l_UI_vbar} }
+    \IfBooleanTF {#1}
+    {
+        \IfBooleanTF {#2}
+            { \begin{terms}*| }
+            { \begin{terms}* }
+    }{
+        \IfBooleanTF {#2}
+            { \begin{terms}| }
+            { \begin{terms} }
+    }
+    \cs_set_eq:NN \uitem \item
+    \cs_set_eq:NN \mitem \item
+}{
+    \end{terms}
+    \group_end:
+}
+
+\NewDocumentCommand \imgitem { m }
+{
+    \item[\lineimg{#1}]
+}
 
 \tl_new:N \l_symbol_options
 \NewDocumentCommand \SymbolsSetup { m }
@@ -3641,10 +3664,34 @@
     \tl_set:Nn \l_symbol_options {#1}
 }
 
+% a variant of the terms environment
+\NewDocumentEnvironment { symbols } { s o } 
+{
+    \group_begin:
+    \IfBooleanT {#1}
+    {
+        \object_skip_before:n {0pt}
+        \begin{RuleBox}[breakable=true]
+    }
+    \exp_args:No \TermsSetup{\l_symbol_options}
+    \IfValueT {#2} { \TermsSetup{base=\lineimg{#2}} }
+    \begin{terms}[index=false]
+}{
+    \end{terms}
+    \IfBooleanT {#1}
+    {
+        \end{RuleBox}
+        \object_skip_after:n {0pt}
+    }
+    \group_end:
+}
+
+\SymbolsSetup{itemsep=1ex, delimiter=\hfill}
+
 % option list
 \int_new:N \l_opt_cnt_int
-\cs_new_nopar:Nn \opt_selected: { \foreign*{2611} } % ☑
-\cs_new_nopar:Nn \opt_unselected: { \foreign*{2610} } % ☐
+\cs_new_nopar:Nn \opt_selected: { \foreign*{2611} }
+\cs_new_nopar:Nn \opt_unselected: { \foreign*{2610} }
 \cs_new_nopar:Nn \opt_label:
 {
     \int_gincr:N \l_opt_cnt_int
@@ -3653,7 +3700,7 @@
         {\opt_unselected:}
 }
 
-\NewDocumentEnvironment { options } { s O{} }
+\NewDocumentEnvironment { option } { s O{} }
 {
     \clist_set:Nn \l_tmpa_clist { #2 }
     \int_zero:N \l_opt_cnt_int
@@ -3676,7 +3723,7 @@
     \int_to_arabic:n { \l_callout_int }
 }
 
-\keys_define:nn { callout }
+\keys_define:nn {callout}
 {
     beforeskip  .skip_set:N = \l_callout_before_skip,
     afterskip   .skip_set:N = \l_callout_after_skip,
@@ -3692,7 +3739,7 @@
 
 \NewDocumentCommand \CalloutSetup {m}
 {
-    \keys_set:nn { callout } {#1}
+    \keys_set:nn {callout} {#1}
 }
 
 \CalloutSetup{
@@ -3962,14 +4009,15 @@
 
 \NewDocumentCommand \NewBoundedBox { s m m }
 {
-    \IfBooleanTF{ #1 }{
+    \IfBooleanTF{#1}{
         \RenewDocumentEnvironment
     }{
         \NewDocumentEnvironment
-    }{ #2 }{ s O{} }
+    }
+    { #2 } { s O{} }
     {
         \keys_set:nn { BoundedBox }{ #3 }
-        \exp_args:Nno \keys_set:nn { BoundedBox}{ \g_bounded_box_options_tl }
+        \exp_args:Nnf \keys_set:nn { BoundedBox} { \g_bounded_box_options_tl }
         \group_begin:
             \keys_set:nn { BoundedBox }{ ##2 } 
             % \IfBooleanT {#2}
@@ -4006,7 +4054,7 @@
 
 \NewDocumentCommand \RenewBoundedBox { m m }
 {
-    \NewBoundedBox*{ #1 }{ #2 }
+    \NewBoundedBox*{#1}{#2}
 }
 
 \keys_define:nn { admonition }
@@ -4714,14 +4762,6 @@
 %    \end{SaveVerb}
 %    \verbinput
 
-\ExplSyntaxOn
-\NewDocumentCommand \vitem { v }
-{
-    \item[#1]
-}
-\ExplSyntaxOff
-
-
 \def\tmpfile{tempverb.tex}
 % Leave nothing behind \end{SaveVerb} in the same line
 \def\SaveVerb{%
@@ -4750,6 +4790,16 @@
         \verbatimindent=0pt
         \verbatiminput{tempverb}
     \end{reference}
+}
+
+\newcommand\VerbFont{\ttfamily\hyphenpenalty 10000}
+\NewDocumentCommand \verbline { v }
+{
+    \object_skip_before:n {\l_admonition_before_skip}
+    \begin{AdmonBox}
+        \VerbFont #1
+    \end{AdmonBox}
+    \object_skip_after:n {\l_admonition_after_skip}
 }
 
 \NewDocumentCommand \showtex { s }
