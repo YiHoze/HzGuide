@@ -22,7 +22,7 @@
 % IV. For those of designer interface level:
 %     Follow clause II. However, it is allowed to use lowercase with compound words.
 
-\ProvidesClass{hzguide}[2018/05/23]
+\ProvidesClass{hzguide}[2018/06/08]
 
 \LoadClassWithOptions{memoir}
 
@@ -118,7 +118,7 @@
         { \IfValueT {#3} {#3} }
 }
 
-% if the document type of this ...
+% if this document's type is ...
 \clist_new:N \g_doc_type
 \NewDocumentCommand \SetDocType { m }
 {
@@ -809,15 +809,17 @@
     \begin{IfVartwoEnlarge}			
         \AtPageBottom
         \setSpacing{1}        
-        \tl_if_empty:NF \cover_image_logo_back
-        {
-            \includegraphics[scale=\l_image_scale]{\cover_image_logo_back}\\
-        }
-        \cover_note \\
+        \tl_if_empty:NTF \cover_image_logo_back
+        {            
+            \cover_note \\
+        }{
+            %%\includegraphics[scale=\l_image_scale]{\cover_image_logo_back}\\
+            \illustimage[valign=b, afterskip=1ex]{\cover_image_logo_back}{\cover_note} \\
+        }        
         \IfVartwo{ 
-            \raisebox{0.5ex}{\rule{\headwidth}{0.5pt}} 
+            \raisebox{-0.25ex}{\rule{\headwidth}{0.5pt}} 
         }[ 
-            \raisebox{0.5ex}{\rule{\textwidth}{0.5pt}} 
+            \raisebox{-0.25ex}{\rule{\textwidth}{0.5pt}} 
         ] \\ 
         © \space \cover_pub_year \space \cover_manufacturer \\ 
         \cover_manufacturer_address
@@ -1146,29 +1148,6 @@
         \end{adjustwidth}
     }
 }
-
-% \NewDocumentEnvironment { WidenThisPage } { o o }
-% {
-%     \IfNoValueTF {#1}
-%     {
-%         \bool_if:NTF \g_column_vartwo_bool
-%         {
-%             \tl_set:Nn \l_tmpa_tl {-2.25\vartwomargin}
-%             \tl_set:Nn \l_tmpb_tl {-0.25\vartwomargin}
-%         }
-%         {
-%             \tl_set:Nn \l_tmpa_tl {-1cm}
-%             \tl_set:Nn \l_tmpb_tl {-1cm}
-%         }
-%     }
-%     {
-%         \tl_set:Nn \l_tmpa_tl {-1cm}
-%         \tl_set:Nn \l_tmpb_tl {-1cm}
-%     }
-%     \begin{adjustwidth}{\l_tmpa_tl}{\l_tmpb_tl}
-% }{
-%     \end{adjustwidth}
-% }
 
 %% paper configuration --------------------------------------------------------
 
@@ -2000,7 +1979,13 @@
 {
     \group_begin:
     \IfValueT {#2} { \setSpacing{#2} }
-    \IfBooleanTF {#1} { \tableofcontent* } { \tableofcontents }
+    \IfBooleanTF {#1} 
+    { 
+        \pdfbookmark[1]{\contentsname}{Contents}
+        \tableofcontents*
+    }{ 
+        \tableofcontents 
+    }
     \group_end:
 }
 
@@ -2215,7 +2200,7 @@
     afterskip   .skip_set:N = \l_action_after_skip,
     font        .tl_set:N = \l_action_font,
     delimiter   .tl_set:N = \l_action_delimiter,
-    inline      .bool_set:N = \l_action_inline_bool
+    inline      .bool_set:N = \l_action_inline_bool  
 }
 
 \NewDocumentCommand \ActionSetup { m }
@@ -2233,7 +2218,7 @@
 \NewDocumentCommand \action { m }
 {
     \object_skip_before:n {\l_action_before_skip}
-    \group_begin:
+    \group_begin:        
         \l_action_font #1
     \group_end:
     \bool_if:NTF \l_action_inline_bool
@@ -2253,6 +2238,12 @@
 }
 
 % graphics * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+\NewDocumentCommand \includegraphicsvoid {}
+{
+    \cs_set_eq:NN \orgincludegraphics \includegraphics
+    \renewcommand\includegraphics[2][]{\orgincludegraphics{uncertain}}
+}
 
 \graphicspath{ {images/}{../images/}{../../images/} }
 
@@ -2919,6 +2910,7 @@
     stretch=1
 }
 
+% \placetable[options](caption)<footnote>{tabu}
 \NewDocumentCommand \placetable { O{} d() d<> m }
 {
     \group_begin:
@@ -3144,7 +3136,9 @@
     \IllustImageSetup{showfilename=true}
     \MarginImageSetup{showfilename=true}
     \LineImageSetup{showfilename=true}
-    \IfBooleanT{#1} { \LineImageSetup{showfilename=true} }
+    \IfBooleanT{#1} { 
+        \LineImageSetup{showfilename=true} 
+    }
 }
 
 \NewDocumentCommand \HideImageFilename { }
@@ -3228,30 +3222,18 @@
 }
 % Use \IndexingOff disable the indexing function of term-related macros including \term.
 
-\bool_new:N \g_indexing_bool
 \NewDocumentCommand \IndexingEnable { s }
 {
-    \makeindex
-    \bool_gset_true:N \g_indexing_bool
-    \TermSetup{ index = true }
+    \makeindex    
+    \bool_gset_true:N \l_term_index_bool
     \bool_gset_true:N \l_terms_index_bool
     \IfBooleanT{ #1 }{ \BookmarkIndexHead }
 }
 \NewDocumentCommand \IndexingDisable {}
 {
-    \bool_gset_false:N \g_indexing_bool
-    \TermSetup{ index = false }
+    \bool_gset_false:N \l_term_index_bool
     \bool_gset_false:N \l_terms_index_bool
 }
-% \NewDocumentCommand \IfIndexing { m o }
-% {
-%     \bool_if:NTF \g_indexing_bool
-%     {
-%         #1
-%     }{
-%         \IfValueT{#2}{#2}
-%     }
-% }
 
 % \term*|[index position]{\LaTeX}
 \tl_new:N \g_term_options_tl
@@ -3268,7 +3250,8 @@
     \keys_set:nn { term }{ #1 }
 }
 \TermInitialize{
-    color = black    
+    color = black,
+    index = false 
 }
 \NewDocumentCommand \TermSetup { m }
 {
@@ -3301,8 +3284,8 @@
             }{
                 \index{##4}
             }
-        }
-        \textcolor{ \l_term_color_tl }{ \l_term_font_tl ##4 }
+        }        
+            \textcolor{ \l_term_color_tl }{ \l_term_font_tl ##4 }
     }    
 }
 \NewDocumentCommand \RenewTerm { m m }
@@ -3318,7 +3301,8 @@
 
 \NewTerm{ \ui } % user interface
 {
-    font = \sffamily,
+    font = \sffamily\bfseries,
+    color = darkgray,
     index = false,
     star = { index=true }
 }
@@ -3452,6 +3436,7 @@
     vbar = { delimiter=\hfill },
     enum-marker = { \int_use:N \l_terms_int)\hskip\l_terms_marker_sep_skip }
 }
+
 \NewDocumentCommand \TermsSetup {m}
 {
     \tl_set:Nn \g_terms_options_tl { #1 }
@@ -3577,14 +3562,16 @@
     \NewTerms*{ #1 }{ #2 }
 }
 
+
 \NewTerms{ terms }
 {
     index = false
 }
 \NewTerms{ UI }
 {
-    index = true,
-    font = \sffamily    
+    font = \sffamily\bfseries,
+    color = darkgray,
+    index = false  
 }
 \NewTerms{ Symbols }
 {
@@ -3847,7 +3834,6 @@
 
 \newtcolorbox{UnbreakableShadeBox}[1][]{
     before~skip=0pt, after~skip=0pt,
-    width=\linewidth-\l_bbox_indent_skip,
     boxrule=0.75pt, colframe=white, colback=backgray, arc=0.5ex,
     boxsep=0.5ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
     titlerule=0.75pt, toptitle=-0.25ex, bottomtitle=0.5ex,
@@ -3896,7 +3882,6 @@
 {
     before-skip .skip_set:N = \l_bbox_before_skip,
     after-skip  .skip_set:N = \l_bbox_after_skip,
-    indent      .skip_set:N = \l_bbox_indent_skip,
     type        .tl_set:N = \l_bbox_type_tl,
     symbol      .tl_set:N = \l_bbox_symbol_tl,
     signal      .tl_set:N = \l_bbox_signal_tl,
@@ -3914,7 +3899,6 @@
 \BoundedBoxInitialize {
     before-skip = 0pt,
     after-skip = 0pt,
-    indent = 0pt,
     type = UnbreakableShade,
     font-color = black
 }
@@ -3972,15 +3956,6 @@
         \exp_args:Nno \keys_set:nn { BoundedBox}{ \g_bounded_box_options_tl }
         \group_begin:
             \keys_set:nn { BoundedBox }{ ##2 } 
-            % \IfBooleanT {#2}
-            % {
-            %    \str_if_eq:VnTF \l_admonition_type {BreakableShade}
-            %    { 
-            %         \keys_set:nn { BoundedBox }{ type=UnBreakableShade }
-            %     }{ 
-            %         \keys_set:nn { BoundedBox }{ type=BreakableShade } 
-            %     }
-            % }
             \bbox_type_set:n { \l_bbox_type_tl }
             \IfBooleanF{##1}{ 
                 \object_skip_before:n { \l_bbox_before_skip }
@@ -4283,7 +4258,6 @@
 {
     \href{mailto:#1}{\nolinkurl{#1}}
 }
-
 \NewDocumentCommand \URL { s m }
 {
     \IfBooleanTF {#1}
@@ -4293,6 +4267,7 @@
         \url{#2} 
     }
 }
+\urlstyle{sf}
 
 \NewDocumentCommand \skiplines { O {1} }
 {
@@ -4441,7 +4416,7 @@
     }
 }
 
-%\exp_args:No \flushrightlist{..., ..., ...}[\font]
+% \flushrightlist{..., ..., ...}[\font]
 % \NewDocumentCommand \flushrightlist { m O{} }
 % {
 %     \tl_if_empty:nF {#1}
