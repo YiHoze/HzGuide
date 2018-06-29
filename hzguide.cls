@@ -481,7 +481,7 @@
     % Use truetype fonts to use PDF2htmlEX
         % \setmainhangulfont{NanumMyeongjo}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*}, BoldFont={*Bold}]
         % \setsanshangulfont{NanumGothic}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*}, BoldFont={*Bold}]
-    %\setmainhangulfont{NotoSerifCJKkr}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Regular}, BoldFont={*-Bold}]
+	%\setmainhangulfont{NotoSerifCJKkr}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Regular}, BoldFont={*-Bold}]
     %\setsanshangulfont{NotoSansCJKkr}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Regular}, BoldFont={*-Bold}]
     \setmainhangulfont{KoPubBatang}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PL}, BoldFont={*PB}]
     \setsanshangulfont{KoPubDotum}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PM}, BoldFont={*PB}]
@@ -772,7 +772,7 @@
         \setSpacing{1}
         \tl_if_empty:NF \cover_image_logo_front
         {
-            \includegraphics[scale=\l_image_scale]{\cover_image_logo_front}
+            \includegraphics[scale=\l_image_scale_tl]{\cover_image_logo_front}
         }
         \nil\par\vspace{\cover_top_skip}
         \begin{minipage}{\linewidth}
@@ -785,7 +785,7 @@
         {
             \par\vspace{1cm}
             \begin{center}
-                    \includegraphics[scale=\l_image_scale]{\cover_image_product}
+                    \includegraphics[scale=\l_image_scale_tl]{\cover_image_product}
             \end{center}
         }
         \vfill
@@ -813,7 +813,7 @@
         {            
             \cover_note \\
         }{
-            %%\includegraphics[scale=\l_image_scale]{\cover_image_logo_back}\\
+            %%\includegraphics[scale=\l_image_scale_tl]{\cover_image_logo_back}\\
             \illustimage[valign=b, afterskip=1ex]{\cover_image_logo_back}{\cover_note} \\
         }        
         \IfVartwo{ 
@@ -972,6 +972,7 @@
 }
 
 \cs_set_eq:NN \HideChanges \HidePending
+\cs_set_eq:NN \ShowChanges \ShowPending
 
 % letters  --------------------------------------------------------------------
 
@@ -1884,7 +1885,7 @@
 \cs_new:Nn \style_paragraph_indent:
 {
     \setlength{\parindent}{\hzparindent}
-    \tl_set:Nn \l_admonition_style_common_tl {\setlength\parindent{\hzparindent}}
+    \tl_set:Nn \l_bbox_style_common_tl { \setlength\parindent{\hzparindent}\noindent }
     \abnormalparskip{0pt}
     \setlist{partopsep=0pt, topsep=.25\baselineskip, itemsep=.25ex}
     \setlist[itemize]{labelindent=.5em,labelwidth=1em,labelsep=.5em}
@@ -2026,7 +2027,7 @@
 \makechapterstyle{null}{
     \renewcommand{\chapnamefont}{\huge\chapterline\chapternamesize}
     \renewcommand{\chapnumfont}{\HUGE\chapterline\chapternumbersize}
-    \renewcommand{\chaptitlefont}{\Huge\chapterline}\chaptertitlesize
+    \renewcommand{\chaptitlefont}{\Huge\chapterline\chaptertitlesize}
 }
 
 \makechapterstyle{hzchapter}{
@@ -2212,7 +2213,8 @@
     beforeskip = 0.5\hzparskip,
     afterskip = -\hzparskip,
     font = \bfseries,
-    inline = true
+	delimiter = :,
+    inline = true,
 }
 
 \NewDocumentCommand \action { m }
@@ -2263,9 +2265,10 @@
 
     beforeskip  .skip_set:N = \g_caption_before_skip,
     afterskip   .skip_set:N = \g_caption_after_skip,
-    align       .tl_set:N = \g_caption_align,
-    font        .tl_set:N = \g_caption_font,
-    delimiter   .tl_set:N = \g_caption_delimiter
+    align       .tl_set:N = \g_caption_align_tl,
+	align-short .tl_set:N = \g_caption_align_short_tl,
+    font        .tl_set:N = \g_caption_font_tl,
+    delimiter   .tl_set:N = \g_caption_delimiter_tl
 }
 
 \NewDocumentCommand \CaptionSetup { m }
@@ -2273,15 +2276,16 @@
     \keys_set:nn { HzCaption } { #1 }
     \dim_set_eq:NN \abovecaptionskip \g_caption_before_skip
     \dim_set_eq:NN \belowcaptionskip \g_caption_after_skip
-    \captionnamefont{ \g_caption_font }
-    \captiontitlefont{ \g_caption_font }
-    \captiondelim{ \g_caption_delimiter }
-    \captionstyle{ \g_caption_align }
+    \captionnamefont{ \g_caption_font_tl }
+    \captiontitlefont{ \g_caption_font_tl }
+    \captiondelim{ \g_caption_delimiter_tl }
+    \captionstyle[\g_caption_align_short_tl]{ \g_caption_align_tl }
 }
 
 \CaptionSetup{
     beforeskip = 1ex,
-    align = \raggedleft,
+    align = \raggedright,
+	align-short = \raggedright,
     font = \rmfamily\bfseries\small,
     delimiter=:\space,
     afterskip = 1ex
@@ -2304,16 +2308,17 @@
     frame         .bool_set:N = \l_image_frame_bool,
     fitline       .bool_set:N = \l_image_fitline_bool, % fit images to the specified width; not valid when an extra image is given.
     fitwidth      .tl_set:N = \l_image_fitwidth_tl,
-    scale         .tl_set:N = \l_image_scale,
+    scale         .tl_set:N = \l_image_scale_tl,
     flush         .bool_set:N = \l_image_flush_bool, % flush images into the left margin
     landscape     .bool_set:N = \l_image_landscape_bool,
     align         .tl_set:N = \l_image_align,
-    caption       .tl_set:N = \l_image_caption,
-    label         .tl_set:N = \l_image_label,
+    caption       .tl_set:N = \l_image_caption_tl,
+	short    	  .tl_set:N = \l_image_caption_short_tl,
+    label         .tl_set:N = \l_image_label_tl,
     legend        .bool_set:N = \l_image_legend_bool,
     showfilename  .bool_set:N = \l_image_showfilename_bool,
-    star          .tl_set:N = \l_image_star,
-    vbar          .tl_set:N = \l_image_vbar
+    star          .tl_set:N = \l_image_star_tl,
+    vbar          .tl_set:N = \l_image_vbar_tl
 }
 \bool_new:N \l_image_extra_bool
 
@@ -2338,7 +2343,7 @@
     vbar=landscape
 }
 
-\NewDocumentCommand \image { s t| O{} m o d() }
+\NewDocumentCommand \image { s t| O{} m o d() d<> }
 {
     \group_begin:
     \IfValueTF{ #5 } 
@@ -2349,28 +2354,33 @@
     }
     \IfBooleanT{ #1 }
     { 
-        \exp_args:No \ImageSetup{\l_image_star} 
+        \exp_args:No \ImageSetup{\l_image_star_tl} 
     }
     \IfBooleanT{ #2 }
     { 
-        \exp_args:No \ImageSetup{\l_image_vbar} 
+        \exp_args:No \ImageSetup{\l_image_vbar_tl} 
     }
     \ImageSetup{#3}
     \IfValueT{ #6 }
     { 
-        \tl_set:Nn \l_image_caption {#6} 
+        \tl_set:Nn \l_image_caption_tl {#6} 
     }
-    \tl_if_empty:NT \l_image_label
+	\IfValueT{ #7 }
+    { 
+        \tl_set:Nn \l_image_caption_short_tl {#7} 
+    }
+    \tl_if_empty:NT \l_image_label_tl
     {
-        \IfValueTF{#5} {
-            \tl_set:Nn \l_image_label {#4~#5}
+        \IfValueTF{#5} 
+		{
+            \tl_set:Nn \l_image_label_tl {#4~#5}
         }{
-            \tl_set:Nn \l_image_label {#4}
+            \tl_set:Nn \l_image_label_tl {#4}
         }
     }
     \image_save:nn {#4} {#5}
     \bool_if:NTF \l_image_float_bool {
-        \begin{figure}
+        \begin{figure}[bt]
         \image_put:
         \end{figure}
     }{
@@ -2388,15 +2398,15 @@
         \bool_if:NTF \l_image_extra_bool {
             \hbox_set:Nn \l_image_box{
                 \objectframe{
-                    \includegraphics[scale=\l_image_scale]{#1}
+                    \includegraphics[scale=\l_image_scale_tl]{#1}
                     \hspace{\l_image_extra_skip}
-                    \includegraphics[scale=\l_image_scale]{#2}
+                    \includegraphics[scale=\l_image_scale_tl]{#2}
                 }
             }
         }{
             \hbox_set:Nn \l_image_box{
                 \objectframe{
-                    \includegraphics[scale=\l_image_scale]{#1}
+                    \includegraphics[scale=\l_image_scale_tl]{#1}
                 }
             }
             \bool_if:NT \l_image_fitline_bool
@@ -2415,13 +2425,13 @@
      }{
          \bool_if:NTF \l_image_extra_bool {
             \hbox_set:Nn \l_image_box{
-                    \includegraphics[scale=\l_image_scale]{#1}
+                    \includegraphics[scale=\l_image_scale_tl]{#1}
                     \hspace{\l_image_extra_skip}
-                    \includegraphics[scale=\l_image_scale]{#2}
+                    \includegraphics[scale=\l_image_scale_tl]{#2}
             }
         }{
             \hbox_set:Nn \l_image_box{
-                    \includegraphics[scale=\l_image_scale]{#1}
+                    \includegraphics[scale=\l_image_scale_tl]{#1}
             }
             \bool_if:NT \l_image_fitline_bool
             {
@@ -2488,18 +2498,23 @@
 {
     \bool_if:NT \l_image_showfilename_bool
     {
-        \tl_set:Nx \l_tmpa_tl {\l_image_label}
+        \tl_set:Nx \l_tmpa_tl {\l_image_label_tl}
         \legend{\tl_to_str:N \l_tmpa_tl}
     }
-    \tl_if_empty:NF \l_image_caption
+    \tl_if_empty:NF \l_image_caption_tl
     {
         \bool_if:NTF \l_image_legend_bool
         {
-            \legend{\l_image_caption}
-        }
-        {
-            \imgcaption{\l_image_caption}
-            \label{\l_image_label}
+            \legend{\l_image_caption_tl}
+        }{
+			\tl_if_empty:NTF \l_image_caption_short_tl
+			{
+            	\imgcaption{\l_image_caption_tl}
+            	
+			}{
+				\imgcaption[\l_image_caption_short_tl]{\l_image_caption_tl}
+			}
+			\label{\l_image_label_tl}
         }
     }
 }
@@ -2866,7 +2881,8 @@
 % \settable[]{ } ------------------------------------
 \taburowcolors{white .. backgray}
 %\newcommand\tableheadfont{\bfseries}
-\NewExpandableDocumentCommand\TableHeadFont{}{\rowfont{\bfseries}}
+\NewExpandableDocumentCommand\HeadFont{}{\rowfont{\bfseries}}
+\NewExpandableDocumentCommand\HeadFontCentering{}{\rowfont[c]{\bfseries}}
 
 \cs_new:Npn \table_footnotestyle:n #1
 {
@@ -2879,18 +2895,20 @@
     beforeskip    .skip_set:N = \l_table_before_skip,
     afterskip     .skip_set:N = \l_table_after_skip,
     float         .bool_set:N = \l_table_float_bool,
-    align         .tl_set:N = \l_table_align,
+    align         .tl_set:N = \l_table_align_tl,
     landscape     .bool_set:N = \l_table_landscape_bool,
-    caption       .tl_set:N = \l_table_caption,
-    label         .tl_set:N = \l_table_label,
+    caption       .tl_set:N = \l_table_caption_tl,
+    label         .tl_set:N = \l_table_label_tl,
     legend        .bool_set:N = \l_table_legend_bool,
-    font          .tl_set:N = \l_table_font,
-    fontsize      .tl_set:N = \l_table_fontsize,
-    hook          .tl_set:N = \l_table_hook,
+    font          .tl_set:N = \l_table_font_tl,
+    fontsize      .tl_set:N = \l_table_fontsize_tl,
+    hook          .tl_set:N = \l_table_hook_tl,
     footnote      .tl_set:N = \l_table_footnote,
-    footnotestyle .code:n = { \table_footnotestyle:n {#1} },
-    stretch       .tl_set:N = \l_table_stretch,
-    norowcolor    .bool_set:N  = \l_table_norowcolor_bool
+    footnotestyle .code:n = { \table_footnotestyle:n {#1} }, % footnotestyle=fnsymbol
+    stretch       .tl_set:N = \l_table_stretch_tl,
+    norowcolor    .bool_set:N  = \l_table_norowcolor_bool,
+	star		  .tl_set:N = \l_table_star_tl,
+	vbar		  .tl_set:N = \_ltable_vbar_tl
 }
 
 \NewDocumentCommand \TableSetup { m }
@@ -2910,26 +2928,33 @@
     stretch=1
 }
 
-% \placetable[options](caption)<footnote>{tabu}
-\NewDocumentCommand \placetable { O{} d() d<> m }
+% \placetable*|[options](caption)<footnote>{tabu}
+\NewDocumentCommand \placetable { s t| O{} d() d<> m }
 {
-    \group_begin:
-    %\table_clear:
-    \TableSetup{#1}
-    \IfValueT{#2} { \tl_set:Nn \l_table_caption {#2} }
-    \IfValueT{#3} { \tl_set:Nn \l_table_footnote {#3} }
+    \group_begin:	
+    \IfBooleanT{ #1 }
+	{
+		\exp_args:No \TableSetup{ \l_table_star_tl }
+	}
+	\IfBooleanT { #2 }
+	{
+		\exp_args:No \TableSetup{ \l_table_vbar_tl}
+	}
+    \TableSetup{ #3 }
+    \IfValueT{ #4 } { \tl_set:Nn \l_table_caption_tl {#4} }
+    \IfValueT{ #5 } { \tl_set:Nn \l_table_footnote {#5} }
     \bool_if:NT \l_table_norowcolor_bool { \taburowcolors{} }
     \hbox_set:Nn \l_text_box
     {
-        \tl_set:Nn \arraystretch {\l_table_stretch}
-        \l_table_font
-        \l_table_fontsize
-        \l_table_hook
-        #4
+        \tl_set:Nn \arraystretch {\l_table_stretch_tl}
+        \l_table_font_tl
+        \l_table_fontsize_tl
+        \l_table_hook_tl
+        #6
     }
     \bool_if:NTF \l_table_float_bool
     {
-        \begin{table}
+        \begin{table}[!bthp]
         \table_put:
         \end{table}
     }{
@@ -2950,20 +2975,22 @@
     }
 }
 
-\cs_new:Nn \table_put_portrait:
-{
+\cs_new:Nn \table_put_portrait:{
+	
     \dim_compare:nTF { \g_protrude_dim > 0pt }
     {
         \dim_set_towidth:Nn \l_tmpa_dim { \box_use:N \l_text_box }
         \object_locate:N \l_tmpa_dim
     }{
         \dim_set:Nn \l_tmpa_dim { \linewidth }
-    }
+    }	
     \begin{minipage}{\l_tmpa_dim}
-        \table_caption:
-        \box_use:N \l_text_box
-        \table_footnote:
-    \end{minipage}
+        \table_caption:	
+		\l_table_align_tl		
+        \mbox{ \box_use:N \l_text_box }
+		\table_footnote:    
+	\end{minipage}
+	
 }
 
 \cs_new:Nn \table_put_landscape:
@@ -2977,26 +3004,26 @@
         \dim_set:Nn \l_tmpb_dim { \linewidth }
     }
     \rotatebox{-90}{
-        \begin{minipage}{\l_tmpb_dim}
-            \l_table_align\nil
+        \begin{minipage}{\l_tmpb_dim}            
             \table_caption:
-            \box_use:N \l_text_box
-            \table_footnote:
+			\l_table_align_tl		
+        	mbox{ \box_use:N \l_text_box }
+			\table_footnote:
         \end{minipage}
     }
 }
 
 \cs_new:Nn \table_caption:
 {
-    \tl_if_empty:NF \l_table_caption
+    \tl_if_empty:NF \l_table_caption_tl
     {
         \bool_if:NTF \l_table_legend_bool
         {
-            \legend{\l_table_caption}
+            \legend{\l_table_caption_tl}
         }
         {
-            \tabcaption{\l_table_caption}
-            \label{\l_table_label}
+            \tabcaption{\l_table_caption_tl}
+            \label{\l_table_label_tl}
         }
     }
 }
@@ -3007,18 +3034,35 @@
     {
         \vspace{-.5\baselineskip}\par
         \begin{minipage}{\linewidth}
-            \setfootnoterule{0pt}{0pt}{0pt}
-            \l_table_footnote
+            \setfootnoterule{0pt}{0pt}{0pt}			
+            \l_table_footnote			
         \end{minipage}
     }
 }
 
 \NewEnviron{PlaceTable}[1][]{ \placetable[#1]{\BODY} }
-\NewDocumentEnvironment { Table } { o d() d<> }
+\NewDocumentEnvironment { Table } { s t| o d() d<> }
 {
-    \IfValueT{#1} { \TableSetup{#1} }
-    \IfValueT{#2} { \tl_set:Nn \l_table_caption {#2} }
-    \IfValueT{#3} { \tl_set:Nn \l_table_footnote {#3} }
+	\IfBooleanT{ #1 }
+	{
+		\exp_args:No \TableSetup{ \l_table_star_tl }
+	}
+	\IfBooleanT { #2 }
+	{
+		\exp_args:No \TableSetup{ \l_table_vbar_tl}
+	}
+    \IfValueT{ #3 } 
+	{ 
+		\TableSetup{#3} 
+	}
+    \IfValueT{ #4 } 
+	{ 
+		\tl_set:Nn \l_table_caption_tl {#4} 
+	}
+    \IfValueT {#5}  
+	{ 
+		\tl_set:Nn \l_table_footnote {#5} 
+	}
     \PlaceTable
 }{
     \endPlaceTable
@@ -3043,7 +3087,7 @@
 \NewDocumentEnvironment { SpecTable } { s o d() d<> }
 {
     \IfValueT{#2} { \TableSetup{#2} }
-    \IfValueT{#3} { \tl_set:Nn \l_table_caption {#3} }
+    \IfValueT{#3} { \tl_set:Nn \l_table_caption_tl {#3} }
     \IfValueT{#4} { \tl_set:Nn \l_table_footnote {#4} }
     \IfBooleanTF{#1}{\spectablex}{\spectable}
 }{
@@ -3090,9 +3134,9 @@
 \NewDocumentCommand \TableCommon { O{} }
 {
     \TableSetup{#1}
-    \tl_set:Nn \arraystretch {\l_table_stretch}
-    \l_table_font
-    \l_table_fontsize
+    \tl_set:Nn \arraystretch {\l_table_stretch_tl}
+    \l_table_font_tl
+    \l_table_fontsize_tl
     \taburowcolors{backgray .. white}
 }
 
@@ -3153,13 +3197,13 @@
 {
     \IfNoValueTF {#2}
     {
-        \tl_set:Nn \l_image_scale {#1}
+        \tl_set:Nn \l_image_scale_tl {#1}
         \tl_set:Nn \l_illustimage_scale_tl {#1}
         \tl_set:Nn \l_lineimg_scale {#1}
     }{
         \str_case:nn {#2}
         {
-            {\image}        { \tl_set:Nn \l_image_scale {#1} }
+            {\image}        { \tl_set:Nn \l_image_scale_tl {#1} }
             {\illustimage}  { \tl_set:Nn \l_illustimage_scale_tl {#1} }
             {\lineimg}      { \tl_set:Nn \l_lineimg_scale {#1} }
         }
@@ -3293,20 +3337,20 @@
     \NewTerm*{ #1 }{ #2 }
 }
 
-\NewTerm{ \term }{
+\NewTerm{\term}{
     font = {},
     index = true,
     star = { font=\itshape }
 }
 
-\NewTerm{ \ui } % user interface
+\NewTerm{\ui} % user interface
 {
     font = \sffamily\bfseries,
     color = darkgray,
     index = false,
     star = { index=true }
 }
-\NewTerm{ \mi } % machine interface
+\NewTerm{\mi} % machine interface
 {
     font = \sffamily\mdseries,
     index = false,
@@ -3342,7 +3386,7 @@
 \RenewDocumentEnvironment {enumerate} { s O{} }
 {
     \IfBooleanTF {#1} {
-        \enit@enumerate\enitdp@enumerate{enum}\thr@@{label=\arabic*), #2}
+        \enit@enumerate\enitdp@enumerate{enum}\thr@@{noitemsep, #2} %label=\arabic*)
     }{
         \enit@enumerate\enitdp@enumerate{enum}\thr@@{#2}
     }  
@@ -3563,17 +3607,17 @@
 }
 
 
-\NewTerms{ terms }
+\NewTerms{terms}
 {
     index = false
 }
-\NewTerms{ UI }
+\NewTerms{UI}
 {
     font = \sffamily\bfseries,
     color = darkgray,
     index = false  
 }
-\NewTerms{ Symbols }
+\NewTerms{Symbols}
 {
     label-type = multiline,
     label-width = 3em,
@@ -3888,7 +3932,7 @@
     style       .tl_set:N = \l_bbox_style_extra_tl,
     font        .tl_set:N = \l_bbox_font_tl,
     font-color  .tl_set:N = \l_bbox_font_color_tl,
-    wrapping    .bool_set:N = \l_bbox_wrapping_bool
+    wrapping    .bool_set:N = \l_bbox_wrapping_bool	
 }
 
 \NewDocumentCommand \BoundedBoxInitialize { m }
@@ -3962,7 +4006,7 @@
             }
             \tl_if_empty:NTF \l_bbox_signal_tl    
             {
-                \begin{BBox}
+                \begin{BBox}				
             }{
                 \begin{BBox}[\l_bbox_symbol_tl\l_bbox_signal_tl]
             }
@@ -4227,6 +4271,32 @@
 }
 
 % miscellaneous utilities * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+\keys_define:nn { finalizer }
+{
+	on		.tl_set:N = \l_finalizer_on_tl,
+	off 	.tl_set:N = \l_finalizer_off_tl
+}
+
+\NewDocumentCommand \FinalizerSetup { m }
+{
+	\keys_set:nn { finalizer }{ #1 }
+}
+
+\NewDocumentCommand \FinalizerOn {}
+{
+	\tl_use:N \l_finalizer_on_tl
+}
+
+\NewDocumentCommand \FinalizerOff {}
+{
+	\tl_use:N \l_finalizer_off_tl
+}
+
+\FinalizerSetup{
+	on = {\HideImageFilename\HidePending},
+	off = {\ShowImageFilename*\ShowPending}
+}
 
 \NewDocumentEnvironment { footnotes } {}
 {
@@ -4779,6 +4849,9 @@
 % default setup * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 % font
+% \setmainfont{NotoSerif}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Regular}, BoldFont={*-Bold}]
+% \setsansfont{NotoSans}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Regular}, BoldFont={*-Bold}]
+% \setmainfont{Linux Biolinum O}
 \setmainfont{TeX Gyre Pagella}
 \setsansfont{TeX Gyre Heros}
 \setmonofont{TeX Gyre Cursor}
