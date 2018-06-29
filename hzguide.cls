@@ -4273,9 +4273,9 @@
 % miscellaneous utilities * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 \keys_define:nn { finalizer }
-{
-	on		.tl_set:N = \l_finalizer_on_tl,
-	off 	.tl_set:N = \l_finalizer_off_tl
+{	
+	final	.tl_set:N = \l_finalizer_final_tl,
+	draft 	.tl_set:N = \l_finalizer_draft_tl
 }
 
 \NewDocumentCommand \FinalizerSetup { m }
@@ -4285,17 +4285,17 @@
 
 \NewDocumentCommand \FinalizerOn {}
 {
-	\tl_use:N \l_finalizer_on_tl
+	\tl_use:N \l_finalizer_final_tl
 }
 
 \NewDocumentCommand \FinalizerOff {}
 {
-	\tl_use:N \l_finalizer_off_tl
+	\tl_use:N \l_finalizer_draft_tl
 }
 
 \FinalizerSetup{
-	on = {\HideImageFilename\HidePending},
-	off = {\ShowImageFilename*\ShowPending}
+	final = {\HideImageFilename\HidePending},
+	draft = {\ShowImageFilename*\ShowPending}
 }
 
 \NewDocumentEnvironment { footnotes } {}
