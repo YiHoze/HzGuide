@@ -884,10 +884,10 @@
 
 \keys_define:nn { pending }
 {
-    beforecolor .tl_set:N = \l_pending_beforecolor,
-    aftercolor  .tl_set:N = \l_pending_aftercolor,
-    font        .tl_set:N = \l_pending_font,
-    hide        .bool_set:N = \l_pending_hide_bool
+    before-color	.tl_set:N = \l_pending_beforecolor_tl,
+    after-color		.tl_set:N = \l_pending_aftercolor_tl,
+    font			.tl_set:N = \l_pending_font_tl,
+    hide			.bool_set:N = \l_pending_hide_bool
 }
 
 \NewDocumentCommand \PendingSetup { m }
@@ -896,8 +896,8 @@
 }
 
 \PendingSetup{
-    beforecolor=darkgray,
-    aftercolor=blue,
+    before-color=purple,
+    after-color=blue,
     font=\foreignrmfamily\small,
     hide=false
 }
@@ -906,7 +906,7 @@
 {
     \bool_if:NF \l_pending_hide_bool
     {
-        \textcolor{\l_pending_beforecolor}{\l_pending_font #1}
+        \textcolor{\l_pending_beforecolor_tl}{\l_pending_font_tl #1}
     }
 }
 
@@ -930,8 +930,8 @@
 {
     \pending{#1}
     \IfNoValueTF {#2}
-        { \addcontentsline{loq}{query}{\l_pending_font #1} }
-        { \addcontentsline{loq}{query}{\l_pending_font #2} }
+        { \addcontentsline{loq}{query}{\l_pending_font_tl #1} }
+        { \addcontentsline{loq}{query}{\l_pending_font_tl #2} }
 }
 
 \cs_set_eq:NN \orglistofqueries \listofqueries
@@ -941,7 +941,7 @@
     \group_begin:
     \bool_if:NF \l_pending_hide_bool
         {
-            \color{\l_pending_beforecolor}
+            \color{\l_pending_beforecolor_tl}
             \IfBooleanTF {#1} {\orglistofqueries*} {\orglistofqueries}
         }
     \group_end:
@@ -958,17 +958,22 @@
     }{        
         \IfBooleanTF {#1}
         {
-            \textcolor{\l_pending_beforecolor}{\sout{#3}}
+            \textcolor{\l_pending_beforecolor_tl}{\sout{#3}}
         }{
             \IfNoValueTF {#2}
             {
-                \textcolor{\l_pending_aftercolor}{#3}
+                \textcolor{\l_pending_aftercolor_tl}{#3}
             }{
-                \textcolor{\l_pending_beforecolor}{\sout{#2}}\,
-                \textcolor{\l_pending_aftercolor}{#3}
+                \textcolor{\l_pending_beforecolor_tl}{\sout{#2}}~
+                \textcolor{\l_pending_aftercolor_tl}{#3}
             }
         }
     }
+}
+
+\NewDocumentCommand \changeitem { m m }
+{
+	\change[#1]{#2}
 }
 
 \cs_set_eq:NN \HideChanges \HidePending
@@ -2258,6 +2263,7 @@
 }
 
 % captions --------------------------------------------------------------------
+
 \newfixedcaption{\imgcaption}{figure}
 \newfixedcaption{\tabcaption}{table}
 
@@ -2291,6 +2297,9 @@
     afterskip = 1ex
 }
 
+\def\fps@figure{!htbp}
+\def\fps@table{!htbp}
+
 % common variables ------------------------------------------------------------
 
 \dim_zero_new:N \g_protrude_dim
@@ -2301,30 +2310,32 @@
 
 \keys_define:nn { image }
 {
-    beforeskip    .skip_set:N = \l_image_before_skip,
-    afterskip     .skip_set:N = \l_image_after_skip,
-    extraskip     .skip_set:N = \l_image_extra_skip,
-    float         .bool_set:N = \l_image_float_bool,
-    frame         .bool_set:N = \l_image_frame_bool,
-    fitline       .bool_set:N = \l_image_fitline_bool, % fit images to the specified width; not valid when an extra image is given.
-    fitwidth      .tl_set:N = \l_image_fitwidth_tl,
-    scale         .tl_set:N = \l_image_scale_tl,
-    flush         .bool_set:N = \l_image_flush_bool, % flush images into the left margin
-    landscape     .bool_set:N = \l_image_landscape_bool,
-    align         .tl_set:N = \l_image_align,
-    caption       .tl_set:N = \l_image_caption_tl,
-	short    	  .tl_set:N = \l_image_caption_short_tl,
-    label         .tl_set:N = \l_image_label_tl,
-    legend        .bool_set:N = \l_image_legend_bool,
-    showfilename  .bool_set:N = \l_image_showfilename_bool,
-    star          .tl_set:N = \l_image_star_tl,
-    vbar          .tl_set:N = \l_image_vbar_tl
+    beforeskip    	.skip_set:N = \l_image_before_skip,
+    afterskip     	.skip_set:N = \l_image_after_skip,
+    extraskip     	.skip_set:N = \l_image_extra_skip,
+    float         	.bool_set:N = \l_image_float_bool,
+	float-placement	.tl_set:N	= \l_image_float_placement_tl,
+    frame         	.bool_set:N = \l_image_frame_bool,
+    fitline       	.bool_set:N = \l_image_fitline_bool, % fit images to the specified width; not valid when an extra image is given.
+    fitwidth      	.tl_set:N 	= \l_image_fitwidth_tl,
+    scale         	.tl_set:N 	= \l_image_scale_tl,
+    flush         	.bool_set:N = \l_image_flush_bool, % flush images into the left margin
+    landscape     	.bool_set:N = \l_image_landscape_bool,
+    align         	.tl_set:N 	= \l_image_align,
+    caption       	.tl_set:N 	= \l_image_caption_tl,
+	short    	  	.tl_set:N 	= \l_image_caption_short_tl,
+    label         	.tl_set:N 	= \l_image_label_tl,
+    legend        	.bool_set:N = \l_image_legend_bool,
+    showfilename  	.bool_set:N = \l_image_showfilename_bool,
+    star          	.tl_set:N 	= \l_image_star_tl,
+    vbar          	.tl_set:N 	= \l_image_vbar_tl
 }
 \bool_new:N \l_image_extra_bool
 
 \NewDocumentCommand \ImageSetup { m }
 {
     \keys_set:nn { image } {#1}
+	\exp_args:NNx \def\fps@figure { \l_image_float_placement_tl }
 }
 
 \ImageSetup{
@@ -2332,6 +2343,7 @@
     afterskip=0pt,
     extraskip=1em,
     float=false,
+	float-placement=tbh,
     frame=false,
     fitline=false,
     fitwidth=\linewidth,
@@ -2380,7 +2392,7 @@
     }
     \image_save:nn {#4} {#5}
     \bool_if:NTF \l_image_float_bool {
-        \begin{figure}[bt]
+        \begin{figure}
         \image_put:
         \end{figure}
     }{
@@ -2892,34 +2904,37 @@
 
 \keys_define:nn { table }
 {
-    beforeskip    .skip_set:N = \l_table_before_skip,
-    afterskip     .skip_set:N = \l_table_after_skip,
-    float         .bool_set:N = \l_table_float_bool,
-    align         .tl_set:N = \l_table_align_tl,
-    landscape     .bool_set:N = \l_table_landscape_bool,
-    caption       .tl_set:N = \l_table_caption_tl,
-    label         .tl_set:N = \l_table_label_tl,
-    legend        .bool_set:N = \l_table_legend_bool,
-    font          .tl_set:N = \l_table_font_tl,
-    fontsize      .tl_set:N = \l_table_fontsize_tl,
-    hook          .tl_set:N = \l_table_hook_tl,
-    footnote      .tl_set:N = \l_table_footnote,
-    footnotestyle .code:n = { \table_footnotestyle:n {#1} }, % footnotestyle=fnsymbol
-    stretch       .tl_set:N = \l_table_stretch_tl,
-    norowcolor    .bool_set:N  = \l_table_norowcolor_bool,
-	star		  .tl_set:N = \l_table_star_tl,
-	vbar		  .tl_set:N = \_ltable_vbar_tl
+    beforeskip    	.skip_set:N = \l_table_before_skip,
+    afterskip     	.skip_set:N = \l_table_after_skip,
+    float         	.bool_set:N = \l_table_float_bool,
+	float-placement	.tl_set:N	= \l_image_float_placement_tl,
+    align         	.tl_set:N 	= \l_table_align_tl,
+    landscape     	.bool_set:N = \l_table_landscape_bool,
+    caption       	.tl_set:N 	= \l_table_caption_tl,
+    label         	.tl_set:N 	= \l_table_label_tl,
+    legend        	.bool_set:N = \l_table_legend_bool,
+    font          	.tl_set:N 	= \l_table_font_tl,
+    fontsize      	.tl_set:N 	= \l_table_fontsize_tl,
+    hook          	.tl_set:N 	= \l_table_hook_tl,
+    footnote      	.tl_set:N 	= \l_table_footnote,
+    footnotestyle 	.code:n 	= { \table_footnotestyle:n {#1} }, % footnotestyle=fnsymbol
+    stretch       	.tl_set:N 	= \l_table_stretch_tl,
+    norowcolor    	.bool_set:N	= \l_table_norowcolor_bool,
+	star		  	.tl_set:N 	= \l_table_star_tl,
+	vbar		  	.tl_set:N 	= \_ltable_vbar_tl
 }
 
 \NewDocumentCommand \TableSetup { m }
 {
     \keys_set:nn { table } { #1 }
+	\exp_args:NNx \def\fps@table { \l_image_float_placement_tl }
 }
 
 \TableSetup{
     beforeskip=0pt,
     afterskip=0pt,
     float=false,
+	float-placement=tbh,
     landscape=false,
     legend=false,
     font=\rmfamily,
@@ -2954,7 +2969,7 @@
     }
     \bool_if:NTF \l_table_float_bool
     {
-        \begin{table}[!bthp]
+        \begin{table}
         \table_put:
         \end{table}
     }{
@@ -3034,7 +3049,7 @@
     {
         \vspace{-.5\baselineskip}\par
         \begin{minipage}{\linewidth}
-            \setfootnoterule{0pt}{0pt}{0pt}			
+            \setfootnoterule{0pt}{0pt}{0pt}
             \l_table_footnote			
         \end{minipage}
     }
