@@ -122,7 +122,7 @@
 \clist_new:N \g_doc_type
 \NewDocumentCommand \SetDocType { m }
 {
-    \clist_gput_right:Nn \g_doc_type {#1}
+    \clist_gput_right:Nn \g_doc_type { #1 }
 }
 
 
@@ -140,7 +140,7 @@
 
 \NewDocumentCommand \IfDocType { m +m o }
 {
-    \doc_type_check:n #1
+    \doc_type_check:n { #1 }
     \bool_if:NTF \g_tmpa_bool
     {
         #2 
@@ -492,11 +492,9 @@
             warning=경고,
             caution=주의,
             notice=주의, %알림
-            note=참고,
-            symbol={\lineimg[-0.25ex]{AlertSymbol}~}
+            note=참고            
         }
         \ProblemSetup{name={}}
-        %\LineImageSetup{raise=0pt}
     }
 }
 
@@ -2296,9 +2294,6 @@
     delimiter=:\space,
     afterskip = 1ex
 }
-
-\def\fps@figure{!htbp}
-\def\fps@table{!htbp}
 
 % common variables ------------------------------------------------------------
 
