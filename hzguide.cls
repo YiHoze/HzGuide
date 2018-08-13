@@ -22,7 +22,7 @@
 % IV. For those of designer interface level:
 %     Follow clause II. However, it is allowed to use lowercase with compound words.
 
-\ProvidesClass{hzguide}[2018/06/08]
+\ProvidesClass{hzguide}[2018/08/13]
 
 \LoadClassWithOptions{memoir}
 
@@ -479,12 +479,17 @@
     %\XeTeXcharclass"201C = \XKlatinopening
     %\XeTeXcharclass"201D = \XKlatinclosing
     % Use truetype fonts to use PDF2htmlEX
+		% ttf
+		\setmainhangulfont{KoPubBatang}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*Light}, BoldFont={*Bold}]
+		\setsanshangulfont{KoPubDotum}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*Medium}, BoldFont={*Bold}]
+		% otf
+		% \setmainhangulfont{KoPubBatang}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PL}, BoldFont={*PB}]
+		% \setsanshangulfont{KoPubDotum}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PM}, BoldFont={*PB}]
         % \setmainhangulfont{NanumMyeongjo}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*}, BoldFont={*Bold}]
         % \setsanshangulfont{NanumGothic}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*}, BoldFont={*Bold}]
-	%\setmainhangulfont{NotoSerifCJKkr}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Regular}, BoldFont={*-Bold}]
-    %\setsanshangulfont{NotoSansCJKkr}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Regular}, BoldFont={*-Bold}]
-    \setmainhangulfont{KoPubBatang}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PL}, BoldFont={*PB}]
-    \setsanshangulfont{KoPubDotum}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PM}, BoldFont={*PB}]
+		% \setmainhangulfont{NotoSerifCJKkr}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Regular}, BoldFont={*-Bold}]
+    	% \setsanshangulfont{NotoSansCJKkr}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Regular}, BoldFont={*-Bold}]	
+	
     \AtBeginDocument{
         \renewcommand*{\contentsname}{차례}
         \AdmonitionSetup {
@@ -1426,7 +1431,7 @@
     \tl_gset:Nn \g_ps_oddfootright_tl {#1}
 }
 
-\NewDocumentCommand \PagestyleSetup { m }
+\NewDocumentCommand \PageStyleSetup { m }
 {
   \keys_set:nn { pagestyle } { #1 }  
   \PagestyleSettle{\g_layout_type}
@@ -1480,7 +1485,7 @@
 {
     \copypagestyle{common}{ruled}
     \setlength{\headwidth}{\textwidth}
-    \PagestyleSetup{
+    \PageStyleSetup{
         headrule=true,
         evenheadleft=\leftmark,
         oddheadright=\rightmark,
@@ -1504,7 +1509,7 @@
     \fi
     \addtolength{\headwidth}{\vartwosecindent}    
     \makeheadposition{vartwo}{flushright}{flushright}{flushright}{flushright}
-    \PagestyleSetup{
+    \PageStyleSetup{
         headrule=true,
         evenheadleft=\leftmark,
         oddheadright=\rightmark,
@@ -3709,8 +3714,6 @@
 
 % callout list
 \int_new:N \l_callout_int
-\tl_new:N \l_callout_label
-\tl_set:Nn \l_callout_label {\calloutno}
 
 \NewDocumentCommand \calloutno {}
 {
@@ -3722,12 +3725,12 @@
     beforeskip  .skip_set:N = \l_callout_before_skip,
     afterskip   .skip_set:N = \l_callout_after_skip,
     rule        .bool_set:N = \l_callout_rule_bool,
-    column      .int_set:N = \l_callout_column,
-    font        .tl_set:N = \l_callout_font,
-    label       .tl_set:N = \l_callout_label,
-    labelenum   .tl_set:N = \l_callout_label_enum,
+    column      .int_set:N = \l_callout_column_int,
+    font        .tl_set:N = \l_callout_font_tl,
+    label       .tl_set:N = \l_callout_label_tl,
+    labelenum   .tl_set:N = \l_callout_label_enum_tl,
     tab         .bool_set:N = \l_callout_tab_bool,
-    space       .skip_set:N = \l_callout_space,
+    space       .skip_set:N = \l_callout_space_skip,
     bar         .bool_set:N = \l_callout_bar_bool
 }
 
@@ -3753,19 +3756,19 @@
     \int_gincr:N \l_callout_int
     \int_compare:nTF { \l_callout_int > 1 }
     {
-        \int_set:Nn \l_tmpa_int {\int_mod:nn {\l_callout_int} {\l_callout_column} }
+        \int_set:Nn \l_tmpa_int {\int_mod:nn {\l_callout_int} {\l_callout_column_int} }
         \int_compare:nTF { \l_tmpa_int = 1 }{\newline}{\tab}
     }{
         \unskip
     }
-    \l_callout_label
+    \l_callout_label_tl
 }
 
 \cs_new:Nn \callout_item_space:
 {
     \int_gincr:N \l_callout_int
-    \int_compare:nT { \l_callout_int > 1 } {\hskip\l_callout_space}
-    \l_callout_label
+    \int_compare:nT { \l_callout_int > 1 } {\hskip\l_callout_space_skip}
+    \l_callout_label_tl
 }
 
 \NewDocumentEnvironment {callout} { s o }
@@ -3773,15 +3776,15 @@
     \object_skip_before:n {\l_callout_before_skip}
     \bool_if:NT \l_callout_rule_bool { \begin{RuleBox} }
     %\setfootnoterule{0pt}{0pt}{0pt}
-    \l_callout_font    
+    \l_callout_font_tl    
     \IfBooleanTF {#1}
     {
-        \renewcommand\labelenumi{\l_callout_label_enum}
+        \renewcommand\labelenumi{\l_callout_label_enum_tl}
         \begin{enumerate}
         \tightlist\HzJustification
     }{
-        \IfValueT {#2} { \int_set:Nn \l_callout_column {#2} }
-        \NumTabs {\l_callout_column}
+        \IfValueT {#2} { \int_set:Nn \l_callout_column_int {#2} }
+        \NumTabs {\l_callout_column_int}
         \int_zero:N \l_callout_int
         \bool_if:NTF \l_callout_tab_bool
             {\cs_set_eq:NN \item \callout_item_tab:}
