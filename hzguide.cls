@@ -1434,10 +1434,10 @@
 \NewDocumentCommand \PageStyleSetup { m }
 {
   \keys_set:nn { pagestyle } { #1 }  
-  \PagestyleSettle{\g_layout_type}
+  \PageStyleSettle{\g_layout_type}
 }
 
-\NewDocumentCommand \PagestyleSettle { m }
+\NewDocumentCommand \PageStyleSettle { m }
 {
     %\makerunningwidth{#1}{\headwidth}    
     \bool_if:NTF \g_ps_headrule_bool
@@ -3695,8 +3695,11 @@
 {
     \int_gincr:N \l_opt_cnt_int
     \clist_if_in:NoTF \l_tmpa_clist {\int_use:N \l_opt_cnt_int}
-        {\opt_selected:}
-        {\opt_unselected:}
+    {
+		\opt_selected:
+	}{
+		\opt_unselected:
+	}
 }
 
 \NewDocumentEnvironment { options } { s O{} }
@@ -4434,6 +4437,7 @@
 
 \NewDocumentCommand \annotate { s t| O{} m }
 {
+	\group_begin:
     \IfBooleanT {#1}
     { 
         \exp_args:No \AnnotateSetup{\l_annotate_star}
@@ -4450,6 +4454,7 @@
     }{
         \annotate_display_unbreakable:n {\l_annotate_opening #4 \l_annotate_closing}
     }
+	\group_end:
 }
 
 \cs_new:Npn \annotate_scope:n #1
