@@ -80,7 +80,7 @@
 ]
 
 \RequirePackage{iftex}
-\RequirePackage{fontspec, xunicode, xltxtra}
+\RequirePackage{fontspec}
 \RequirePackage{bookmark}
 \RequirePackage{etoolbox}
 \RequirePackage{environ}
@@ -481,13 +481,14 @@
 
 %% overlay
 \int_new:N \l_expose_int
+\newcommand\UnexposedColor{lightgray}
 \DeclareExpandableDocumentCommand \expose { s o m }
 {
 	\IfBooleanT {#1} { \int_zero:N \l_expose_int }
 	\int_incr:N \l_expose_int 
 	\IfValueT {#2} { \int_set:Nn \l_expose_int {#2} }
 	\tl_set:Nn \l_tmpa_tl { \int_use:N \l_expose_int }
-	\alt<\l_tmpa_tl->{#3}{\textcolor{lightgray}{#3}}
+	\alt<\l_tmpa_tl->{#3}{\textcolor{\UnexposedColor}{#3}}
 }
 
 \NewDocumentCommand \setverbatimfont { m }

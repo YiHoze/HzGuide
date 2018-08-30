@@ -1260,10 +1260,10 @@
 
 \cs_new:Nn \layout_paper_smartphone:
 {
-    \dim_gset:Nn \stockwidth {70mm}
-    \dim_gset:Nn \stockheight {124mm}
-    \dim_gset:Nn \paperwidth {70mm}
-    \dim_gset:Nn \paperheight {124mm}
+    \dim_gset:Nn \stockwidth {60mm}
+    \dim_gset:Nn \stockheight {105mm}
+    \dim_gset:Nn \paperwidth {60mm}
+    \dim_gset:Nn \paperheight {105mm}
     \tl_gset:Nn \g_layout_type {smartphone}
 }
 
