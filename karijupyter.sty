@@ -90,21 +90,29 @@
 \def\x@vobeylines{\par\leavevmode\relax}
 
 \ExplSyntaxOn
-% \renewtcolorbox{BreakableShadeBox}[1][]{
-%     before~skip=0pt, after~skip=0pt,
-%     boxrule=0.75pt, colframe=white, colback=backgray, arc=0.5ex,
-%     boxsep=1ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
-%     titlerule=0.75pt, toptitle=0.5ex, bottomtitle=0.5ex,
-%     colbacktitle=lightgray, coltitle=black,
-%     fonttitle=\bfseries, breakable=true, title=#1
+	% \renewtcolorbox{BreakableShadeBox}[1][]{
+	%     before~skip=0pt, after~skip=0pt,
+	%     boxrule=0.75pt, colframe=white, colback=backgray, arc=0.5ex,
+	%     boxsep=1ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
+	%     titlerule=0.75pt, toptitle=0.5ex, bottomtitle=0.5ex,
+	%     colbacktitle=lightgray, coltitle=black,
+	%     fonttitle=\bfseries, breakable=true, title=#1
+	% }
+% \InstanceSetup{
+%     beforeskip=.4\baselineskip,
+%     afterskip=.6\baselineskip,
+%     type=Shadow, 
+%     style=\raggedright,
+%     font=\ttfamily\small
 % }
-\InstanceSetup{
-    beforeskip=.4\baselineskip,
-    afterskip=.6\baselineskip,
-    type=Shadow, 
-    style=\raggedright,
-    font=\ttfamily\small
+\BoundedBoxInitialize{
+	before-skip=.4\baselineskip,
+    after-skip=.6\baselineskip,
+    type=BreakableShade, 
+    style=\raggedright,    
 }
+\RenewBoundedBox{instance}{font=\ttfamily\small, type=shadow, signal={}}
+
 \RenewDocumentEnvironment {Verbatim} { o }
 {  
     \begin{instance}
@@ -172,7 +180,7 @@
 \hypersetup{linkcolor=MidnightBlue, citecolor=MidnightBlue, urlcolor=MidnightBlue}
 
 
-\AdmonitionSetup{indent=1.5em}
+%\AdmonitionSetup{indent=1.5em}
 \setsecnumdepth{chapter}
 
 \styleinput{PreDoc.tex}

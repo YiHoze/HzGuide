@@ -329,9 +329,13 @@
 \ExplSyntaxOff
 
 % list ------------------------------------------------------------------------
-\TermsSetup{
-    newline=true, marker={{},{}}, font=\bfseries, index=false,
-    star={newline=false, font=\bfseries, delimiter=\hfill, itemsep=-1ex}
+% \TermsSetup{
+%     newline=true, marker={{},{}}, font=\bfseries, index=false,
+%     star={newline=false, font=\bfseries, delimiter=\hfill, itemsep=-1ex}
+% }
+\RenewTerms{terms}{
+    label-type=newline, marker={{},{}}, font=\bfseries, index=false,
+    star={label-type=default, delimiter=\hfill, item-sep=-1ex}
 }
 %\SetListStyle{enumerate=\raggedright, itemize=\raggedright}
 
@@ -520,17 +524,25 @@
     colbacktitle=lightgray, coltitle=black,
     fonttitle=\bfseries, breakable=true, title=#1
 }
-\ReferenceSetup{
-    beforeskip=.4\baselineskip,
-    afterskip=.6\baselineskip,
+% \ReferenceSetup{
+%     beforeskip=.4\baselineskip,
+%     afterskip=.6\baselineskip,
+%     type=BreakableShade, 
+%     style=\raggedright,
+%     font=\ttfamily\footnotesize
+% }
+% \AdmonitionSetup{
+%     type=BreakableShade,
+%     style=\raggedright
+% }
+\BoundedBoxInitialize{
+	before-skip=.4\baselineskip,
+    after-skip=.6\baselineskip,
     type=BreakableShade, 
-    style=\raggedright,
-    font=\ttfamily\footnotesize
+    style=\raggedright,    
 }
-\AdmonitionSetup{
-    type=BreakableShade,
-    style=\raggedright
-}
+\RenewBoundedBox{reference}{font=\ttfamily\footnotesize, signal={}}
+
 
 \ExplSyntaxOff
 

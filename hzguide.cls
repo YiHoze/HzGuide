@@ -1261,9 +1261,9 @@
 \cs_new:Nn \layout_paper_smartphone:
 {
     \dim_gset:Nn \stockwidth {60mm}
-    \dim_gset:Nn \stockheight {105mm}
+    \dim_gset:Nn \stockheight {110mm}
     \dim_gset:Nn \paperwidth {60mm}
-    \dim_gset:Nn \paperheight {105mm}
+    \dim_gset:Nn \paperheight {110mm}
     \tl_gset:Nn \g_layout_type {smartphone}
 }
 
@@ -1316,7 +1316,7 @@
 
 \cs_new:Nn \layout_smartphone:
 {
-    \setulmarginsandblock{5mm}{10mm}{*}
+    \setulmarginsandblock{8mm}{12mm}{*}
     \setlrmarginsandblock{5mm}{5mm}{*}
     \setheadfoot{0mm}{5mm}
     \setlength\headsep{0mm}
@@ -4837,7 +4837,7 @@
     \begin{RightBarBox}
         \sffamily \input{\tmpfile}
     \end{RightBarBox}
-    \object_skip_after:n {}
+    \object_skip_after:n {0pt}
 }
 
 \NewDocumentCommand \showtexh {}
@@ -4859,7 +4859,7 @@
             \end{RightBarBox}
         \end{minipage}
     \end{IfVartwoEnlarge}
-    \object_skip_after:n {}    
+    \object_skip_after:n {0pt}
 }
 
 \ExplSyntaxOff
