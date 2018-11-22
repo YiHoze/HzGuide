@@ -285,7 +285,7 @@
 \graphicspath{{images/}{../images/}}
 
 \IfSlide{
-	\NewDocumentCommand \biblio {s m}
+	\NewDocumentCommand \biblio { s m }
 	{
 		\group_begin:
 		\IfBooleanTF{#1}
@@ -331,7 +331,6 @@
 	titlerule=0.75pt, toptitle=0.25ex, bottomtitle=0.5ex,
 	title=#1
 }
-    
 
 %% lists
 \setbeamertemplate{enumerate~subitem}{\Alph{enumii}.}

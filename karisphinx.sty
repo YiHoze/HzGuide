@@ -502,18 +502,30 @@
 
 % admonition ------------------------------------------------------------------
 \ExplSyntaxOn
+% \DeclareDocumentEnvironment {sphinxadmonition} { m m }
+% {
+%     \begin{admonition}{#2}
+% }{
+%     \end{admonition}
+% }
+% % 'notice' might be deprecated by nbsphinx
+% \DeclareDocumentEnvironment {notice} { m m }
+% {
+%     \begin{admonition}{#1}
+% }{
+%     \end{admonition}
+% }
 \DeclareDocumentEnvironment {sphinxadmonition} { m m }
 {
-    \begin{admonition}{#2}
+    \begin{BreakableShadeBox}{#2}
 }{
-    \end{admonition}
+    \end{BreakableShadeBox}
 }
-% 'notice' might be deprecated by nbsphinx
 \DeclareDocumentEnvironment {notice} { m m }
 {
-    \begin{admonition}{#1}
+    \begin{BreakableShadeBox}{#1}
 }{
-    \end{admonition}
+    \end{BreakableShadeBox}
 }
 
 \renewtcolorbox{BreakableShadeBox}[1][]{
