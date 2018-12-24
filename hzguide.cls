@@ -22,6 +22,27 @@
 % IV. For those of designer interface level:
 %     Follow clause II. However, it is allowed to use lowercase with compound words.
 
+% Frank Mittelbach's recipe for the error from tabu and xcolor
+% \usepackage{etoolbox}
+% \makeatletter
+% \patchcmd\tabu@startpboxmeasure
+%   {\aftergroup\tabu@endpboxmeasure}
+%   {\aftergroup\tabu@endpboxmeasure
+%    \color@begingroup
+%   }{\typeout{tabu patched}}{\typeout{tabu patch failed!}}
+% \makeatletter
+
+% For a breakable color box
+% \usepackage[normalem]{ulem}
+% \def\myhlcolor{yellow!75}
+% \newcommand\hl{%
+%     \bgroup \markoverwith{%
+%     \kern-.1pt%
+%     \raisebox{-.15\baselineskip}%
+%     {\hbox{\color{\myhlcolor}\rule{1pt}{12pt}}}%
+%     }\ULon
+% }
+
 \ProvidesClass{hzguide}[2018/08/13]
 
 \LoadClassWithOptions{memoir}
@@ -42,11 +63,11 @@
 \RequirePackage{tcolorbox}
 \RequirePackage{tabu, longtable, multirow}
 \RequirePackage[obeyspaces, spaces]{url} %\path{file path}
-% when using \path, redefine \flushleft like below if don't want spaces above and below it.
+% when using \path, redefine \flushleft like below if you don't want spaces above and below it.
 %\def\flushleft{\setlength\topsep{0pt}\trivlist \raggedright\item\relax}
 \RequirePackage{hyperref}
 \RequirePackage{bookmark}
-\RequirePackage{calc}
+%\RequirePackage{calc}
 
 \hypersetup{pdfencoding=auto, colorlinks=true, bookmarksnumbered=true, pdfauthor={hzguide.cls}} % allcolors=darkgray
 
@@ -3279,7 +3300,7 @@
         \par\textbf{##1}\nopagebreak
     }
 }
-% Use \IndexingOff disable the indexing function of term-related macros including \term.
+% Use \IndexingEnable disable the indexing function of term-related macros including \term.
 
 \NewDocumentCommand \IndexingEnable { s }
 {
@@ -3805,7 +3826,7 @@
 \usetikzlibrary{shapes}
 \ExplSyntaxOn
 
-\NewDocumentCommand\cirnumdraw{mmmmmmm}
+\NewDocumentCommand\cirnumdraw{ m m m m m m m }
 {
     \raisebox{#1}{\abnormalparskip{0pt}
         \tikz\node[
@@ -4452,7 +4473,7 @@
     {
         \exp_args:Nx \annotate_scope:n {\l_annotate_opening #4 \l_annotate_closing}
     }{
-        \annotate_display_unbreakable:n {\l_annotate_opening #4 \l_annotate_closing}
+        \annotate_unbreakable:n {\l_annotate_opening #4 \l_annotate_closing}
     }
 	\group_end:
 }
@@ -4469,7 +4490,7 @@
         \tl_clear:N \l_annotate_tl
     }{
         \tl_put_right:Nn \l_annotate_tl {#1}
-        \annotate_display_breakable:V \l_annotate_tl
+        \annotate_breakable:V \l_annotate_tl
         \tl_clear:N \l_annotate_tl
         \peek_catcode:NTF \c_space_token
         {
@@ -4480,7 +4501,7 @@
     }
 }
 
-\cs_new:Npn \annotate_display_breakable:V #1
+\cs_new:Npn \annotate_breakable:V #1
 {
     \group_begin:
         \l_annotate_font
@@ -4494,7 +4515,7 @@
     \group_end:
 }
 
-\cs_new:Npn \annotate_display_unbreakable:n #1
+\cs_new:Npn \annotate_unbreakable:n #1
 {
     \bool_if:NTF \l_annotate_superscript_bool
     {
