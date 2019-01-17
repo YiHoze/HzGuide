@@ -501,11 +501,12 @@
     %\XeTeXcharclass"201D = \XKlatinclosing
     % Use truetype fonts to use PDF2htmlEX
 		% ttf
-		\setmainhangulfont{KoPubBatang}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*Light}, BoldFont={*Bold}]
-		\setsanshangulfont{KoPubDotum}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*Medium}, BoldFont={*Bold}]
+		% Some symbolic letters such as em-dash are missing
+		% \setmainhangulfont{KoPubBatang}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*Light}, BoldFont={*Bold}]
+		% \setsanshangulfont{KoPubDotum}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*Medium}, BoldFont={*Bold}]
 		% otf
-		% \setmainhangulfont{KoPubBatang}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PL}, BoldFont={*PB}]
-		% \setsanshangulfont{KoPubDotum}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PM}, BoldFont={*PB}]
+		\setmainhangulfont{KoPubBatang}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PL}, BoldFont={*PB}]
+		\setsanshangulfont{KoPubDotum}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PM}, BoldFont={*PB}]
         % \setmainhangulfont{NanumMyeongjo}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*}, BoldFont={*Bold}]
         % \setsanshangulfont{NanumGothic}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*}, BoldFont={*Bold}]
 		% \setmainhangulfont{NotoSerifCJKkr}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Regular}, BoldFont={*-Bold}]
@@ -2345,6 +2346,7 @@
     align         	.tl_set:N 	= \l_image_align,
     caption       	.tl_set:N 	= \l_image_caption_tl,
 	short    	  	.tl_set:N 	= \l_image_caption_short_tl,
+	fitcaption		.bool_set:N = \l_image_fitcatpion_bool, % fit the caption to the image width
     label         	.tl_set:N 	= \l_image_label_tl,
     legend        	.bool_set:N = \l_image_legend_bool,
     showfilename  	.bool_set:N = \l_image_showfilename_bool,
@@ -2534,6 +2536,12 @@
         \tl_set:Nx \l_tmpa_tl {\l_image_label_tl}
         \legend{\tl_to_str:N \l_tmpa_tl}
     }
+	\bool_if:NT \l_image_fitcatpion_bool
+	{
+		\dim_set_towidth:Nn \l_tmpa_dim { \box_use:N \l_image_box }
+		\captionwidth{\l_tmpa_dim}
+		\changecaptionwidth
+	}
     \tl_if_empty:NF \l_image_caption_tl
     {
         \bool_if:NTF \l_image_legend_bool
@@ -2545,7 +2553,7 @@
             	\imgcaption{\l_image_caption_tl}
             	
 			}{
-				\imgcaption[\l_image_caption_short_tl]{\l_image_caption_tl}
+				\imgcaption[\l_image_caption_short_tl]{\l_image_caption_tl}				
 			}
 			\label{\l_image_label_tl}
         }
@@ -3344,7 +3352,7 @@
         \RenewDocumentCommand 
     }{
         \NewDocumentCommand 
-    } #2 { s t| o m }
+    } #2 { s t| o m o }
     {
         \keys_set:nn { term }{ #3 }
         \exp_args:Nno \keys_set:nn { term }{ \g_term_options_tl }        
@@ -3362,7 +3370,12 @@
             {
                 \index{##3@##4}                
             }{
-                \index{##4}
+				\IfValueTF { ##5 }
+				{
+					\index{##5!##4}
+				}{
+                	\index{##4}
+				}
             }
         }        
             \textcolor{ \l_term_color_tl }{ \l_term_font_tl ##4 }
@@ -4436,6 +4449,7 @@
     color       .tl_set:N = \l_annotate_color,
     space       .tl_set:N = \l_annotate_space,
     raise       .tl_set:N = \l_annotate_raise,
+	indexing	.bool_set:N = \l_annotate_indexing_bool,
     star        .tl_set:N = \l_annotate_star,
 }
 
@@ -4475,6 +4489,10 @@
     }{
         \annotate_unbreakable:n {\l_annotate_opening #4 \l_annotate_closing}
     }
+	\bool_if:NT \l_annotate_indexing_bool
+	{
+		\index{#4}
+	}
 	\group_end:
 }
 
@@ -4524,6 +4542,8 @@
         \textsubscript{\textcolor{\l_annotate_color}{\l_annotate_font #1}}
     }
 }
+
+\cs_set_eq:NN \anota \annotate
 
 % \flushrightlist{..., ..., ...}[\font]
 % \NewDocumentCommand \flushrightlist { m O{} }
