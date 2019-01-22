@@ -67,7 +67,7 @@
 %\def\flushleft{\setlength\topsep{0pt}\trivlist \raggedright\item\relax}
 \RequirePackage{hyperref}
 \RequirePackage{bookmark}
-%\RequirePackage{calc}
+\RequirePackage{calc} % to allow arithmetic expressions for \setlength 
 
 \hypersetup{pdfencoding=auto, colorlinks=true, bookmarksnumbered=true, pdfauthor={hzguide.cls}} % allcolors=darkgray
 
@@ -4954,7 +4954,6 @@
 
 % page layout thanks to https://www.kockoc.com/newgari/1119255
 
-%\makeatletter
 \newlength\memoirPleftodd \newlength\memoirPrightodd
 \newlength\memoirPlefteven \newlength\memoirPrighteven
 \newlength\memoirPtop \newlength\memoirPbottom
