@@ -53,7 +53,7 @@
 \RequirePackage{fontspec}
 \RequirePackage{ragged2e}
 \RequirePackage{xspace}
-\RequirePackage{enumitem}
+\RequirePackage[shortlabels]{enumitem}
 \RequirePackage{tabto}
 \RequirePackage[normalem]{ulem}
 \RequirePackage[svgnames,x11names,dvipsnames,hyperref,table]{xcolor}
@@ -787,13 +787,13 @@
 }
 
 \NewDocumentCommand \FrontCover {}
-{
+{	
     \thispagestyle{empty}
     \tl_if_empty:NF \cover_image_background
     {
         \watermark{x=0, y=0, image=\cover_image_background}
     }
-    \begin{IfVartwoEnlarge}
+    \begin{IfVartwoEnlarge}		
         \setSpacing{1}
         \tl_if_empty:NF \cover_image_logo_front
         {
@@ -820,7 +820,7 @@
                 \par
             \CoverFontSize{4} \cover_pub_year \hspace{0.5em}|\hspace{0.5em} \cover_revision
             \end{flushright}        
-    \end{IfVartwoEnlarge}        
+    \end{IfVartwoEnlarge}
     \cover_after_front
     \tl_if_empty:NF \cover_image_background
     {
@@ -830,8 +830,8 @@
 
 \NewDocumentCommand \BackCover {}
 {
-    \cover_before_back
-    \begin{IfVartwoEnlarge}			
+    \cover_before_back	
+    \begin{IfVartwoEnlarge}		
         \AtPageBottom
         \setSpacing{1}        
         \tl_if_empty:NTF \cover_image_logo_back
@@ -2345,8 +2345,9 @@
     landscape     	.bool_set:N = \l_image_landscape_bool,
     align         	.tl_set:N 	= \l_image_align,
     caption       	.tl_set:N 	= \l_image_caption_tl,
-	short    	  	.tl_set:N 	= \l_image_caption_short_tl,
-	fitcaption		.bool_set:N = \l_image_fitcatpion_bool, % fit the caption to the image width
+	caption-short  	.tl_set:N 	= \l_image_caption_short_tl,
+	caption-ignore	.bool_set:N = \l_image_caption_ignore_bool,
+	caption-fit		.bool_set:N = \l_image_caption_fit_bool, % fit the caption to the image width
     label         	.tl_set:N 	= \l_image_label_tl,
     legend        	.bool_set:N = \l_image_legend_bool,
     showfilename  	.bool_set:N = \l_image_showfilename_bool,
@@ -2533,37 +2534,39 @@
 {
     \bool_if:NT \l_image_showfilename_bool
     {
-        \tl_set:Nx \l_tmpa_tl {\l_image_label_tl}
+        \tl_set:Nx \l_tmpa_tl { \l_image_label_tl }
         \legend{\tl_to_str:N \l_tmpa_tl}
-    }
-	\bool_if:NT \l_image_fitcatpion_bool
+    }	
+	\bool_if:NT \l_image_caption_fit_bool
 	{
 		\dim_set_towidth:Nn \l_tmpa_dim { \box_use:N \l_image_box }
 		\captionwidth{\l_tmpa_dim}
 		\changecaptionwidth
 	}
     \tl_if_empty:NF \l_image_caption_tl
-    {
-        \bool_if:NTF \l_image_legend_bool
-        {
-            \legend{\l_image_caption_tl}
-        }{
-			\tl_if_empty:NTF \l_image_caption_short_tl
+	{
+		\bool_if:NF \l_image_caption_ignore_bool
+		{
+			\bool_if:NTF \l_image_legend_bool
 			{
-            	\imgcaption{\l_image_caption_tl}
-            	
+				\legend{\l_image_caption_tl}
 			}{
-				\imgcaption[\l_image_caption_short_tl]{\l_image_caption_tl}				
+				\tl_if_empty:NTF \l_image_caption_short_tl
+				{
+					\imgcaption{\l_image_caption_tl}
+					
+				}{
+					\imgcaption[\l_image_caption_short_tl]{\l_image_caption_tl}				
+				}
+				\label{\l_image_label_tl}
 			}
-			\label{\l_image_label_tl}
-        }
-    }
+		}
+	}
 }
 
-% \illustimage*^[option]{image}(caption){ text } -------------------------------
-%\illustimage[options]{filename}(caption){description}
+%\illustimage*^[ options ]{ image filename }( caption ){ description } -------------------------------
 %\illustimage*: user-specified action
-%\illustimage^: use firstskip
+%\illustimage^: another user-specified action
 
 \bool_new:N \in_illustimage
 \keys_define:nn { illustimage }
@@ -2579,6 +2582,7 @@
     voffset         .skip_set:N = \l_illustimage_voffset_skip,
     valign          .tl_set:N = \l_illustimage_valign_tl,
     caption         .tl_set:N = \l_illustimage_caption,
+	caption-ignore	.bool_set:N = \l_illustimage_caption_ignore_bool,
     label           .tl_set:N = \l_illustimage_label,
     legend          .bool_set:N = \l_illustimage_legend_bool,
     width           .dim_set:N = \l_illustimage_width_dim, 
@@ -2587,7 +2591,8 @@
     showfilename    .bool_set:N = \l_illustimage_showfilename_bool,
     textstyle       .tl_set:N = \l_illustimage_textstyle_tl,
     star            .tl_set:N = \l_illustimage_star_tl,
-    enum            .tl_set:N = \l_illustimage_enum_tl
+    enum            .tl_set:N = \l_illustimage_enum_tl,
+    hook            .tl_set:N = \l_illustimage_hook_tl
 }
 
 \NewDocumentCommand \IllustImageSetup { m }
@@ -2627,6 +2632,7 @@
         \bool_if:NT \g_column_vartwo_bool
             { \begin{adjustwidth}{-\vartwosecindent}{0pt} }
     }
+	\tl_use:N \l_illustimage_hook_tl
     \IfValueT{#5} { \tl_set:Nn \l_illustimage_caption {#5} }
     % save image
     \tl_if_empty:NT \l_illustimage_label
@@ -2749,14 +2755,16 @@
     }
     \tl_if_empty:NF \l_illustimage_caption
     {
-        \bool_if:NTF \l_illustimage_legend_bool
-        {
-            \legend{\l_illustimage_caption}
-        }
-        {
-            \imgcaption{\l_illustimage_caption}
-            \label{\l_illustimage_label}
-        }
+		\bool_if:NF \l_illustimage_caption_ignore_bool
+		{
+			\bool_if:NTF \l_illustimage_legend_bool
+			{
+				\legend{\l_illustimage_caption}
+			}{
+				\imgcaption{\l_illustimage_caption}
+				\label{\l_illustimage_label}
+			}
+		}
     }
 }
 
@@ -4005,7 +4013,7 @@
 
 \cs_new:Npn \bbox_type_set:n #1
 {
-    \str_case_x:nn { #1 }
+    \str_case_x:nnTF { #1 }
     {
         { BreakableShade }{
             \cs_set_eq:NN \BBox \BreakableShadeBox
@@ -4034,9 +4042,18 @@
         { RightBar }{
             \cs_set_eq:NN \BBox \RightBarBox
             \cs_set_eq:NN \endBBox \endRightBarBox
-        }        
-    }
+        }
+	}
+	{}        
+	{ \AdhocBoxType } % define like below
 }
+% \newtcolorbox{FooBox}{...} 
+% \NenewBoundedBox{foo}{type=FooBox}
+% \NewDocumentCommand \AdhocBoxType { }
+% {
+% 	\cs_set_eq:NN \BBox \FooBox
+% 	\cs_set_eq:NN \endBBox \endFooBox
+% }
 
 \NewDocumentCommand \NewBoundedBox { s m m }
 {
