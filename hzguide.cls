@@ -712,7 +712,7 @@
 
 \NewDocumentCommand \AdhocSetup { m }
 {
-    \keys_set:nn { adhoc } { #1 }
+    \keys_set:nn { adhoc }{ #1 }
 }
 
 \AdhocSetup{layout=false, heading=false}
@@ -2265,7 +2265,7 @@
 
 \NewDocumentCommand \DecolorHyperlinks { O {darkgray} O {\bfseries} }
 {
-    \hypersetup{colorlinks=false,pdfborder={0 0 0}}    
+    \hypersetup{colorlinks=false,pdfborder={0 0 0}}  % plainpages=false   
     \renewcommand{\theTitleReference}[2]{\textcolor{#1}{#2 ##2}}
 }
 
@@ -2328,7 +2328,7 @@
 \box_new:N \l_image_box
 \box_new:N \l_text_box
 
-% \image*|[options]{image}[extra image](caption) -------------------------------------
+% \image*|[options]{image}[extra image](caption)<short caption> -------------------------------------
 
 \keys_define:nn { image }
 {
@@ -2770,7 +2770,7 @@
 
 % as environment
 \NewEnviron{IllustratedImage}[1]{ \illustimage{ #1 }{ \BODY } }
-\NewDocumentEnvironment {IllustImage} { s t^ o m d() }
+\NewDocumentEnvironment {IllustImage} { s t^ O{} m d() }
 {
     \IfBooleanT {#1} { 
         \exp_args:No \IllustImageSetup{\l_illustimage_star_tl} 
@@ -2778,9 +2778,9 @@
     \IfBooleanT {#2} { 
         \IllustImageSetup{first=true} 
     }
-    \IfValueT {#3} { 
+    %\IfValueT {#3} { 
         \IllustImageSetup{#3} 
-    }
+    %}
     \IfValueT {#5} { 
         \tl_set:Nn \l_illustimage_caption {#5} 
     }
@@ -4123,8 +4123,8 @@
 \NewBoundedBox{caution}{signal=\g_admonition_caution_tl, symbol={}}
 \NewBoundedBox{notice}{signal=\g_admonition_notice_tl, symbol={}}
 \NewBoundedBox{note}{signal=\g_admonition_note_tl, symbol={}}
-\NewBoundedBox{instance}{signal={}, type=RightBar}
-\NewBoundedBox{reference}{signal={}}
+\NewBoundedBox{instance}{signal={}, type=RightBar, font=\small}
+\NewBoundedBox{reference}{signal={}, font=\small}
 
 %\watermark{x=30,y=30,fontsize=90,color=red,text={...},image=foo,rotate=50}
 % when both text and image are specified, the former is ignored.
@@ -4830,10 +4830,10 @@
 %    \end{verbatim}
 %    \end{reference}
 % AN ALTERNATIVE METHOD IS
-%    \begin{SaveVerb}
+%    \begin{verbsave}
 %    ...
-%    \end{SaveVerb}
-%    \verbinput
+%    \end{verbsave}
+%    \verbread
 
 \ExplSyntaxOn
 \NewDocumentCommand \vitem { v }
@@ -4843,9 +4843,9 @@
 \ExplSyntaxOff
 
 
-\def\tmpfile{tempverb.tex}
-% Leave nothing behind \end{SaveVerb} in the same line
-\def\SaveVerb{%
+\def\tmpfile{tmpverb.tex}
+% Leave nothing after \end{} in the same line
+\def\verbsave{%
     \@bsphack
     \immediate\openout \verbatim@out \tmpfile
     \let\do\@makeother\dospecials
@@ -4854,8 +4854,8 @@
         \immediate\write\verbatim@out
             {\the\verbatim@line}}%
     \verbatim@start}
-\def\endSaveVerb{%
-    \immediate\closeout\verbatim@out
+\def\endverbsave{%	
+    \immediate\closeout\verbatim@out	
     \@esphack}
 
 \ExplSyntaxOn
@@ -4864,62 +4864,53 @@
     \texttt{#1}
 }
 
-\NewDocumentCommand \verbinput {}
+\NewDocumentCommand \verbread {}
 {  
     \begin{reference}
         %\wrappingon
         \verbatimindent=0pt
-        \verbatiminput{tempverb}
+        \verbatiminput{\tmpfile}
     \end{reference}
 }
+\NewDocumentCommand \verbinput {}
+{
+	\begin{instance}
+		\input{\tmpfile}
+	\end{instance}
+}
 
-\NewDocumentCommand \showtex { s }
+\NewDocumentCommand \verbrender{ s }
 {
     \IfBooleanTF {#1}
     {
-        \showtexv
+        \verb_render_below:
     }{
-        \showtexh
+        \verb_render_side:
     }    
 }
 
-\NewDocumentCommand \showtexv {}
+\cs_new:Nn \verb_render_below:
 {
-    \bool_if:NTF \g_verbatim_bool
-    {
-        \inputminted{latex}{\tmpfile}
-    }{
-        \boxedverbatiminput{\tmpfile}
-    }
-    \object_skip_before:n {0pt}
-    \begin{RightBarBox}
-        \sffamily \input{\tmpfile}
-    \end{RightBarBox}
-    \object_skip_after:n {0pt}
+    \verbread   
+	\ExplSyntaxOn
+    \verbinput	
+	\ExplSyntaxOff 
 }
 
-\NewDocumentCommand \showtexh {}
+\cs_new:Nn \verb_render_side:
 {    
-    \object_skip_before:n {0pt}
     \begin{IfVartwoEnlarge}\noindent
-        \begin{minipage}{.48\linewidth}
-            \bool_if:NTF \g_verbatim_bool
-            {
-                \inputminted{latex}{\tmpfile}
-            }{
-                \boxedverbatiminput{\tmpfile}
-            }
+        \begin{minipage}{.55\linewidth}
+			\verbread
         \end{minipage}
         \hfill
-        \begin{minipage}{.48\linewidth}
-            \begin{RightBarBox}
-                \sffamily \input{\tmpfile}
-            \end{RightBarBox}
+        \begin{minipage}{.44\linewidth}
+			\ExplSyntaxOn			
+            \verbinput
+			\ExplSyntaxOff
         \end{minipage}
     \end{IfVartwoEnlarge}
-    \object_skip_after:n {0pt}
 }
-
 \ExplSyntaxOff
 
 % default setup * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

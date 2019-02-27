@@ -104,14 +104,14 @@
 		\xetexkofontregime[cjksymbols=hangul]{latin}		
 	\fi
 	\setmainhangulfont{KoPubBatang}[Ligatures=TeX,Scale=MatchUppercase,UprightFont={*PL},BoldFont={*PM}]
-	\setsanshangulfont{KoPubDotum}[Ligatures=TeX,Scale=MatchUppercase,UprightFont={*PL},BoldFont={*PM}]
+	\setsanshangulfont{KoPubDotum}[Ligatures=TeX,Scale=MatchUppercase,UprightFont={*PM},BoldFont={*PB}]
 	\setmonohangulfont{KoPubDotum}[Scale=MatchLowercase,UprightFont={*PL},BoldFont={*PM}]
 }
 
 % Bookmark frame titles
-% \apptocmd{\beamer@@frametitle}{\bookmark[page=\the\c@page,level=3]{#1}}%
+% \apptocmd{\beamer@@frametitle}{\bookmark[page=\the\c@page,level=3]{##1}}%
 % {\message{** patching of \string\beamer@@frametitle succeeded **}}%
-% {\message{** patching of \string\beamer@@frametitle failed **}}%
+% {\message{** patching of \string\beamer@@frametitle failed **}}
 
 \newcommand\justified{\rightskip\z@skip\leftskip\z@skip}
 
@@ -123,13 +123,17 @@
 }
 
 %% division
-\NewDocumentCommand \Section {s m}
+\NewDocumentCommand \Section {s o m}
 {
-	\section{#2}
-	\IfBooleanT{#1}
+	\IfValueTF{#2}{
+		\section{#2}
+	}{
+		\section{#3}
+	}	
+	\IfBooleanF{#1}
 	{
 		\begin{frame}[standout]
-		#2
+		#3
 		\end{frame}
 	}	
 }
@@ -419,11 +423,11 @@
 
 \keys_define:nn { annotate }
 {
-	opening		.tl_set:N = \l_annotate_opening,
-	closing		.tl_set:N = \l_annotate_closing,
-	font		.tl_set:N = \l_annotate_font,
-	color		.tl_set:N = \l_annotate_color,
-	%%star		.tl_set:N = \l_annotate_star,
+	opening		.tl_set:N = \l_annotate_opening_tl,
+	closing		.tl_set:N = \l_annotate_closing_tl,
+	font		.tl_set:N = \l_annotate_font_tl,
+	color		.tl_set:N = \l_annotate_color_tl,
+	raise 		.tl_set:N = \l_annotate_raise_tl,
 }
 
 \NewDocumentCommand \AnnotateSetup { m }
@@ -432,22 +436,24 @@
 }
 
 \AnnotateSetup{
-	font=\footnotesize,
+	font=\scriptsize,
 	color=darkgray,
 	opening=(,
 	closing=),
+	raise=.75ex
 }
 
 
 \NewDocumentCommand \annotate { O{} m }
 {
 	\AnnotateSetup{#1}
-	\group_begin:		
-		\color{\l_annotate_color}
-		\l_annotate_font
-		\l_annotate_opening #2 \l_annotate_closing
-	\group_end:
+	\raisebox{\l_annotate_raise_tl}{
+		\color{\l_annotate_color_tl}
+		\l_annotate_font_tl
+		\l_annotate_opening_tl #2 \l_annotate_closing_tl
+	}
 }
+\cs_set_eq:NN \anota \annotate
 
 \tl_new:N \l_exam_style
 \tl_set:Nn \l_exam_style { \color{gray} }
