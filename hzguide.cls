@@ -47,7 +47,7 @@
 
 \LoadClassWithOptions{memoir}
 
-\RequirePackage{iftex}
+%\RequirePackage{iftex}
 \RequirePackage{expl3,xparse,l3keys2e}
 \RequirePackage{environ}
 \RequirePackage{fontspec}
@@ -89,7 +89,7 @@
     styleset    .tl_set:N = \g_style_set,
     doctype     .code:n = { \SetDocType {#1} },
     smallerfont .bool_set:N = \g_smallerfont_bool,
-    verbatim    .bool_set:N = \g_verbatim_bool,
+    minted    	.bool_set:N = \g_minted_bool,
     pairquote   .bool_set:N = \g_pairquote_bool,
     uprightmath .bool_set:N = \g_upright_math_bool,
     %bitmap      .bool_set:N = \g_bitmap_bool
@@ -192,7 +192,7 @@
 
 \keys_set:nn { HzGuide }
 {
-    verbatim = false,    
+    minted = false,    
     language = english,
     pairquote = true,
     %bitmap = false,
@@ -215,7 +215,7 @@
     \cs_set_eq:NN \tiny \miniscule %4pt
 }
 
-\bool_if:NT \g_verbatim_bool
+\bool_if:NT \g_minted_bool
 {
     \RequirePackage{minted}
 }
@@ -268,7 +268,7 @@
     \newcommand\prenum{제}
 }
 
-\ExplSyntaxOff
+%\ExplSyntaxOff
 
 % language settings -----------------------------------------------------------
 
@@ -489,13 +489,15 @@
 
 \IfLang{kor}
 {
-    \ifXeTeX
+    \sys_if_engine_xetex:TF
+	{
         \usepackage[hangul]{xetexko}
-    \else
-        \ifLuaTeX
+    }{	
+        \sys_if_engine_luatex:T
+		{
             \usepackage[hangul]{luatexko}
-        \fi
-    \fi
+        }
+    }
     %\xetexkofontregime{hangul}
     %\XeTeXcharclass"201C = \XKlatinopening
     %\XeTeXcharclass"201D = \XKlatinclosing
@@ -659,7 +661,7 @@
     }
 }
 
-\ExplSyntaxOn
+%\ExplSyntaxOn
 
 % class utilities to customize styles * * * * * * * * * * * * * * * * * * * * *
 
@@ -1020,21 +1022,23 @@
 % \foreign[Arial]{Philanthropy}
 % \foreign*{263A}
 
-\ifXeTeX
+\sys_if_engine_xetex:TF
+{
     \NewDocumentCommand \SetForeignFonts { m m }
     {
         \newfontfamily\foreignrmfamily{#1}[AutoFakeBold=1.5]
         \newfontfamily\foreignsffamily{#2}[AutoFakeBold=1.5]
     }
-\else
-    \ifLuaTeX
+}{
+    \sys_if_engine_luatex:T
+	{
         \NewDocumentCommand \SetForeignFonts { m m }
         {
             \newfontfamily\foreignrmfamily{#1}
             \newfontfamily\foreignsffamily{#2}
         }
-    \fi
-\fi
+    }
+}
 
 \SetForeignFonts{HCR Batang}{HCR Dotum}
 
@@ -4842,12 +4846,11 @@
 }
 \ExplSyntaxOff
 
-
-\def\tmpfile{tmpverb.tex}
+\def\tmpverbfile{tmpverb.tex}
 % Leave nothing after \end{} in the same line
 \def\verbsave{%
     \@bsphack
-    \immediate\openout \verbatim@out \tmpfile
+    \immediate\openout \verbatim@out \tmpverbfile
     \let\do\@makeother\dospecials
     \catcode`\^^M\active
     \def\verbatim@processline{%
@@ -4864,49 +4867,56 @@
     \texttt{#1}
 }
 
-\NewDocumentCommand \verbread {}
+\NewDocumentCommand \verbread { O{ \tmpverbfile } }
 {  
-    \begin{reference}
-        %\wrappingon
-        \verbatimindent=0pt
-        \verbatiminput{\tmpfile}
+	\begin{reference}
+		\bool_if:NTF \g_minted_bool
+		{
+			\inputminted{latex}{#1}
+		}{
+			%\wrappingon
+			\verbatimindent=0pt
+			\verbatiminput{#1}
+		}
     \end{reference}
 }
-\NewDocumentCommand \verbinput {}
+
+\NewDocumentCommand \verbinput { O{ \tmpverbfile } }
 {
+	
 	\begin{instance}
-		\input{\tmpfile}
+		\input{#1}
 	\end{instance}
 }
 
-\NewDocumentCommand \verbrender{ s }
+\NewDocumentCommand \verbrender{ s O{ \tmpverbfile } }
 {
     \IfBooleanTF {#1}
     {
-        \verb_render_below:
+        \verb_render_below:n { #2 }
     }{
-        \verb_render_side:
+        \verb_render_side:n { #2 }
     }    
 }
 
-\cs_new:Nn \verb_render_below:
+\cs_new:Npn \verb_render_below:n #1
 {
-    \verbread   
+    \verbread[#1]   
 	\ExplSyntaxOn
-    \verbinput	
+    \verbinput[#1]	
 	\ExplSyntaxOff 
 }
 
-\cs_new:Nn \verb_render_side:
+\cs_new:Npn \verb_render_side:n #1
 {    
     \begin{IfVartwoEnlarge}\noindent
-        \begin{minipage}{.55\linewidth}
-			\verbread
+		\begin{minipage}{.55\linewidth}
+			\verbread[#1]			
         \end{minipage}
         \hfill
         \begin{minipage}{.44\linewidth}
 			\ExplSyntaxOn			
-            \verbinput
+            \verbinput[#1]
 			\ExplSyntaxOff
         \end{minipage}
     \end{IfVartwoEnlarge}
@@ -4921,7 +4931,7 @@
 % \setmainfont{Linux Biolinum O}
 \setmainfont{TeX Gyre Pagella}
 \setsansfont{TeX Gyre Heros}
-\setmonofont{TeX Gyre Cursor}
+%\setmonofont{TeX Gyre Cursor}
 
 % sectional divisions
 \setsecnumdepth{section}
@@ -4956,7 +4966,7 @@
 \renewcommand{\figurerefname}{\figurename}
 
 \@ifpackageloaded{minted}{
-    \setminted{encoding=UTF8, fontsize=\small, tabsize=2, breaklines=true, linenos=false, frame=single}
+    \setminted{encoding=UTF8, fontsize=\footnotesize, tabsize=2, breaklines=true, linenos=false, frame=none}
     \patchcmd{\FV@ListVSpace}{\@topsepadd\topsep}{\vspace{.25\baselineskip}}{}{}
 }{}
 
