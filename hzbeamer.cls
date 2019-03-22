@@ -101,7 +101,7 @@
 \IfHangul{
 	\RequirePackage[hangul]{kotex}
 	\ifXeTeX
-		\xetexkofontregime[cjksymbols=hangul]{latin}		
+		\xetexkofontregime{hangul}[alphs=latin, nums=prevfont, parens=prevfont, quotes=prevfont, colons=prevfont, hyphens=prevfont, puncts=prevfont, cjksymbols=hangul]
 	\fi
 	\setmainhangulfont{KoPubBatang}[Ligatures=TeX,Scale=MatchUppercase,UprightFont={*PL},BoldFont={*PM}]
 	\setsanshangulfont{KoPubDotum}[Ligatures=TeX,Scale=MatchUppercase,UprightFont={*PM},BoldFont={*PB}]
@@ -308,17 +308,19 @@
 		\group_end:
 	}
 }[
-	\NewDocumentCommand \biblio {s m} {---\thinspace #2}
+	\NewDocumentCommand \biblio {s m} {\mbox{}\newline---\thinspace #2}
 ]
 
 %% frame title
 \setbeamertemplate{frametitle~continuation}[from~second]
 
-\IfHangul{		
-	\renewcommand\insertcontinuationtext{{\scriptsize(계속)}}		
-}[
-	\renewcommand\insertcontinuationtext{{\scriptsize(cont.)}}
-]
+\IfSlide{
+	\IfHangul{		
+		\renewcommand\insertcontinuationtext{{\scriptsize(계속)}}		
+	}[
+		\renewcommand\insertcontinuationtext{{\scriptsize(cont.)}}
+	]
+}
 
 %% blocks
 \newcommand\sepbelow{\parbox{0pt}{\rule{0pt}{4ex}}}
@@ -500,7 +502,14 @@
 {
 	\def\verbatim@font{#1}	
 }
+
+\NewDocumentCommand \email { m }
+{
+    \href{mailto:#1}{\nolinkurl{#1}}
+}
+
 \ExplSyntaxOff
+
 \setverbatimfont{\ttfamily\footnotesize}
 
 \setbeamercolor{alerted text}{fg=Brown}
@@ -509,4 +518,3 @@
 	\justified
 	\linespread{1.2}
 }
-\endinput

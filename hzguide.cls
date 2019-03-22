@@ -1195,8 +1195,9 @@
         {A4}          { \layout_paper_aiv: }
         {B5}          { \layout_paper_bv: }
         {A5}          { \layout_paper_av: }
+        {A5V}          { \layout_paper_avv: } % 신국판
         {letter}      { \layout_paper_letter: }
-        {46}          { \layout_paper_ivvi: }
+        {46D}          { \layout_paper_ivvid: } % 사륙배판 = JIS B5
         {slide}       { \layout_paper_slide: }
         {smartphone}  { \layout_paper_smartphone: }
         {arbitrary}   { \layout_paper_arbitrary: }
@@ -1263,16 +1264,28 @@
     \dim_gset:Nn \vartwomargin {20mm}
 }
 
-% 46
-\cs_new:Nn \layout_paper_ivvi:
+% 46D
+\cs_new:Nn \layout_paper_ivvid:
 {
     \dim_gset:Nn \stockwidth {210mm}
     \dim_gset:Nn \stockheight {297mm}
     \dim_gset:Nn \paperwidth {182mm}
     \dim_gset:Nn \paperheight {257mm}
-    \dim_gset:Nn \ulmargin {28mm}
-    \dim_gset:Nn \lrmargin {30mm}
-    \dim_gset:Nn \vartwomargin {15mm}
+	\dim_gset:Nn \ulmargin {28.5mm} % textheight: 257 - 57 = 200 mm
+    \dim_gset:Nn \lrmargin {26mm} % textwidth: 130 mm (= 182 - 52)
+    \dim_gset:Nn \vartwomargin {14mm}
+}
+
+% A5V
+\cs_new:Nn \layout_paper_avv:
+{
+    \dim_gset:Nn \stockwidth {176mm}
+    \dim_gset:Nn \stockheight {250mm}
+    \dim_gset:Nn \paperwidth {152mm}
+    \dim_gset:Nn \paperheight {225mm}
+    \dim_gset:Nn \ulmargin {20mm} % textheight: 225 - 40 = 185 mm
+    \dim_gset:Nn \lrmargin {21mm} % textwidth: 110 mm (= 152 - 52)
+    \dim_gset:Nn \vartwomargin {10mm}
 }
 
 \cs_new:Nn \layout_paper_slide:
@@ -1596,7 +1609,7 @@
         \dim_set:Nn \trimedge {\stockwidth-\paperwidth}
         \settrims{.5\trimtop}{.5\trimedge}
         \renewcommand*{\shipout}{\afterassignment\mem@shipi\setbox\@cclv=}
-        \trimLmarks
+		\quarkmarks %\trimLmarks
     }{
         \showtrimsoff
         \setstocksize{\paperheight}{\paperwidth}
@@ -2016,7 +2029,7 @@
     \IfValueT {#2} { \setSpacing{#2} }
     \IfBooleanTF {#1} 
     { 
-        \pdfbookmark[1]{\contentsname}{Contents}
+        \pdfbookmark[0]{\contentsname}{Contents}
         \tableofcontents*
     }{ 
         \tableofcontents 
@@ -2413,7 +2426,7 @@
     {
         \IfValueTF{#5} 
 		{
-            \tl_set:Nn \l_image_label_tl {#4~#5}
+            \tl_set:Nn \l_image_label_tl {#4-#5}
         }{
             \tl_set:Nn \l_image_label_tl {#4}
         }
@@ -4494,26 +4507,27 @@
 \NewDocumentCommand \annotate { s t| O{} m }
 {
 	\group_begin:
-    \IfBooleanT {#1}
-    { 
-        \exp_args:No \AnnotateSetup{\l_annotate_star}
-    }
-    \IfBooleanT {#2}
-    { 
-        \AnnotateSetup{breakable=false} 
-    }
-    \AnnotateSetup{#3}
-    \l_annotate_space
-    \bool_if:NTF \l_annotate_breakable_bool
-    {
-        \exp_args:Nx \annotate_scope:n {\l_annotate_opening #4 \l_annotate_closing}
-    }{
-        \annotate_unbreakable:n {\l_annotate_opening #4 \l_annotate_closing}
-    }
-	\bool_if:NT \l_annotate_indexing_bool
-	{
-		\index{#4}
-	}
+		\AnnotateSetup{#3}
+		\IfBooleanT {#1}
+		{ 
+			\exp_args:No \AnnotateSetup{\l_annotate_star}
+		}
+		\IfBooleanT {#2}
+		{ 
+			\AnnotateSetup{breakable=false} 
+		}
+		\l_annotate_space
+		\bool_if:NTF \l_annotate_breakable_bool
+		{
+			\exp_args:Nx \annotate_scope:n {\l_annotate_opening #4 \l_annotate_closing}
+		}{
+			\annotate_unbreakable:n {\l_annotate_opening #4 \l_annotate_closing}
+		}
+		\bool_if:NT \l_annotate_indexing_bool
+		{
+			\index{#4}
+		}
+		\l_annotate_space
 	\group_end:
 }
 
@@ -4812,7 +4826,7 @@
     }
 
     \cs_set_eq:NN \orgaddcontentsline \addcontentsline
-    \RenewDocumentCommand \addcontentsline {mmm}
+    \RenewDocumentCommand \addcontentsline { m m m }
     {
         \orgaddcontentsline{##1}{##2}{##3}
         \str_if_eq:nnT {##1}{toc}
@@ -4846,7 +4860,7 @@
 }
 \ExplSyntaxOff
 
-\def\tmpverbfile{tmpverb.tex}
+\def\tmpverbfile{tmp.vrb}
 % Leave nothing after \end{} in the same line
 \def\verbsave{%
     \@bsphack
@@ -4926,8 +4940,8 @@
 % default setup * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 % font
-% \setmainfont{NotoSerif}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Regular}, BoldFont={*-Bold}]
-% \setsansfont{NotoSans}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Regular}, BoldFont={*-Bold}]
+% \setmainfont{NotoSerif}[Ligatures=TeX, UprightFont={*-Regular}, BoldFont={*-Bold}]
+% \setsansfont{NotoSans}[Ligatures=TeX, UprightFont={*-Regular}, BoldFont={*-Bold}]
 % \setmainfont{Linux Biolinum O}
 \setmainfont{TeX Gyre Pagella}
 \setsansfont{TeX Gyre Heros}
@@ -4947,7 +4961,6 @@
 % TOC
 %\setlength{\cftchapternumwidth}{4.0em}
 %\setlength\cftsectionnumwidth{2.5em}
-%\setlength\cftsubsectionindent{0em}
 %\setlength\cftsubsectionnumwidth{3.5em}
 
 % justification & alignment
