@@ -497,23 +497,9 @@
 		{
             \usepackage[hangul]{luatexko}
         }
-    }
-    %\xetexkofontregime{hangul}
-    %\XeTeXcharclass"201C = \XKlatinopening
-    %\XeTeXcharclass"201D = \XKlatinclosing
-    % Use truetype fonts to use PDF2htmlEX
-		% ttf
-		% Some symbolic letters such as em-dash are missing
-		% \setmainhangulfont{KoPubBatang}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*Light}, BoldFont={*Bold}]
-		% \setsanshangulfont{KoPubDotum}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*Medium}, BoldFont={*Bold}]
-		% otf
-		\setmainhangulfont{KoPubBatang}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PL}, BoldFont={*PB}]
-		\setsanshangulfont{KoPubDotum}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*PM}, BoldFont={*PB}]
-        % \setmainhangulfont{NanumMyeongjo}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*}, BoldFont={*Bold}]
-        % \setsanshangulfont{NanumGothic}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*}, BoldFont={*Bold}]
-		% \setmainhangulfont{NotoSerifCJKkr}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Regular}, BoldFont={*-Bold}]
-    	% \setsanshangulfont{NotoSansCJKkr}[Ligatures=TeX, Scale=MatchUppercase, UprightFont={*-Regular}, BoldFont={*-Bold}]	
-	
+	}
+	\setmainhangulfont{Noto~Serif~CJK~KR}[Scale=MatchUppercase]
+	\setsanshangulfont{Noto~Sans~CJK~KR}[Scale=MatchUppercase]
     \AtBeginDocument{
         \renewcommand*{\contentsname}{차례}
         \AdmonitionSetup {
@@ -4940,8 +4926,6 @@
 % default setup * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 % font
-% \setmainfont{NotoSerif}[Ligatures=TeX, UprightFont={*-Regular}, BoldFont={*-Bold}]
-% \setsansfont{NotoSans}[Ligatures=TeX, UprightFont={*-Regular}, BoldFont={*-Bold}]
 % \setmainfont{Linux Biolinum O}
 \setmainfont{TeX Gyre Pagella}
 \setsansfont{TeX Gyre Heros}
@@ -4966,7 +4950,7 @@
 % justification & alignment
 % Use \RaggedRight instead of \raggedright when using bidi
 % \sloppy
-\raggedbottom
+\raggedbottom % \flushbottom
 
 % colors
 \definecolor{backgray}{gray}{0.9}
@@ -5150,3 +5134,9 @@
 \newhangulfontfamily\pilgi{Pilgi}[ItalicFont=*]
 \edef\slshape{\unexpanded\expandafter{\slshape\gungseo}}
 \edef\itshape{\unexpanded\expandafter{\itshape\pilgi}}
+
+%\XeTeXcharclass"201C = \XKlatinopening
+%\XeTeXcharclass"201D = \XKlatinclosing
+% \setmainfont{NotoSerifCJKkr}[Scale=MatchUppercase, UprightFont={*-Light}, BoldFont={*-Medium}, ItalicFont=NotoSerif-LightItalic]
+% \setsansfont{NotoSansCJKkr}[Scale=MatchUppercase, UprightFont={*-Light}, BoldFont={*-Medium}]
+% \disablekoreanfonts
