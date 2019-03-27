@@ -498,6 +498,11 @@
             \usepackage[hangul]{luatexko}
         }
 	}
+	%\XeTeXcharclass"201C = \XKlatinopening
+	%\XeTeXcharclass"201D = \XKlatinclosing
+	% \setmainfont{NotoSerifCJKkr}[Scale=MatchUppercase, UprightFont={*-Light}, BoldFont={*-Medium}, ItalicFont=NotoSerif-LightItalic]
+	% \setsansfont{NotoSansCJKkr}[Scale=MatchUppercase, UprightFont={*-Light}, BoldFont={*-Medium}]
+	% \disablekoreanfonts
 	\setmainhangulfont{Noto~Serif~CJK~KR}[Scale=MatchUppercase]
 	\setsanshangulfont{Noto~Sans~CJK~KR}[Scale=MatchUppercase]
     \AtBeginDocument{
@@ -5134,9 +5139,3 @@
 \newhangulfontfamily\pilgi{Pilgi}[ItalicFont=*]
 \edef\slshape{\unexpanded\expandafter{\slshape\gungseo}}
 \edef\itshape{\unexpanded\expandafter{\itshape\pilgi}}
-
-%\XeTeXcharclass"201C = \XKlatinopening
-%\XeTeXcharclass"201D = \XKlatinclosing
-% \setmainfont{NotoSerifCJKkr}[Scale=MatchUppercase, UprightFont={*-Light}, BoldFont={*-Medium}, ItalicFont=NotoSerif-LightItalic]
-% \setsansfont{NotoSansCJKkr}[Scale=MatchUppercase, UprightFont={*-Light}, BoldFont={*-Medium}]
-% \disablekoreanfonts
