@@ -266,6 +266,9 @@
 {
     \bool_gset_true:N \g_CJK_bool
     \newcommand\prenum{제}
+	\renewcommand*{\printpartname}{\partnamefont\prenum}
+	\renewcommand*{\partnamenum}{\space}
+	\renewcommand*{\printpartnum}{\partnumfont\thepart\space\partnamefont\partname}
 }
 
 %\ExplSyntaxOff
@@ -489,22 +492,22 @@
 
 \IfLang{kor}
 {
+	%\XeTeXcharclass"201C = \XKlatinopening
+	%\XeTeXcharclass"201D = \XKlatinclosing	
     \sys_if_engine_xetex:TF
 	{
         \usepackage[hangul]{xetexko}
+		% \setmainfont{NotoSerifCJKkr}[Scale=MatchUppercase, UprightFont={*-Light}, BoldFont={*-Medium}, ItalicFont=NotoSerif-LightItalic]
+		% \setsansfont{NotoSansCJKkr}[Scale=MatchUppercase, UprightFont={*-Light}, BoldFont={*-Medium}]
+		% \disablekoreanfonts	
+		\setmainhangulfont{Noto~Serif~CJK~KR}[Scale=MatchUppercase]
+		\setsanshangulfont{Noto~Sans~CJK~KR}[Scale=MatchUppercase]
     }{	
         \sys_if_engine_luatex:T
 		{
             \usepackage[hangul]{luatexko}
         }
 	}
-	%\XeTeXcharclass"201C = \XKlatinopening
-	%\XeTeXcharclass"201D = \XKlatinclosing
-	% \setmainfont{NotoSerifCJKkr}[Scale=MatchUppercase, UprightFont={*-Light}, BoldFont={*-Medium}, ItalicFont=NotoSerif-LightItalic]
-	% \setsansfont{NotoSansCJKkr}[Scale=MatchUppercase, UprightFont={*-Light}, BoldFont={*-Medium}]
-	% \disablekoreanfonts
-	\setmainhangulfont{Noto~Serif~CJK~KR}[Scale=MatchUppercase]
-	\setsanshangulfont{Noto~Sans~CJK~KR}[Scale=MatchUppercase]
     \AtBeginDocument{
         \renewcommand*{\contentsname}{차례}
         \AdmonitionSetup {
@@ -678,46 +681,28 @@
     \dim_set:Nn #1 { \box_ht:N \l_tmpc_box + \box_dp:N \l_tmpc_box }
 }
 
-% \clist_new:N \g_tex_files_clist
-% \NewDocumentCommand \InputOnly { m }
+% a style -----------------------------------------------------------------
+% \keys_define:nn { adhoc }
 % {
-% 	\clist_gput_right:Nn \g_tex_files_clist {#1}
-% }
-% \NewDocumentCommand \Input { m }
-% {
-% 	\clist_if_empty:NTF \g_tex_files_clist
-% 	{
-% 		\input{#1}
-% 	}{
-% 		\clist_if_in:NnT \g_tex_files_clist {#1} 
-% 		{
-% 			\input{#1}
-% 		}
-% 	}
+%     layout      .bool_set:N = \g_adhoc_layout_bool,
+%     heading      .bool_set:N = \g_adhoc_heading_bool,
 % }
 
-% adhoc style -----------------------------------------------------------------
-\keys_define:nn { adhoc }
-{
-    layout      .bool_set:N = \g_adhoc_layout_bool,
-    heading      .bool_set:N = \g_adhoc_heading_bool,
-}
+% \NewDocumentCommand \AdhocSetup { m }
+% {
+%     \keys_set:nn { adhoc }{ #1 }
+% }
 
-\NewDocumentCommand \AdhocSetup { m }
-{
-    \keys_set:nn { adhoc }{ #1 }
-}
+% \AdhocSetup{layout=false, heading=false}
 
-\AdhocSetup{layout=false, heading=false}
-
-\NewDocumentCommand \IfNoAdhoc { m m }
-{
-    \str_case:nn { #1 }
-    {
-        { layout }  { \bool_if:NF \g_adhoc_layout_bool {#2} }
-        { heading } { \bool_if:NF \g_adhoc_heading_bool {#2} }
-    }
-}
+% \NewDocumentCommand \IfNoAdhoc { m m }
+% {
+%     \str_case:nn { #1 }
+%     {
+%         { layout }  { \bool_if:NF \g_adhoc_layout_bool {#2} }
+%         { heading } { \bool_if:NF \g_adhoc_heading_bool {#2} }
+%     }
+% }
 
 % covers ----------------------------------------------------------------------
 \keys_define:nn { cover }
@@ -1033,16 +1018,10 @@
 
 \SetForeignFonts{HCR Batang}{HCR Dotum}
 
-\tl_new:N \WithHangul
-\IfLang{kor}
-{ 
-    \tl_set:Nn \WithHangul { \disablekoreanfonts }
-}
-
 \NewDocumentCommand \foreign {s o m}
 {
     \group_begin:
-        \WithHangul
+        \disablekoreanfonts
         \ifx\f@family\rmdefault
             \IfNoValueTF { #2 }{ \foreignrmfamily }{ \fontspec{#2} }
         \else
@@ -1965,8 +1944,8 @@
     subsectionsize        .tl_set:N = \subsecfontsize,
     subsubsectionsize     .tl_set:N = \subsubsecfontsize,
     paragraphstyle        .code:n = { \style_paragraph_configure:n {#1} },
-    parskip               .skip_set: N = \hzparskip,
-    parindent             .skip_set: N = \hzparindent,
+    parskip               .skip_set:N = \hzparskip,
+    parindent             .skip_set:N = \hzparindent
 }
 
 \NewDocumentCommand \HeadingSetup { m }
@@ -2042,6 +2021,8 @@
 }
 
 % chapter styles
+% \CJKchapterstyle: chapter name
+% \CJKchapterstyle*: chapter number
 \NewDocumentCommand \CJKchapterstyle { s }
 {
     \IfBooleanTF {#1}
@@ -2055,7 +2036,7 @@
     }{
         \bool_if:NTF \g_CJK_bool
         {
-            \ifanappendix \chapnamefont\@chapapp \else \chapnamefont\prenum\space\chapnumfont\thechapter \fi
+            \ifanappendix \chapnamefont\@chapapp\enspace \else \chapnamefont\prenum\space\chapnumfont\thechapter \fi
         }{
             \chapnamefont\@chapapp
         }
@@ -2090,6 +2071,8 @@
     \renewcommand{\chapnamefont}{\huge\chapterline\chapternamesize}
     \renewcommand{\chapnumfont}{\HUGE\chapterline\chapternumbersize}
     \renewcommand{\chaptitlefont}{\Huge\chapterline\chaptertitlesize}
+	\renewcommand{\printchaptername}{\CJKchapterstyle}
+    \renewcommand{\printchapternum}{\CJKchapterstyle*}
 }
 
 \makechapterstyle{hzarticlefirm}{
@@ -2170,7 +2153,7 @@
 
 % objects ---------------------------------------------------------------------
 
-\newtcbox{\objectframe}{%[1][]{
+\newtcbox{\objectframe}{
     colframe=\g_object_frame_color,
     colback=white,
     boxrule=0.5pt,
@@ -2825,14 +2808,14 @@
 % as environment for enumerate
 \NewEnviron{IllustratedEnumerateStart}[1]{
     \illustimage{#1}{
-        \begin{enumerate}[series=IlluEnum]
+        \begin{enumerate}[series=IlluEnum, leftmargin=1.5em]
         \BODY
         \end{enumerate}
     }
 }
 \NewEnviron{IllustratedEnumerateContinue}[1]{
     \illustimage{#1}{
-        \begin{enumerate}[series=IlluEnum, resume=IlluEnum]
+        \begin{enumerate}[series=IlluEnum, resume=IlluEnum, leftmargin=1.5em]
         \BODY
         \end{enumerate}
     }
@@ -3674,13 +3657,13 @@
 
 \NewTerms{terms}
 {
-    index = false
+    %index = false
 }
 \NewTerms{UI}
 {
     font = \sffamily\bfseries,
     color = darkgray,
-    index = false  
+    %index = false  
 }
 \NewTerms{Symbols}
 {
@@ -3990,15 +3973,17 @@
 
 \keys_define:nn { BoundedBox }
 {
-    before-skip .skip_set:N = \l_bbox_before_skip,
-    after-skip  .skip_set:N = \l_bbox_after_skip,
-    type        .tl_set:N = \l_bbox_type_tl,
-    symbol      .tl_set:N = \l_bbox_symbol_tl,
-    signal      .tl_set:N = \l_bbox_signal_tl,
-    style       .tl_set:N = \l_bbox_style_extra_tl,
-    font        .tl_set:N = \l_bbox_font_tl,
-    font-color  .tl_set:N = \l_bbox_font_color_tl,
-    wrapping    .bool_set:N = \l_bbox_wrapping_bool	
+    before-skip 	.skip_set:N = \l_bbox_before_skip,
+    after-skip  	.skip_set:N = \l_bbox_after_skip,
+    type        	.tl_set:N = \l_bbox_type_tl,
+    symbol      	.tl_set:N = \l_bbox_symbol_tl,
+    signal      	.tl_set:N = \l_bbox_signal_tl,
+    before-signal	.tl_set:N = \l_bbox_before_signal_tl,
+    after-signal	.tl_set:N = \l_bbox_after_signal_tl,
+    style       	.tl_set:N = \l_bbox_style_extra_tl,
+    font        	.tl_set:N = \l_bbox_font_tl,
+    font-color  	.tl_set:N = \l_bbox_font_color_tl,
+    wrapping    	.bool_set:N = \l_bbox_wrapping_bool	
 }
 
 \NewDocumentCommand \BoundedBoxInitialize { m }
@@ -4069,21 +4054,25 @@
         \RenewDocumentEnvironment
     }{
         \NewDocumentEnvironment
-    }{ #2 }{ s O{} }
+    }{ #2 }{ s O{} d<> }
     {
         \keys_set:nn { BoundedBox }{ #3 }
         \exp_args:Nno \keys_set:nn { BoundedBox}{ \g_bounded_box_options_tl }
         \group_begin:
             \keys_set:nn { BoundedBox }{ ##2 } 
+			\IfValueT { ##3 }
+			{
+				\tl_set:Nn \l_bbox_signal_tl { ##3 }
+			}
             \bbox_type_set:n { \l_bbox_type_tl }
-            \IfBooleanF{##1}{ 
+            \IfBooleanF{ ##1 }{ 
                 \object_skip_before:n { \l_bbox_before_skip }
             }
             \tl_if_empty:NTF \l_bbox_signal_tl    
             {
                 \begin{BBox}				
             }{
-                \begin{BBox}[\l_bbox_symbol_tl\l_bbox_signal_tl]
+                \begin{BBox}[\l_bbox_symbol_tl\l_bbox_before_signal_tl\l_bbox_signal_tl\l_bbox_after_signal_tl]
             }
                 \bool_if:NT \l_bbox_wrapping_bool { \wrappingon }
                 \l_bbox_style_tl
@@ -4486,13 +4475,13 @@
 \AnnotateSetup{
     breakable=true,
     superscript=true,
-    font=\footnotesize,
+    font=\scriptsize,
     color=darkgray,
     space=\thinspace,
-    opening=(,
-    closing=),
+    opening={},
+    closing={},
     raise=0.75ex,
-    star={superscript=false, font=\scriptsize, raise=0.25ex}
+	star={indexing=true},
 }
 
 \NewDocumentCommand \annotate { s t| O{} m }
