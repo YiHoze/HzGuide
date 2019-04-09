@@ -267,8 +267,8 @@
     \bool_gset_true:N \g_CJK_bool
     \newcommand\prenum{제}
 	\renewcommand*{\printpartname}{\partnamefont\prenum}
-	\renewcommand*{\partnamenum}{\space}
 	\renewcommand*{\printpartnum}{\partnumfont\thepart\space\partnamefont\partname}
+	\renewcommand*{\partnamenum}{\space}
 }
 
 %\ExplSyntaxOff
@@ -997,26 +997,21 @@
 
 % \foreign[Arial]{Philanthropy}
 % \foreign*{263A}
-
-\sys_if_engine_xetex:TF
+ \NewDocumentCommand \SetForeignFonts { s m m }
 {
-    \NewDocumentCommand \SetForeignFonts { m m }
-    {
-        \newfontfamily\foreignrmfamily{#1}[AutoFakeBold=1.5]
-        \newfontfamily\foreignsffamily{#2}[AutoFakeBold=1.5]
-    }
-}{
-    \sys_if_engine_luatex:T
+	\let\foreignrmfamily\relax
+	\let\foreignsffamily\relax
+	\IfBooleanTF{ #1 }
 	{
-        \NewDocumentCommand \SetForeignFonts { m m }
-        {
-            \newfontfamily\foreignrmfamily{#1}
-            \newfontfamily\foreignsffamily{#2}
-        }
-    }
+		\newfontfamily\foreignrmfamily{#2}
+		\newfontfamily\foreignsffamily{#3}
+	}{
+		\newfontfamily\foreignrmfamily{#2}[AutoFakeBold=1.5]
+		\newfontfamily\foreignsffamily{#3}[AutoFakeBold=1.5]
+	}
 }
-
 \SetForeignFonts{HCR Batang}{HCR Dotum}
+%\SetForeignFonts{Noto Serif}{Noto Sans}
 
 \NewDocumentCommand \foreign {s o m}
 {
@@ -2029,14 +2024,22 @@
     {
         \bool_if:NTF \g_CJK_bool
         {
-            \ifanappendix \chapnumfont\thechapter \else \chapnamefont\@chapapp \fi
+            \ifanappendix 
+				\chapnumfont\thechapter 
+			\else 
+				\chapnumfont\thechapter\space\chapnamefont\@chapapp 
+			\fi
         }{
-            \enspace\chapnumfont\thechapter
+            \chapnumfont\thechapter
         }
     }{
         \bool_if:NTF \g_CJK_bool
         {
-            \ifanappendix \chapnamefont\@chapapp\enspace \else \chapnamefont\prenum\space\chapnumfont\thechapter \fi
+            \ifanappendix 
+				\chapnamefont\@chapapp
+			\else 
+				\chapnamefont\prenum
+			\fi
         }{
             \chapnamefont\@chapapp
         }
@@ -2052,7 +2055,6 @@
 \makechapterstyle{hzchapter}{
     \chapterstyle{null}
     \setlength{\midchapskip}{6ex}
-    %\renewcommand{\printchapternum}{\enspace\chapnumfont\thechapter}
     \renewcommand{\printchaptername}{\CJKchapterstyle}
     \renewcommand{\printchapternum}{\CJKchapterstyle*}
 }
@@ -2070,22 +2072,20 @@
     \chapterstyle{article}
     \renewcommand{\chapnamefont}{\huge\chapterline\chapternamesize}
     \renewcommand{\chapnumfont}{\HUGE\chapterline\chapternumbersize}
-    \renewcommand{\chaptitlefont}{\Huge\chapterline\chaptertitlesize}
-	\renewcommand{\printchaptername}{\CJKchapterstyle}
-    \renewcommand{\printchapternum}{\CJKchapterstyle*}
+    \renewcommand{\chaptitlefont}{\Huge\chapterline\chaptertitlesize}	
 }
 
-\makechapterstyle{hzarticlefirm}{
-    \chapterstyle{null}
-    \setlength{\beforechapskip}{\baselineskip}
-    \setlength{\midchapskip}{0pt}
-    \setlength{\afterchapskip}{\baselineskip}
-    \renewcommand{\chapterheadstart}{\vspace*{\beforechapskip}}
-    \renewcommand{\printchaptername}{}
-    \renewcommand{\chapternamenum}{}
-    \renewcommand{\printchapternum}{\chapnumfont\thechapter\quad}
-    \renewcommand{\afterchapternum}{}
-}
+% \makechapterstyle{hzarticlefirm}{
+%     \chapterstyle{null}
+%     \setlength{\beforechapskip}{\baselineskip}
+%     \setlength{\midchapskip}{0pt}
+%     \setlength{\afterchapskip}{\baselineskip}
+%     \renewcommand{\chapterheadstart}{\vspace*{\beforechapskip}}
+%     \renewcommand{\printchaptername}{}
+%     \renewcommand{\chapternamenum}{}
+%     \renewcommand{\printchapternum}{\chapnumfont\thechapter\quad}
+%     \renewcommand{\afterchapternum}{}
+% }
 
 % heading utilities -----------------------------------------------
 
@@ -2256,7 +2256,12 @@
 
 \NewDocumentCommand \DecolorHyperlinks { O {darkgray} O {\bfseries} }
 {
-    \hypersetup{colorlinks=false,pdfborder={0 0 0}}  % plainpages=false   
+    \hypersetup{
+		%colorlinks=false,
+		allcolors=#1,
+		pdfborder={0 0 0}, 
+		plainpages=false,
+	}
     \renewcommand{\theTitleReference}[2]{\textcolor{#1}{#2 ##2}}
 }
 
@@ -3330,7 +3335,8 @@
     font        .tl_set:N = \l_term_font_tl,
     star        .tl_set:N = \l_term_star_tl,
     vbar        .tl_set:N = \l_term_vbar_tl,
-    index       .bool_set:N = \l_term_index_bool
+    index       .bool_set:N = \l_term_index_bool,
+	link		.bool_set:N = \l_term_link_bool % link to glossary
 }
 \NewDocumentCommand \TermInitialize { m }
 {
@@ -3376,8 +3382,13 @@
                 	\index{##4}
 				}
             }
-        }        
-            \textcolor{ \l_term_color_tl }{ \l_term_font_tl ##4 }
+        }
+		\bool_if:NTF \l_term_link_bool
+		{
+        	\textcolor{ \l_term_color_tl }{ \l_term_font_tl \hyperlink{##4}{##4} }
+		}{
+        	\textcolor{ \l_term_color_tl }{ \l_term_font_tl ##4 }
+		}
     }    
 }
 \NewDocumentCommand \RenewTerm { m m }
@@ -3443,12 +3454,12 @@
     \enit@endenumerate
 }
 
-\RenewDocumentEnvironment {itemize} { s O{} }
+\RenewDocumentEnvironment {itemize} { s t| O{} }
 {  
-    \IfBooleanTF {#1} { 
-        \enit@itemize\enitdp@itemize{item}\thr@@{noitemsep, #2}
+    \IfBooleanTF {#1} { 		
+        \enit@itemize\enitdp@itemize{item}\thr@@{noitemsep, #3}
     }{
-        \enit@itemize\enitdp@itemize{item}\thr@@{#2}
+        \enit@itemize\enitdp@itemize{item}\thr@@{#3}
     }
     \g_hzlist_itemize_style
 }{
@@ -3503,6 +3514,7 @@
     label-width .dim_set:N = \l_terms_label_width_dim,
     label-sep   .skip_set:N = \l_terms_label_sep_skip,
     index       .bool_set:N = \l_terms_index_bool,
+	anchor		.bool_set:N = \l_terms_anchor_bool, % for glossary
     top-sep     .skip_set:N = \l_terms_top_sep_skip,
     item-sep    .skip_set:N  = \l_terms_item_sep_skip,
     before-list .tl_set:N = \l_terms_before_list_tl,
@@ -3533,7 +3545,15 @@
 {
     \tl_set:Nn \g_terms_options_tl { #1 }
 }
-
+\cs_new:Npn \terms_label_anchor:n #1
+{
+	\bool_if:NTF \l_terms_anchor_bool
+	{
+		\hypertarget{#1}{#1}
+	}{
+		#1
+	}
+}
 \cs_new:Npn \terms_label_default:n #1
 {
     \int_gincr:N \l_terms_int
@@ -3541,7 +3561,8 @@
     \group_begin:
         \color{\l_terms_color_tl}
         \l_terms_marker
-        \l_terms_font_tl #1
+        \l_terms_font_tl 
+		\terms_label_anchor:n { #1 }
     \group_end:
     \l_terms_delimiter_tl
 }
@@ -3553,7 +3574,8 @@
         \makebox[0pt][l]{
             \color{\l_terms_color_tl}
             \l_terms_marker
-            \l_terms_font_tl #1
+            \l_terms_font_tl 
+			\terms_label_anchor:n { #1 }
             \l_terms_delimiter_tl
         }
         \newline
@@ -3568,7 +3590,8 @@
         \parbox[t]{\labelwidth}{
             \raggedright
             \color{\l_terms_color_tl}
-            \l_terms_font_tl #1
+            \l_terms_font_tl 
+			\terms_label_anchor:n { #1 }
         }
     }
     \hbox_set:Nn \l_tmpb_box {\l_terms_font_tl A}
@@ -4334,7 +4357,7 @@
     style = \section*{\ProblemListName}
 }
 
-% miscellaneous utilities * * * * * * * * * * * * * * * * * * * * * * * * * * *
+% miscellaneous utilities * * * * * * * * * * * * * * * * * * * * * * * * *
 
 \keys_define:nn { finalizer }
 {	
@@ -4372,7 +4395,6 @@
     \end{enumerate}
 }
 
-
 \NewDocumentCommand \EnlargePage { O{\baselineskip} }
 {
     \enlargethispage{#1}
@@ -4386,6 +4408,20 @@
          \node [xshift=-\spinemargin+\l_tmpa_dim, yshift=\lowermargin-\l_tmpa_dim] at (current~page.south~east) (BottomRight) {};
          \draw (TopLeft.center) rectangle (BottomRight.center);
      \end{tikzpicture}
+}
+
+\NewDocumentCommand \MakeQuaterPages {} % 4배수 페이지
+{	
+	\clearpage
+	\pagestyle{empty}
+	\mbox{}
+	\int_set:Nn \l_tmpa_int { \int_mod:nn { \thepage }{ 4 } }
+	\int_set:Nn \l_tmpb_int { 4 - \l_tmpa_int }
+	\int_step_inline:nn { \l_tmpb_int }
+	{
+		\clearpage
+		\mbox{}
+	}
 }
 
 \NewDocumentCommand \email { m }
@@ -4410,9 +4446,9 @@
 
 \keys_define:nn { wraprule }
 {
-    gap      .tl_set:N = \l_wraprule_gap,
-    thickness  .tl_set:N = \l_wraprule_thickness,
-    raise    .dim_set:N = \l_wraprule_raise
+    gap      	.tl_set:N = \l_wraprule_gap,
+    thickness	.tl_set:N = \l_wraprule_thickness,
+    raise		.dim_set:N = \l_wraprule_raise
 }
 
 \NewDocumentCommand \WrapruleSetup { m }
@@ -4539,12 +4575,12 @@
     \group_begin:
         \l_annotate_font
         \color{\l_annotate_color}
-        \bool_if:NTF \l_annotate_superscript_bool
-        { 
-            \raisebox{\l_annotate_raise}{#1} 
-        }{ 
-            \raisebox{-\l_annotate_raise}{#1} 
-        }
+		\bool_if:NTF \l_annotate_superscript_bool
+		{ 
+			\raisebox{\l_annotate_raise}{#1} 
+		}{ 
+			\raisebox{-\l_annotate_raise}{#1} 
+		}		
     \group_end:
 }
 
@@ -4557,34 +4593,10 @@
         \textsubscript{\textcolor{\l_annotate_color}{\l_annotate_font #1}}
     }
 }
-
 \cs_set_eq:NN \anota \annotate
 
-% \flushrightlist{..., ..., ...}[\font]
-% \NewDocumentCommand \flushrightlist { m O{} }
-% {
-%     \tl_if_empty:nF {#1}
-%     {
-%         \dim_zero:N \l_tmpa_dim
-%         \dim_zero:N \l_tmpb_dim
-%         \tl_clear:N \l_tmpa_tl
-%         \exp_args:No \clist_map_inline:nn {#1}
-%         {
-%             \tl_put_right:Nn \l_tmpa_tl {##1\newline}
-%             \dim_set_towidth:Nn \l_tmpb_dim {#2 ##1}
-%             \dim_compare:nT { \l_tmpa_dim < \l_tmpb_dim }
-%             {
-%                 \dim_set_eq:NN \l_tmpa_dim \l_tmpb_dim
-%             }
-%         }
-%         \hfill
-%         \begin{minipage}{\l_tmpa_dim}
-%             #2 \l_tmpa_tl
-%         \end{minipage}
-%     }
-% }
+% templates for document elements  * * * * * * * * * * * * * * * * * * * * *
 
-% templates for document elements
 \seq_new:N \g_template_text_seq
 \cs_new:Npn \template_add_text:n #1
 {
