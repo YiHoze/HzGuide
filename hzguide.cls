@@ -496,12 +496,9 @@
 	%\XeTeXcharclass"201D = \XKlatinclosing	
     \sys_if_engine_xetex:TF
 	{
-        \usepackage[hangul]{xetexko}
-		% \setmainfont{NotoSerifCJKkr}[Scale=MatchUppercase, UprightFont={*-Light}, BoldFont={*-Medium}, ItalicFont=NotoSerif-LightItalic]
-		% \setsansfont{NotoSansCJKkr}[Scale=MatchUppercase, UprightFont={*-Light}, BoldFont={*-Medium}]
-		% \disablekoreanfonts	
-		\setmainhangulfont{Noto~Serif~CJK~KR}[Scale=MatchUppercase]
-		\setsanshangulfont{Noto~Sans~CJK~KR}[Scale=MatchUppercase]
+        \usepackage[hangul]{xetexko}		
+		% \setmainhangulfont{Noto~Serif~CJK~KR}[Scale=MatchUppercase]
+		% \setsanshangulfont{Noto~Sans~CJK~KR}[Scale=MatchUppercase]
     }{	
         \sys_if_engine_luatex:T
 		{
@@ -672,12 +669,12 @@
 \box_new:N \l_tmpc_box
 \cs_new:Npn \dim_set_towidth:Nn #1 #2
 {
-    \hbox_set:Nn \l_tmpc_box { #2 }
+    \exp_args:NNo \hbox_set:Nn \l_tmpc_box { #2 }
     \dim_set:Nn #1 { \box_wd:N \l_tmpc_box }
 }
 \cs_new:Npn \dim_set_toheight:Nn #1 #2
 {
-    \hbox_set:Nn \l_tmpc_box { #2 }
+    \exp_args:NNo \hbox_set:Nn \l_tmpc_box { #2 }
     \dim_set:Nn #1 { \box_ht:N \l_tmpc_box + \box_dp:N \l_tmpc_box }
 }
 
@@ -909,7 +906,9 @@
 {
     \bool_if:NF \l_pending_hide_bool
     {
-        \textcolor{\l_pending_beforecolor_tl}{\l_pending_font_tl #1}
+		\textcolor{\l_pending_beforecolor_tl}{
+			\l_pending_font_tl #1
+		}
     }
 }
 
@@ -925,16 +924,33 @@
     \bool_set_false:N \l_pending_hide_bool
 }
 
+\newcounter{query}
+\renewcommand\thequery{\arabic{query})}
 \newlistof{listofqueries}{loq}{Queries}
 \newlistentry{query}{loq}{0}
 \setcounter{loqdepth}{1}
+\renewcommand*\cftqueryafterpnum{\bigskip}
 
 \NewDocumentCommand \query { +m o }
 {
-    \pending{#1}
-    \IfNoValueTF {#2}
-        { \addcontentsline{loq}{query}{\l_pending_font_tl #1} }
-        { \addcontentsline{loq}{query}{\l_pending_font_tl #2} }
+	\stepcounter{query}	
+	\bool_if:NF \l_pending_hide_bool
+    {
+		\hangfrom{
+			\textcolor{\l_pending_beforecolor_tl}{
+				\l_pending_font_tl \thequery
+			}
+		}\space
+		\textcolor{\l_pending_beforecolor_tl}{
+				\l_pending_font_tl #1
+		}
+    }
+    \IfValueTF {#2}
+    { 
+		\addcontentsline{loq}{query}{\thequery\enspace #2 } 
+	}{ 
+		\addcontentsline{loq}{query}{\thequery\enspace #1 } 
+	}
 }
 
 \cs_set_eq:NN \orglistofqueries \listofqueries
@@ -944,7 +960,7 @@
     \group_begin:
     \bool_if:NF \l_pending_hide_bool
         {
-            \color{\l_pending_beforecolor_tl}
+            %\color{\l_pending_beforecolor_tl}
             \IfBooleanTF {#1} {\orglistofqueries*} {\orglistofqueries}
         }
     \group_end:
@@ -1006,8 +1022,8 @@
 		\newfontfamily\foreignrmfamily{#2}
 		\newfontfamily\foreignsffamily{#3}
 	}{
-		\newfontfamily\foreignrmfamily{#2}[AutoFakeBold=1.5]
-		\newfontfamily\foreignsffamily{#3}[AutoFakeBold=1.5]
+		\newfontfamily\foreignrmfamily{#2}[Ligatures=TeX, AutoFakeBold=1.5]
+		\newfontfamily\foreignsffamily{#3}[Ligatures=TeX, AutoFakeBold=1.5]
 	}
 }
 \SetForeignFonts{HCR Batang}{HCR Dotum}
@@ -1991,7 +2007,7 @@
 \NewDocumentCommand \TableOfContents { s o }
 {
     \group_begin:
-    \IfValueT {#2} { \setSpacing{#2} }
+    \IfValueT { #2 }{ \setSpacing{#2} }
     \IfBooleanTF {#1} 
     { 
         \pdfbookmark[0]{\contentsname}{Contents}
@@ -2105,19 +2121,24 @@
     \renewcommand*{\verbatimbreakchar}{}
 }
 
-\NewDocumentCommand \SectionNewpageOn { }
+\NewDocumentCommand \SectionNewpageOn { s }
 {
-    \int_compare:nTF { \value{secnumdepth} < 1 }
-    {
-        \setsechook {
-            \int_compare:nT { \value{unsec} > 0 } { \newpage }
-            \stepcounter{unsec}
-        }
-    }{
-        \setsechook {
-            \int_compare:nT { \value{section} > 0 } { \newpage }
-        }
-    }
+	\IfBooleanTF { #1 }
+	{
+		\setsechook{\newpage}
+	}{
+		\int_compare:nTF { \value{secnumdepth} < 1 }
+		{
+			\setsechook {
+				\int_compare:nT { \value{unsec} > 0 } { \newpage }
+				\stepcounter{unsec}
+			}
+		}{
+			\setsechook {
+				\int_compare:nT { \value{section} > 0 } { \newpage }
+			}
+		}
+	}
 }
 \NewDocumentCommand \SectionNewpageOff {}
 {  
@@ -2254,15 +2275,19 @@
 
 % hyperlinks
 
-\NewDocumentCommand \DecolorHyperlinks { O {darkgray} O {\bfseries} }
+\NewDocumentCommand \DecolorHyperlinks { s O {darkgray} O {\bfseries} }
 {
-    \hypersetup{
-		%colorlinks=false,
-		allcolors=#1,
+	\hypersetup{
 		pdfborder={0 0 0}, 
 		plainpages=false,
 	}
-    \renewcommand{\theTitleReference}[2]{\textcolor{#1}{#2 ##2}}
+	\IfBooleanTF {#1}
+	{
+		\hypersetup{colorlinks=false}
+	}{
+		\hypersetup{allcolors=#1}
+	}
+    \renewcommand{\theTitleReference}[2]{\textcolor{#2}{#3 ##2}}
 }
 
 % graphics * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -2564,7 +2589,10 @@
 %\illustimage*: user-specified action
 %\illustimage^: another user-specified action
 
-\bool_new:N \in_illustimage
+\dim_new:N \l_illustimage_image_width_dim
+\dim_new:N \l_illustimage_text_width_dim
+
+\bool_new:N \in_illustimage_bool
 \keys_define:nn { illustimage }
 {
     first           .bool_set:N = \l_illustimage_first_bool,
@@ -2581,7 +2609,8 @@
 	caption-ignore	.bool_set:N = \l_illustimage_caption_ignore_bool,
     label           .tl_set:N = \l_illustimage_label,
     legend          .bool_set:N = \l_illustimage_legend_bool,
-    width           .dim_set:N = \l_illustimage_width_dim, 
+    min-width           .dim_set:N = \l_illustimage_minimum_width_dim, 
+	image-align		.tl_set:N = \l_illustimage_image_align_tl, % this is effective when min-width is specified
     broad           .bool_set:N = \l_illustimage_broad_bool, % take the full width in case of vartwo
     flush           .bool_set:N = \l_illustimage_flush_bool,
     showfilename    .bool_set:N = \l_illustimage_showfilename_bool,
@@ -2602,7 +2631,7 @@
     afterskip=.15\baselineskip,
     firstskip=.5\baselineskip,
     frame=false,
-    width=0pt,
+    min-width=0pt,
     position=left,
     voffset=0pt,
     valign=t,
@@ -2617,7 +2646,9 @@
 \NewDocumentCommand \illustimage { s t^ O{} m d() +m }
 {
     \group_begin:
-    \bool_set_true:N \in_illustimage
+	\dim_zero:N \l_illustimage_image_width_dim
+	\dim_zero:N \l_illustimage_text_width_dim
+    \bool_set_true:N \in_illustimage_bool
     \IfBooleanT {#1}
         { \exp_args:No \IllustImageSetup{\l_illustimage_star_tl} }
     \IfBooleanT {#2}
@@ -2626,11 +2657,13 @@
     \bool_if:NT \l_illustimage_broad_bool
     {
         \bool_if:NT \g_column_vartwo_bool
-            { \begin{adjustwidth}{-\vartwosecindent}{0pt} }
+        {
+			\begin{adjustwidth}{-\vartwosecindent}{0pt} 
+		}
     }
 	\tl_use:N \l_illustimage_hook_tl
     \IfValueT{#5} { \tl_set:Nn \l_illustimage_caption {#5} }
-    % save image
+    % save image & text
     \tl_if_empty:NT \l_illustimage_label
     {
         \tl_set:Nn \l_illustimage_label {#4}
@@ -2639,36 +2672,35 @@
     {
         \hbox_set:Nn \l_image_box
             { \objectframe{\includegraphics[scale=\l_illustimage_scale_tl]{#4}} }
-     }
-     {
+     }{
          \hbox_set:Nn \l_image_box
              { \includegraphics[scale=\l_illustimage_scale_tl]{#4} }
      }
-    % save text
-    \dim_compare:nTF { \l_illustimage_width_dim > 0pt }
+	\dim_set_towidth:Nn \l_illustimage_image_width_dim { \box_use:N \l_image_box }
+    \dim_compare:nT { \l_illustimage_minimum_width_dim > 0pt }
     {
-        \dim_set_eq:NN \l_tmpa_dim \l_illustimage_width_dim
-        \dim_set_towidth:Nn \l_tmpb_dim { \box_use:N \l_image_box }
-        \dim_compare:nT { \l_tmpa_dim < \l_tmpb_dim }
-            { \dim_set_eq:NN \l_tmpa_dim \l_tmpb_dim }
-    }
-    {
-        \dim_set_towidth:Nn \l_tmpa_dim { \box_use:N \l_image_box }
-    }
-    \dim_set:Nn \l_tmpb_dim { \linewidth - \l_tmpa_dim - \l_illustimage_gap_dim }
+        \dim_compare:nT { \l_illustimage_image_width_dim <  \l_illustimage_minimum_width_dim }
+        {
+			\dim_set_eq:NN \l_illustimage_image_width_dim \l_illustimage_minimum_width_dim
+		}
+	}    
+    \dim_set:Nn \l_illustimage_text_width_dim { \linewidth - \l_illustimage_image_width_dim - \l_illustimage_gap_dim }	
     \hbox_set:Nn \l_text_box
     {
-        \begin{minipage}{\l_tmpb_dim}
+        \begin{minipage}{\l_illustimage_text_width_dim}
             \HzJustification\l_illustimage_textstyle_tl #6
         \end{minipage}
     }
+	% restore image & text
     \illustimage_put:
     \bool_if:NT \l_illustimage_broad_bool
     {
         \bool_if:NT \g_column_vartwo_bool
-            { \end{adjustwidth} }
+        { 
+			\end{adjustwidth} 
+		}
     }
-    \bool_set_false:N \in_illustimage
+    \bool_set_false:N \in_illustimage_bool
     \group_end:
 }
 
@@ -2676,8 +2708,8 @@
 {
     \str_case_x:nn { \l_illustimage_position_tl }
     {
-        {left}   { \illustimage_put_left: }
-        {right}  { \illustimage_put_right: }
+        { left } { \illustimage_put_left: }
+        { right } { \illustimage_put_right: }
     }
 }
 
@@ -2690,17 +2722,18 @@
         \object_skip_before:n {\l_illustimage_before_skip}
     }
     \begin{minipage}{\linewidth} 
-        \begin{minipage}[\l_illustimage_valign_tl]{\l_tmpa_dim}
-            \vspace{0pt}
+        \begin{minipage}[\l_illustimage_valign_tl]{\l_illustimage_image_width_dim}
+            \vspace{0pt}			
             \bool_if:NT \l_illustimage_broad_bool
             {
-                \bool_if:NT \l_illustimage_flush_bool {\hfill}
+                \bool_if:NT \l_illustimage_flush_bool { \hfill }
             }
-            \box_use:N \l_image_box      
+			\l_illustimage_image_align_tl
+            \leavevmode \box_use:N \l_image_box      
             \illustimage_caption:      
         \end{minipage}
         \hfill 
-        \begin{minipage}[\l_illustimage_valign_tl]{\l_tmpb_dim}
+        \begin{minipage}[\l_illustimage_valign_tl]{\l_illustimage_text_width_dim}
             \vspace{0pt}
             \begin{minipage}{\linewidth}        
                 \vspace{\l_illustimage_voffset_skip}
@@ -2720,8 +2753,8 @@
     }{
         \object_skip_before:n {\l_illustimage_before_skip}
     }
-    \begin{minipage}{\linewidth}
-        \begin{minipage}[\l_illustimage_valign_tl]{\l_tmpb_dim}
+    \begin{minipage}{\linewidth}	
+        \begin{minipage}[\l_illustimage_valign_tl]{\l_illustimage_text_width_dim}
             \vspace{0pt}
             \begin{minipage}{\linewidth}        
                 \vspace{\l_illustimage_voffset_skip}
@@ -2730,13 +2763,14 @@
             \vspace{0pt}
         \end{minipage}
         \hfill
-        \begin{minipage}[\l_illustimage_valign_tl]{\l_tmpa_dim}
-            \vspace{0pt}
+        \begin{minipage}[\l_illustimage_valign_tl]{\l_illustimage_image_width_dim}			
+            \vspace{0pt}			
             \bool_if:NT \l_illustimage_broad_bool
             {
-                \bool_if:NT \l_illustimage_flush_bool {\hfill}
+                \bool_if:NT \l_illustimage_flush_bool { \hfill }
             }
-            \box_use:N \l_image_box
+			\l_illustimage_image_align_tl
+            \leavevmode \box_use:N \l_image_box
             \illustimage_caption:
         \end{minipage}
     \end{minipage}
@@ -2901,7 +2935,7 @@
 
 \LineImageSetup{
     scale=1,
-    raise=-.35ex,
+    raise=-.25ex,
     showfilename=false
 }
 
@@ -2925,9 +2959,9 @@
 
 % \settable[]{ } ------------------------------------
 \taburowcolors{white .. backgray}
-%\newcommand\tableheadfont{\bfseries}
 \NewExpandableDocumentCommand\HeadFont{}{\rowfont{\bfseries}}
-\NewExpandableDocumentCommand\HeadFontCentering{}{\rowfont[c]{\bfseries}}
+%\NewExpandableDocumentCommand\HeadFontC{}{\rowfont[c]{\bfseries}}
+%\newtabulinestyle{thick=1pt}
 
 \cs_new:Npn \table_footnotestyle:n #1
 {
@@ -2952,6 +2986,7 @@
     footnote      	.tl_set:N 	= \l_table_footnote,
     footnotestyle 	.code:n 	= { \table_footnotestyle:n {#1} }, % footnotestyle=fnsymbol
     stretch       	.tl_set:N 	= \l_table_stretch_tl,
+	linesep 		.tl_set:N 	= \l_table_linesep_tl,
     norowcolor    	.bool_set:N	= \l_table_norowcolor_bool,
 	star		  	.tl_set:N 	= \l_table_star_tl,
 	vbar		  	.tl_set:N 	= \_ltable_vbar_tl
@@ -2973,7 +3008,9 @@
     font=\rmfamily,
     fontsize=\small,
     footnotestyle=arabic,
-    stretch=1
+    stretch=1,
+	linesep=1pt,
+	star={norowcolor}
 }
 
 % \placetable*|[options](caption)<footnote>{tabu}
@@ -2994,7 +3031,8 @@
     \bool_if:NT \l_table_norowcolor_bool { \taburowcolors{} }
     \hbox_set:Nn \l_text_box
     {
-        \tl_set:Nn \arraystretch {\l_table_stretch_tl}
+        \tl_set:NV \arraystretch \l_table_stretch_tl 
+		\tl_set:NV \tabulinesep \l_table_linesep_tl
         \l_table_font_tl
         \l_table_fontsize_tl
         \l_table_hook_tl
@@ -3055,7 +3093,7 @@
         \begin{minipage}{\l_tmpb_dim}            
             \table_caption:
 			\l_table_align_tl		
-        	mbox{ \box_use:N \l_text_box }
+        	\mbox{ \box_use:N \l_text_box }
 			\table_footnote:
         \end{minipage}
     }
@@ -3143,7 +3181,7 @@
 }
 
 \NewEnviron{imagetableiii}{
-    \placetable[stretch=1.3]{
+    \placetable[stretch=1.3,font=\small]{
         \taburowcolors{}
         \begin{tabu}{X[cm]X[cm]X[cm]}
         \BODY
@@ -3152,7 +3190,7 @@
 }
 
 \NewEnviron{imagetableii}{
-    \placetable[stretch=1.3]{
+    \placetable[stretch=1.3,font=\small]{
         \taburowcolors{}
         \begin{tabu}{X[cm]X[cm]}
         \BODY
@@ -3346,9 +3384,14 @@
     color = black,
     index = false 
 }
-\NewDocumentCommand \TermSetup { m }
+\NewDocumentCommand \TermSetup { o m }
 {
-    \tl_set:Nn \g_term_options_tl { #1 }
+	\IfValueTF { #1 }
+	{
+		\NewTerm*{ #1 }{ #2 }
+	}{
+    	\tl_set:Nn \g_term_options_tl { #2 }
+	}
 }
 
 \NewDocumentCommand \NewTerm { s m m }
@@ -3541,9 +3584,14 @@
     enum-marker = { \int_use:N \l_terms_int)\hskip\l_terms_marker_sep_skip }
 }
 
-\NewDocumentCommand \TermsSetup {m}
+\NewDocumentCommand \TermsSetup { o m}
 {
-    \tl_set:Nn \g_terms_options_tl { #1 }
+	\IfValueTF { #1 }
+	{
+		\NewTerms*{ #1 }{ #2 }
+	}{
+    	\tl_set:Nn \g_terms_options_tl { #2 }
+	}
 }
 \cs_new:Npn \terms_label_anchor:n #1
 {
@@ -3598,7 +3646,6 @@
     \dim_set:Nn \l_tmpa_dim { \box_ht:N \l_tmpb_box }
     \raisebox{\l_tmpa_dim}{ \smash{\box_use:N \l_tmpa_box} }
 }
-
 \cs_new:Npn \terms_label_type_set:n #1
 {
     \skip_set:Nn \partopsep { 0pt }
@@ -3641,7 +3688,7 @@
         \exp_args:Nno \keys_set:nn { terms }{ \g_terms_options_tl }
         \IfBooleanT{ ##1 }
         {
-            \exp_args:Nno \keys_set:nn { terms }{ \l_terms_star_tl }            
+            \exp_args:Nno \keys_set:nn { terms }{ \l_terms_star_tl }        
         }
         \IfBooleanT{ ##2 }
         {
@@ -3693,8 +3740,8 @@
     label-type = multiline,
     label-width = 3em,
     index = false,
-    before-list = \RuleBox,
-    after-list = \endRuleBox,
+    %before-list = \RuleBox,
+    %after-list = \endRuleBox,
     delimiter = \hfill,
     item-sep = 1ex, 
 }
