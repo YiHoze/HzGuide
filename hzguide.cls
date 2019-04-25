@@ -497,8 +497,10 @@
     \sys_if_engine_xetex:TF
 	{
         \usepackage[hangul]{xetexko}		
-		% \setmainhangulfont{Noto~Serif~CJK~KR}[Scale=MatchUppercase]
-		% \setsanshangulfont{Noto~Sans~CJK~KR}[Scale=MatchUppercase]
+		% \setmainfont{NotoSerifCJKkr}[Script=Hangul, Scale=MatchUppercase, WordSpace=0.85, UprightFont={*-Light}, BoldFont={*-Medium}, ItalicFont=NotoSerif-LightItalic]
+		% \setsansfont{NotoSansCJKkr}[Scale=MatchUppercase, UprightFont={*-Light}, BoldFont={*-Medium}]
+		% \disablekoreanfonts
+		% \disablehangulspacing
     }{	
         \sys_if_engine_luatex:T
 		{
@@ -2283,11 +2285,11 @@
 	}
 	\IfBooleanTF {#1}
 	{
-		\hypersetup{colorlinks=false}
-	}{
 		\hypersetup{allcolors=#1}
+	}{
+		\hypersetup{colorlinks=false}
+    	\renewcommand{\theTitleReference}[2]{\textcolor{#2}{#3 ##2}}
 	}
-    \renewcommand{\theTitleReference}[2]{\textcolor{#2}{#3 ##2}}
 }
 
 % graphics * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -2939,7 +2941,7 @@
     showfilename=false
 }
 
-\NewDocumentCommand \lineimg { O { \l_lineimg_raise } m }
+\NewDocumentCommand \img { O { \l_lineimg_raise } m }
 {
     \raisebox{#1}{
         \,\includegraphics[scale=\l_lineimg_scale]{#2}\,
@@ -2952,15 +2954,17 @@
     }
 }
 
+\cs_set_eq:NN \lineimg \img
+
 \NewDocumentCommand \listimg { m }
 {
-    \par\lineimg[0pt]{#1}
+    \par\img[0pt]{#1}
 }
 
 % \settable[]{ } ------------------------------------
 \taburowcolors{white .. backgray}
 \NewExpandableDocumentCommand\HeadFont{}{\rowfont{\bfseries}}
-%\NewExpandableDocumentCommand\HeadFontC{}{\rowfont[c]{\bfseries}}
+%\rowfont[c]{\bfseries}
 %\newtabulinestyle{thick=1pt}
 
 \cs_new:Npn \table_footnotestyle:n #1
@@ -3226,10 +3230,10 @@
     \taburowcolors{backgray .. white}
 }
 
-\DeclareExpandableDocumentCommand \LongTableHeadFont {}
-{
-    \rowcolor{white}\rowfont{\bfseries}
-}
+% \DeclareExpandableDocumentCommand \LongTableHeadFont {}
+% {
+%     \rowcolor{white}\rowfont{\bfseries}
+% }
 
 %\NewDocumentEnvironment { LongTable }{ O{} }
 %{
@@ -3584,7 +3588,7 @@
     enum-marker = { \int_use:N \l_terms_int)\hskip\l_terms_marker_sep_skip }
 }
 
-\NewDocumentCommand \TermsSetup { o m}
+\NewDocumentCommand \TermsSetup { o m }
 {
 	\IfValueTF { #1 }
 	{
@@ -3923,7 +3927,7 @@
 
 \cs_new:Npn \cirnum_get_base_width:n #1
 {
-    \dim_set_towidth:Nn \l_cirnum_width_dim{\l_cirnum_font_feature\l_cirnum_font #1}
+    \dim_set_towidth:Nn \l_cirnum_width_dim { \l_cirnum_font_feature\l_cirnum_font #1 }
 }
 
 \keys_define:nn {cirnum}
@@ -3951,7 +3955,7 @@
     base=9
 }
 
-\CirnumSetup{fontfeature={\addfontfeature{LetterSpace=-3}}}
+%\CirnumSetup{fontfeature={\addfontfeature{LetterSpace=-3}}}
 
 \NewDocumentCommand \cirnum { m }
 {
