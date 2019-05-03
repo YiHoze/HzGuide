@@ -3035,8 +3035,8 @@
     \bool_if:NT \l_table_norowcolor_bool { \taburowcolors{} }
     \hbox_set:Nn \l_text_box
     {
-        \tl_set:NV \arraystretch \l_table_stretch_tl 
-		\tl_set:NV \tabulinesep \l_table_linesep_tl
+        \tl_set:NV \arraystretch \l_table_stretch_tl
+		\dim_set:Nn \tabulinesep { \l_table_linesep_tl }
         \l_table_font_tl
         \l_table_fontsize_tl
         \l_table_hook_tl
@@ -3560,6 +3560,8 @@
     delimiter   .tl_set:N = \l_terms_delimiter_tl,
     label-width .dim_set:N = \l_terms_label_width_dim,
     label-sep   .skip_set:N = \l_terms_label_sep_skip,
+	item-indent .dim_set:N = \l_terms_item_indent_dim,
+	left-margin .dim_set:N = \l_terms_left_margin_dim,
     index       .bool_set:N = \l_terms_index_bool,
 	anchor		.bool_set:N = \l_terms_anchor_bool, % for glossary
     top-sep     .skip_set:N = \l_terms_top_sep_skip,
@@ -3581,8 +3583,9 @@
     base = MM,
     font = \bfseries,
     color = black,
-    delimiter = :\hfill,
+    delimiter = :\hfill,	
     label-sep = 0.5em,
+	left-margin = 0pt,
     star = { item-sep=0ex },
     vbar = { delimiter=\hfill },
     enum-marker = { \int_use:N \l_terms_int)\hskip\l_terms_marker_sep_skip }
@@ -3594,7 +3597,7 @@
 	{
 		\NewTerms*{ #1 }{ #2 }
 	}{
-    	\tl_set:Nn \g_terms_options_tl { #2 }
+    	\tl_gset:Nn \g_terms_options_tl { #2 }
 	}
 }
 \cs_new:Npn \terms_label_anchor:n #1
@@ -3673,11 +3676,19 @@
         }
     }
     \skip_set_eq:NN \labelsep \l_terms_label_sep_skip
-    \dim_set:Nn \leftmargin { \labelwidth+\labelsep }
+   	\dim_set:Nn \leftmargin { \labelwidth+\labelsep }
     \int_compare:nT { \@listdepth = 1 }
     {
         \addtolength\leftmargin{ \l_terms_offset_skip } 
-    }
+    }	
+	\dim_compare:nT { \l_terms_left_margin_dim > 0pt }
+	{
+		\dim_set:Nn \leftmargin \l_terms_left_margin_dim
+	}
+	\dim_compare:nT { \l_terms_item_indent_dim > 0pt }
+	{
+		\dim_set:Nn \itemindent \l_terms_item_indent_dim
+	}
 }
 
 \NewDocumentCommand \NewTerms { s m m }
@@ -3704,7 +3715,6 @@
             \keys_set:nn { terms }{ ##3 }
             \bool_if:NT \l_terms_enumerate_bool
             {
-                %\tl_set:Nn \l_terms_marker_i {\int_use:N \l_terms_int)\hskip\l_terms_markersep}
                 \tl_set:Nn \l_terms_marker_i { \l_terms_enummarker_tl }
                 \int_gzero:N \l_terms_int
             }
@@ -3715,8 +3725,8 @@
             \terms_label_type_set:n { \l_terms_label_type_tl }
         }
     }{
-        \cs_set_eq:NN \uitem \item
-        \cs_set_eq:NN \mitem \item
+        % \cs_set_eq:NN \uitem \item
+        % \cs_set_eq:NN \mitem \item
         \end{list}
         \l_terms_after_list_tl
     }
@@ -3838,10 +3848,8 @@
     column      .int_set:N = \l_callout_column_int,
     font        .tl_set:N = \l_callout_font_tl,
     label       .tl_set:N = \l_callout_label_tl,
-    labelenum   .tl_set:N = \l_callout_label_enum_tl,
     tab         .bool_set:N = \l_callout_tab_bool,
     space       .skip_set:N = \l_callout_space_skip,
-    bar         .bool_set:N = \l_callout_bar_bool
 }
 
 \NewDocumentCommand \CalloutSetup {m}
@@ -3855,7 +3863,6 @@
     column=3,
     font=\small,
     label={\makebox[1.25em]{\hfill\calloutno)}\enspace},
-    labelenum=\theenumi),
     tab=true,
     space=0.25em
 }
@@ -3890,8 +3897,9 @@
     \IfBooleanTF {#1}
     {
         \renewcommand\labelenumi{\l_callout_label_enum_tl}
-        \begin{enumerate}
-        \tightlist\HzJustification
+        \begin{calloutenum}
+        %\tightlist
+		\HzJustification
     }{
         \IfValueT {#2} { \int_set:Nn \l_callout_column_int {#2} }
         \NumTabs {\l_callout_column_int}
@@ -3901,12 +3909,16 @@
             {\cs_set_eq:NN \item \callout_item_space:}
     }
 }{
-    \IfBooleanT {#1} { \end{enumerate}  }
+    \IfBooleanT {#1} { \end{calloutenum}  }
     \bool_if:NT \l_callout_rule_bool { \end{RuleBox} }
     \object_skip_after:n {\l_callout_after_skip}
 }
 
-% circled number
+
+\newlist{calloutenum}{enumerate}{1}
+\setlist[calloutenum]{
+	label=\arabic*),
+}
 
 \ExplSyntaxOff
 \usetikzlibrary{shapes}
@@ -3950,7 +3962,7 @@
     font=\sffamily\footnotesize\bfseries,
     fgcolor=white,
     bgcolor=black,
-    sep=1pt,
+    sep=0.5pt,
     raise=-.5ex,
     base=9
 }
@@ -3973,60 +3985,70 @@
 % BoundedBox*: without linespacing before and after
 % BoundedBox|: (deprecated) the box becomes breakable when it is globally set to be unbreakable, or the other way.
 
-\tcbuselibrary{breakable, skins}
+\tcbuselibrary{breakable, skins, xparse}
 \tcbset{enhanced}
 
-\newtcolorbox{LeftBarBox}{
+\NewTColorBox{LeftBarBox}{ d<> }
+{
     before~skip=0pt, after~skip=0pt, breakable=false,
     colframe=white, colback=white, arc=0ex, boxrule=0pt,
     boxsep=0pt, top=0pt, bottom=0pt, left=1.5em, right=0em,
-    borderline~west={1.5pt}{0pt}{gray}
+    borderline~west={1.5pt}{0pt}{gray}, IfValueTF={#1}{#1}{}
 }
 
-\newtcolorbox{RightBarBox}{
+\NewTColorBox{RightBarBox}{ d<> }
+{
     before~skip=0pt, after~skip=0pt, breakable=false,
     colframe=white, colback=white, arc=0ex, boxrule=0pt,
     boxsep=0pt,  top=0pt, bottom=0pt, left=3em, right=1.5em,
-    borderline~east={1.5pt}{0pt}{gray}
+    borderline~east={1.5pt}{0pt}{gray}, IfValueTF={#1}{#1}{}
 }
 
-\newtcolorbox{ShadowBox}[1][]{
+\NewTColorBox{ShadowBox}{ O{} d<> }
+{
     before~skip=0pt, after~skip=0pt,
     boxrule=0.5pt, colframe=darkgray, colback=white, arc=0.5ex,
     boxsep=0.5ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
     titlerule=0.75pt, toptitle=0.25ex, bottomtitle=0.5ex,
     colbacktitle=darkgray, coltitle=white,
-    drop~fuzzy~shadow={scale=2}, breakable=true, title=\textbf{#1}
+    drop~fuzzy~shadow={scale=2}, breakable=true, title=#1, 
+	IfValueTF={#2}{#2}{}
 }
 
-\newtcolorbox{UnbreakableShadeBox}[1][]{
+\NewTColorBox{UnbreakableShadeBox}{ O{} d<> }
+{
     before~skip=0pt, after~skip=0pt,
     boxrule=0.75pt, colframe=white, colback=backgray, arc=0.5ex,
     boxsep=0.5ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
     titlerule=0.75pt, toptitle=-0.25ex, bottomtitle=0.5ex,
     colbacktitle=lightgray, coltitle=black,
-    fonttitle=\bfseries, breakable=false, title=#1
+    fonttitle=\bfseries, breakable=false, title=#1, 
+	IfValueTF={#2}{#2}{}
 }
 
-\newtcolorbox{BreakableShadeBox}[1][]{
+\NewTColorBox{BreakableShadeBox}{ O{} d<> }
+{
     before~skip=0pt, after~skip=0pt,
     boxrule=0.75pt, colframe=white, colback=backgray, arc=0.5ex,
     boxsep=0.5ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
     titlerule=0.75pt, toptitle=0.5ex, bottomtitle=0.5ex,
     colbacktitle=lightgray, coltitle=black,
-    fonttitle=\bfseries, breakable=true, title=#1
+    fonttitle=\bfseries, breakable=true, title=#1,
+	IfValueTF={#2}{#2}{}
 }
 
-\newtcolorbox{RuleBox}[1][]{
+\NewTColorBox{RuleBox}{ d<> }
+{
     opacityfill=0,
     before~skip=0pt, after~skip=0pt, breakable=false,
     arc=0ex, boxrule=0pt,
     boxsep=0.25ex,  top=0.75ex, bottom=0.75ex, left=0em, right=0em,
     borderline~north={0.5pt}{0pt}{darkgray},
-    borderline~south={0.5pt}{0pt}{darkgray}, #1
+    borderline~south={0.5pt}{0pt}{darkgray}, IfValueTF={#1}{#1}{}
 }
 
-\newtcolorbox{TabBox}[1][]{
+\NewTColorBox{TabBox}{ O{} d<> }
+{
     enhanced,
     before~skip=0pt, after~skip=0pt,
     boxrule=0.5pt, colframe=gray, colback=white, arc=0.5ex,
@@ -4034,7 +4056,8 @@
     colbacktitle=white, coltitle=black,
     attach~boxed~title~to~top~left={xshift=.5cm, yshift=-1.75mm},
     boxed~title~style={size=minimal, enhanced, boxrule=0.25pt, colframe=white},
-    fonttitle=\bfseries, breakable=false, title={\space #1 \space}
+    fonttitle=\bfseries, breakable=false, title={\space #1 \space}, 
+	IfValueTF={#2}{#2}{}
 }
 
 \tl_new:N \l_bbox_style_tl
@@ -4073,9 +4096,14 @@
 }
 
 \tl_new:N \g_bounded_box_options_tl
-\NewDocumentCommand \BoundedBoxSetup { m }
+\NewDocumentCommand \BoundedBoxSetup { o m }
 {
-    \tl_set:Nn \g_bounded_box_options_tl { #1 }    
+	\IfValueTF { #1 }
+	{
+		\NewBoundedBox*{ #1 }{ #2 }
+	}{
+    	\tl_gset:Nn \g_bounded_box_options_tl { #2 }
+	}
 }
 
 \cs_new:Npn \bbox_type_set:n #1
@@ -4128,15 +4156,15 @@
         \RenewDocumentEnvironment
     }{
         \NewDocumentEnvironment
-    }{ #2 }{ s O{} d<> }
+    }{ #2 }{ s O{} d<> d() }
     {
         \keys_set:nn { BoundedBox }{ #3 }
         \exp_args:Nno \keys_set:nn { BoundedBox}{ \g_bounded_box_options_tl }
         \group_begin:
             \keys_set:nn { BoundedBox }{ ##2 } 
-			\IfValueT { ##3 }
+			\IfValueT { ##4 }
 			{
-				\tl_set:Nn \l_bbox_signal_tl { ##3 }
+				\tl_set:Nn \l_bbox_signal_tl { ##4 }
 			}
             \bbox_type_set:n { \l_bbox_type_tl }
             \IfBooleanF{ ##1 }{ 
@@ -4144,9 +4172,9 @@
             }
             \tl_if_empty:NTF \l_bbox_signal_tl    
             {
-                \begin{BBox}				
+                \begin{BBox}<##3>
             }{
-                \begin{BBox}[\l_bbox_symbol_tl\l_bbox_before_signal_tl\l_bbox_signal_tl\l_bbox_after_signal_tl]
+                \begin{BBox}[\l_bbox_symbol_tl\l_bbox_before_signal_tl\l_bbox_signal_tl\l_bbox_after_signal_tl]<##3>
             }
                 \bool_if:NT \l_bbox_wrapping_bool { \wrappingon }
                 \l_bbox_style_tl
