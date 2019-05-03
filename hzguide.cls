@@ -3988,66 +3988,78 @@
 \tcbuselibrary{breakable, skins, xparse}
 \tcbset{enhanced}
 
-\NewTColorBox{LeftBarBox}{ d<> }
+\NewTColorBox{LeftBarBox}{ s }
 {
     before~skip=0pt, after~skip=0pt, breakable=false,
     colframe=white, colback=white, arc=0ex, boxrule=0pt,
     boxsep=0pt, top=0pt, bottom=0pt, left=1.5em, right=0em,
-    borderline~west={1.5pt}{0pt}{gray}, IfValueTF={#1}{#1}{}
+    borderline~west={1.5pt}{0pt}{gray}, 
+	IfBooleanTF={#1}{
+		breakable=\l_bbox_breakable_adhoc_tl
+	}{
+		breakable=\l_bbox_breakable_default_tl
+	}
 }
 
-\NewTColorBox{RightBarBox}{ d<> }
+\NewTColorBox{RightBarBox}{ s }
 {
     before~skip=0pt, after~skip=0pt, breakable=false,
     colframe=white, colback=white, arc=0ex, boxrule=0pt,
     boxsep=0pt,  top=0pt, bottom=0pt, left=3em, right=1.5em,
-    borderline~east={1.5pt}{0pt}{gray}, IfValueTF={#1}{#1}{}
+    borderline~east={1.5pt}{0pt}{gray}, 
+	IfBooleanTF={#1}{
+		breakable=\l_bbox_breakable_adhoc_tl
+	}{
+		breakable=\l_bbox_breakable_default_tl
+	}
 }
 
-\NewTColorBox{ShadowBox}{ O{} d<> }
+\NewTColorBox{ShadowBox}{ s O{} }
 {
     before~skip=0pt, after~skip=0pt,
     boxrule=0.5pt, colframe=darkgray, colback=white, arc=0.5ex,
     boxsep=0.5ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
     titlerule=0.75pt, toptitle=0.25ex, bottomtitle=0.5ex,
     colbacktitle=darkgray, coltitle=white,
-    drop~fuzzy~shadow={scale=2}, breakable=true, title=#1, 
-	IfValueTF={#2}{#2}{}
+    drop~fuzzy~shadow={scale=2}, title=#2, 
+	IfBooleanTF={#1}{
+		breakable=\l_bbox_breakable_adhoc_tl
+	}{
+		breakable=\l_bbox_breakable_default_tl
+	}
 }
 
-\NewTColorBox{UnbreakableShadeBox}{ O{} d<> }
-{
-    before~skip=0pt, after~skip=0pt,
-    boxrule=0.75pt, colframe=white, colback=backgray, arc=0.5ex,
-    boxsep=0.5ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
-    titlerule=0.75pt, toptitle=-0.25ex, bottomtitle=0.5ex,
-    colbacktitle=lightgray, coltitle=black,
-    fonttitle=\bfseries, breakable=false, title=#1, 
-	IfValueTF={#2}{#2}{}
-}
-
-\NewTColorBox{BreakableShadeBox}{ O{} d<> }
+\NewTColorBox{ShadeBox}{ s O{} }
 {
     before~skip=0pt, after~skip=0pt,
     boxrule=0.75pt, colframe=white, colback=backgray, arc=0.5ex,
     boxsep=0.5ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
     titlerule=0.75pt, toptitle=0.5ex, bottomtitle=0.5ex,
     colbacktitle=lightgray, coltitle=black,
-    fonttitle=\bfseries, breakable=true, title=#1,
-	IfValueTF={#2}{#2}{}
+    fonttitle=\bfseries, title=#2,
+	IfBooleanTF={#1}{
+		breakable=\l_bbox_breakable_adhoc_tl
+	}{
+		breakable=\l_bbox_breakable_default_tl
+	}
 }
 
-\NewTColorBox{RuleBox}{ d<> }
+\NewTColorBox{RuleBox}{ s }
 {
     opacityfill=0,
     before~skip=0pt, after~skip=0pt, breakable=false,
     arc=0ex, boxrule=0pt,
     boxsep=0.25ex,  top=0.75ex, bottom=0.75ex, left=0em, right=0em,
     borderline~north={0.5pt}{0pt}{darkgray},
-    borderline~south={0.5pt}{0pt}{darkgray}, IfValueTF={#1}{#1}{}
+    borderline~south={0.5pt}{0pt}{darkgray}, 
+	IfBooleanTF={#1}{
+		breakable=\l_bbox_breakable_adhoc_tl
+	}{
+		breakable=\l_bbox_breakable_default_tl
+	}
 }
 
-\NewTColorBox{TabBox}{ O{} d<> }
+\NewTColorBox{TabBox}{ s O{} }
 {
     enhanced,
     before~skip=0pt, after~skip=0pt,
@@ -4056,8 +4068,12 @@
     colbacktitle=white, coltitle=black,
     attach~boxed~title~to~top~left={xshift=.5cm, yshift=-1.75mm},
     boxed~title~style={size=minimal, enhanced, boxrule=0.25pt, colframe=white},
-    fonttitle=\bfseries, breakable=false, title={\space #1 \space}, 
-	IfValueTF={#2}{#2}{}
+    fonttitle=\bfseries, title=#2, 
+	IfBooleanTF={#1}{
+		breakable=\l_bbox_breakable_adhoc_tl
+	}{
+		breakable=\l_bbox_breakable_default_tl
+	}
 }
 
 \tl_new:N \l_bbox_style_tl
@@ -4070,17 +4086,19 @@
 
 \keys_define:nn { BoundedBox }
 {
-    before-skip 	.skip_set:N = \l_bbox_before_skip,
-    after-skip  	.skip_set:N = \l_bbox_after_skip,
-    type        	.tl_set:N = \l_bbox_type_tl,
-    symbol      	.tl_set:N = \l_bbox_symbol_tl,
-    signal      	.tl_set:N = \l_bbox_signal_tl,
-    before-signal	.tl_set:N = \l_bbox_before_signal_tl,
-    after-signal	.tl_set:N = \l_bbox_after_signal_tl,
-    style       	.tl_set:N = \l_bbox_style_extra_tl,
-    font        	.tl_set:N = \l_bbox_font_tl,
-    font-color  	.tl_set:N = \l_bbox_font_color_tl,
-    wrapping    	.bool_set:N = \l_bbox_wrapping_bool	
+    before-skip 		.skip_set:N = \l_bbox_before_skip,
+    after-skip  		.skip_set:N = \l_bbox_after_skip,
+    type        		.tl_set:N = \l_bbox_type_tl,
+    symbol      		.tl_set:N = \l_bbox_symbol_tl,
+    signal      		.tl_set:N = \l_bbox_signal_tl,
+    before-signal		.tl_set:N = \l_bbox_before_signal_tl,
+    after-signal		.tl_set:N = \l_bbox_after_signal_tl,
+    style       		.tl_set:N = \l_bbox_style_extra_tl,
+    font        		.tl_set:N = \l_bbox_font_tl,
+    font-color  		.tl_set:N = \l_bbox_font_color_tl,
+    wrapping    		.bool_set:N = \l_bbox_wrapping_bool,
+	breakable-default	.tl_set:N = \l_bbox_breakable_default_tl,
+	breakable-adhoc		.tl_set:N = \l_bbox_breakable_adhoc_tl
 }
 
 \NewDocumentCommand \BoundedBoxInitialize { m }
@@ -4091,8 +4109,10 @@
 \BoundedBoxInitialize {
     before-skip = 0pt,
     after-skip = 0pt,
-    type = UnbreakableShade,
-    font-color = black
+    type = shade,
+    font-color = black,
+	breakable-default = true,
+	breakable-adhoc = false
 }
 
 \tl_new:N \g_bounded_box_options_tl
@@ -4110,14 +4130,10 @@
 {
     \str_case_x:nnTF { #1 }
     {
-        { BreakableShade }{
+        { shade }{
             \cs_set_eq:NN \BBox \BreakableShadeBox
             \cs_set_eq:NN \endBBox \endBreakableShadeBox
-        }
-        { UnbreakableShade }{
-            \cs_set_eq:NN \BBox \UnbreakableShadeBox
-            \cs_set_eq:NN \endBBox \endUnbreakableShadeBox
-        }
+        }        
         { shadow }{
             \cs_set_eq:NN \BBox \ShadowBox
             \cs_set_eq:NN \endBBox \endShadowBox
@@ -4155,13 +4171,13 @@
     \IfBooleanTF{ #1 }{
         \RenewDocumentEnvironment
     }{
-        \NewDocumentEnvironment
-    }{ #2 }{ s O{} d<> d() }
+        \NewDocumentEnvironment % \begin{bbox}*=nolinesep|=nobreakable[options](title)
+    }{ #2 }{ s t| O{} d() }
     {
         \keys_set:nn { BoundedBox }{ #3 }
-        \exp_args:Nno \keys_set:nn { BoundedBox}{ \g_bounded_box_options_tl }
+        \exp_args:Nno \keys_set:nn { BoundedBox }{ \g_bounded_box_options_tl }
         \group_begin:
-            \keys_set:nn { BoundedBox }{ ##2 } 
+            \keys_set:nn { BoundedBox }{ ##3 } 
 			\IfValueT { ##4 }
 			{
 				\tl_set:Nn \l_bbox_signal_tl { ##4 }
@@ -4172,9 +4188,19 @@
             }
             \tl_if_empty:NTF \l_bbox_signal_tl    
             {
-                \begin{BBox}<##3>
+				\IfBooleanTF { ##2 }
+				{
+                	\begin{BBox}*
+				}{
+					\begin{BBox}*
+				}
             }{
-                \begin{BBox}[\l_bbox_symbol_tl\l_bbox_before_signal_tl\l_bbox_signal_tl\l_bbox_after_signal_tl]<##3>
+				\IfBooleanTF { ##2 }
+				{
+                	\begin{BBox}*[\l_bbox_symbol_tl\l_bbox_before_signal_tl\l_bbox_signal_tl\l_bbox_after_signal_tl]
+				}{
+                	\begin{BBox}[\l_bbox_symbol_tl\l_bbox_before_signal_tl\l_bbox_signal_tl\l_bbox_after_signal_tl]
+				}
             }
                 \bool_if:NT \l_bbox_wrapping_bool { \wrappingon }
                 \l_bbox_style_tl
@@ -4609,7 +4635,7 @@
 		}
 		\IfBooleanT {#2}
 		{ 
-			\AnnotateSetup{breakable=false} 
+			\AnnotateSetup{\l_bbox_breakable_adhoc_tl} 
 		}
 		\l_annotate_space
 		\bool_if:NTF \l_annotate_breakable_bool
