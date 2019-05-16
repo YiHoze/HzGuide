@@ -69,7 +69,7 @@
 \RequirePackage{bookmark}
 \RequirePackage{calc} % to allow arithmetic expressions for \setlength 
 
-\hypersetup{pdfencoding=auto, colorlinks=true, bookmarksnumbered=true, pdfauthor={hzguide.cls}} % allcolors=darkgray
+\hypersetup{pdfencoding=auto, , bookmarksnumbered=true, pdfauthor={hzguide.cls}} 
 
 % TeX: ^^b7
 % LaTeX: ^^^^ac00 ^^^^^^020000  \char44032 \char"AC00 \char'126000 \char`가 \char`^^^^ac00
@@ -86,7 +86,7 @@
 \keys_define:nn { HzGuide }
 {
     language    .code:n = { \LanguageSetup {#1} },
-    styleset    .tl_set:N = \g_style_set,
+    styleset    .tl_set:N = \g_style_set_tl,
     doctype     .code:n = { \SetDocType {#1} },
     smallerfont .bool_set:N = \g_smallerfont_bool,
     minted    	.bool_set:N = \g_minted_bool,
@@ -496,9 +496,9 @@
 	%\XeTeXcharclass"201D = \XKlatinclosing	
     \sys_if_engine_xetex:TF
 	{
-        \usepackage[hangul]{xetexko}		
-		% \setmainfont{NotoSerifCJKkr}[Script=Hangul, Scale=MatchUppercase, WordSpace=0.85, UprightFont={*-Light}, BoldFont={*-Medium}, ItalicFont=NotoSerif-LightItalic]
-		% \setsansfont{NotoSansCJKkr}[Scale=MatchUppercase, UprightFont={*-Light}, BoldFont={*-Medium}]
+        \usepackage[hangul]{xetexko}
+		% \setmainfont{Noto Serif KR}[UprightFont={*-Light}, BoldFont={*-Medium}] % Script=Hangul, ItalicFont=NotoSerif-LightItalic
+		% \setmainfont{Noto Sans KR}[UprightFont={*-Light}, BoldFont={*-Medium}]
 		% \disablekoreanfonts
 		% \disablehangulspacing
     }{	
@@ -710,7 +710,8 @@
     FrontLogoImage      .tl_set:N = \cover_image_logo_front,	
     BackLogoImage       .tl_set:N = \cover_image_logo_back,	
     ProductImage        .tl_set:N = \cover_image_product,
-    BackgroundImage     .tl_set:N = \cover_image_background,
+    FrontImage     		.tl_set:N = \cover_image_background_front,
+    BackImage     		.tl_set:N = \cover_image_background_back,
     title			    .tl_set:N = \cover_title,
     subtitle            .tl_set:N = \cover_subtitle,
     TitleAlign			.tl_set:N = \cover_title_align,
@@ -727,7 +728,9 @@
     FontSizeI			.tl_set:N = \cover_font_size_i,
     FontSizeII			.tl_set:N = \cover_font_size_ii,
     FontSizeIII		    .tl_set:N = \cover_font_size_iii,
-    FontSizeIV			.tl_set:N = \cover_font_size_iv,	
+    FontSizeIV			.tl_set:N = \cover_font_size_iv,
+	BlankFront			.bool_set:N = \cover_blank_front_bool,
+	BlankBack			.bool_set:N = \cover_blank_back_bool,
 }
 
 \NewDocumentCommand \CoverSetup { m }
@@ -749,7 +752,8 @@
     ProductImage = cover_image,
     AfterFront=\clearpage, %\cleartorecto,
     BeforeBack=\clearpage, %\cleartoverso,
-
+	BlankFront=false,
+	BlankBack=false
 }
 
 \NewDocumentCommand \CoverFontSize { m }
@@ -763,77 +767,94 @@
     }
 }
 
-\NewDocumentCommand \FrontCover {}
+\NewDocumentCommand \FrontCover { }
 {	
     \thispagestyle{empty}
-    \tl_if_empty:NF \cover_image_background
+    \tl_if_empty:NF \cover_image_background_front
     {
-        \watermark{x=0, y=0, image=\cover_image_background}
+        \watermark{x=0, y=0, image=\cover_image_background_front}
     }
-    \begin{IfVartwoEnlarge}		
-        \setSpacing{1}
-        \tl_if_empty:NF \cover_image_logo_front
-        {
-            \includegraphics[scale=\l_image_scale_tl]{\cover_image_logo_front}
-        }
-        \nil\par\vspace{\cover_top_skip}
-        \begin{minipage}{\linewidth}
-                \cover_title_align\cover_font_i
-                \CoverFontSize{1} \cover_title
-                \par\medskip
-                \CoverFontSize{2} \cover_subtitle
-        \end{minipage}      
-        \tl_if_empty:NF \cover_image_product
-        {
-            \par\vspace{1cm}
-            \begin{center}
-                    \includegraphics[scale=\l_image_scale_tl]{\cover_image_product}
-            \end{center}
-        }
-        \vfill
-        \begin{flushright}
-                \cover_font_ii
-                \CoverFontSize{3} \cover_doc_type
-                \par
-            \CoverFontSize{4} \cover_pub_year \hspace{0.5em}|\hspace{0.5em} \cover_revision
-            \end{flushright}        
-    \end{IfVartwoEnlarge}
+	\bool_if:NTF \cover_blank_front_bool
+	{
+		\mbox{}
+	}
+	{
+		\begin{IfVartwoEnlarge}		
+			\setSpacing{1}
+			\tl_if_empty:NF \cover_image_logo_front
+			{
+				\includegraphics[scale=\l_image_scale_tl]{\cover_image_logo_front}
+			}
+			\nil\par\vspace{\cover_top_skip}
+			\begin{minipage}{\linewidth}
+					\cover_title_align\cover_font_i
+					\CoverFontSize{1} \cover_title
+					\par\medskip
+					\CoverFontSize{2} \cover_subtitle
+			\end{minipage}      
+			\tl_if_empty:NF \cover_image_product
+			{
+				\par\vspace{1cm}
+				\begin{center}
+						\includegraphics[scale=\l_image_scale_tl]{\cover_image_product}
+				\end{center}
+			}
+			\vfill
+			\begin{flushright}
+					\cover_font_ii
+					\CoverFontSize{3} \cover_doc_type
+					\par
+				\CoverFontSize{4} \cover_pub_year \hspace{0.5em}|\hspace{0.5em} \cover_revision
+				\end{flushright}        
+		\end{IfVartwoEnlarge}
+	}
     \cover_after_front
-    \tl_if_empty:NF \cover_image_background
+    \tl_if_empty:NF \cover_image_background_front
     {
         \ClearWatermark
     }    
 }
 
-\NewDocumentCommand \BackCover {}
+\NewDocumentCommand \BackCover { }
 {
-    \cover_before_back	
-    \begin{IfVartwoEnlarge}		
-        \AtPageBottom
-        \setSpacing{1}        
-        \tl_if_empty:NTF \cover_image_logo_back
-        {            
-            \cover_note \\
-        }{
-            %%\includegraphics[scale=\l_image_scale_tl]{\cover_image_logo_back}\\
-            \illustimage[valign=b, afterskip=1ex]{\cover_image_logo_back}{\cover_note} \\
-        }        
-        \IfVartwo{ 
-            \raisebox{-0.25ex}{\rule{\headwidth}{0.5pt}} 
-        }[ 
-            \raisebox{-0.25ex}{\rule{\textwidth}{0.5pt}} 
-        ] \\ 
-        © \space \cover_pub_year \space \cover_manufacturer \\ 
-        \cover_manufacturer_address
-    \end{IfVartwoEnlarge}
+    \cover_before_back
+	\thispagestyle{empty}	
+	\tl_if_empty:NF \cover_image_background_back
+    {
+        \watermark{x=0, y=0, image=\cover_image_background_back}
+    }
+	\bool_if:NTF \cover_blank_front_bool
+	{
+		\mbox{}
+	}
+	{
+		\begin{IfVartwoEnlarge}		
+			\AtPageBottom
+			\setSpacing{1}        
+			\tl_if_empty:NTF \cover_image_logo_back
+			{            
+				\cover_note \\
+			}{
+				%%\includegraphics[scale=\l_image_scale_tl]{\cover_image_logo_back}\\
+				\illustimage[valign=b, afterskip=1ex]{\cover_image_logo_back}{\cover_note} \\
+			}        
+			\IfVartwo{ 
+				\raisebox{-0.25ex}{\rule{\headwidth}{0.5pt}} 
+			}[ 
+				\raisebox{-0.25ex}{\rule{\textwidth}{0.5pt}} 
+			] \\ 
+			© \space \cover_pub_year \space \cover_manufacturer \\ 
+			\cover_manufacturer_address
+		\end{IfVartwoEnlarge}
+	}
 }
 
 % extra style set  ------------------------------------------------------------
 \NewDocumentCommand \LoadStyleset {}
 {
-    \tl_if_empty:NF \g_style_set 
+    \tl_if_empty:NF \g_style_set_tl
     {
-        \input{\g_style_set}
+        \input{ \g_style_set_tl }
     }
 }
 
@@ -1455,8 +1476,8 @@
 
 \NewDocumentCommand \PageStyleSetup { m }
 {
-  \keys_set:nn { pagestyle } { #1 }  
-  \PageStyleSettle{\g_layout_type}
+  	\keys_set:nn { pagestyle } { #1 } 
+  	\PageStyleSettle{ \g_layout_type }	
 }
 
 \NewDocumentCommand \PageStyleSettle { m }
@@ -1479,8 +1500,8 @@
     \makeevenfoot{#1}{\hffont\g_ps_evenfootleft_tl}{\hffont\g_ps_evenfootcenter_tl}{\hffont\g_ps_evenfootright_tl}
     \makeoddfoot{#1}{\hffont\g_ps_oddfootleft_tl}{\hffont\g_ps_oddfootcenter_tl}{\hffont\g_ps_oddfootright_tl}
     \pagestyle{#1}
-    \copypagestyle{adhoc}{#1}
     \copypagestyle{chapter}{#1}
+    \copypagestyle{adhoc}{#1}
     \bool_if:NF \g_ps_chapterpage_bool
     {
         \makeheadrule{chapter}{0pt}{0pt}
@@ -1972,7 +1993,7 @@
     \bool_if:NT \g_column_vartwo_bool
     {
         \bool_if:NT \g_style_chapterwider_bool
-        {
+        {            
             \patchcommand{\@makechapterhead}{\begin{adjustwidth}{-\vartwosecindent}{0pt}}{\end{adjustwidth}}
             \patchcommand{\@makeschapterhead}{\begin{adjustwidth}{-\vartwosecindent}{0pt}}{\end{adjustwidth}}
             \patchcommand\printtoctitle{\hspace*{-\vartwosecindent}}{}
@@ -3110,10 +3131,12 @@
         \bool_if:NTF \l_table_legend_bool
         {
             \legend{\l_table_caption_tl}
-        }
-        {
+        }{
             \tabcaption{\l_table_caption_tl}
-            \label{\l_table_label_tl}
+			\tl_if_empty:NF \l_table_label_tl
+			{
+	            \label{\l_table_label_tl}
+			}
         }
     }
 }
@@ -3269,7 +3292,6 @@
     \ImageSetup{showfilename=true}
     \IllustImageSetup{showfilename=true}
     \MarginImageSetup{showfilename=true}
-    \LineImageSetup{showfilename=true}
     \IfBooleanT{#1} { 
         \LineImageSetup{showfilename=true} 
     }
@@ -4021,7 +4043,7 @@
     boxsep=0.5ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
     titlerule=0.75pt, toptitle=0.25ex, bottomtitle=0.5ex,
     colbacktitle=darkgray, coltitle=white,
-    drop~fuzzy~shadow={scale=2}, title=#2, 
+    drop~fuzzy~shadow={scale=2}, fonttitle=\bfseries, title=#2, 
 	IfBooleanTF={#1}{
 		breakable=\l_bbox_breakable_adhoc_tl
 	}{
@@ -4283,7 +4305,7 @@
     scale     .tl_set:N = \l_watermark_scale
 }
 
-\NewDocumentCommand \WatermarkSetup {m}
+\NewDocumentCommand \WatermarkSetup { m }
 {
     \keys_set:nn {watermark} {#1}
 }
@@ -4298,7 +4320,7 @@
     scale=1
 }
 
-\NewDocumentCommand \watermark {m}
+\NewDocumentCommand \watermark { m }
 {
     \ClearWatermark
     \WatermarkSetup {#1}
@@ -4542,7 +4564,7 @@
         \url{#2} 
     }
 }
-\urlstyle{sf}
+%\urlstyle{sf}
 
 \NewDocumentCommand \skiplines { O {1} }
 {
