@@ -3014,7 +3014,8 @@
 	linesep 		.tl_set:N 	= \l_table_linesep_tl,
     norowcolor    	.bool_set:N	= \l_table_norowcolor_bool,
 	star		  	.tl_set:N 	= \l_table_star_tl,
-	vbar		  	.tl_set:N 	= \_ltable_vbar_tl
+	vbar		  	.tl_set:N 	= \l_table_vbar_tl,
+	protrude		.dim_set:N  = \l_table_protrude_dim % valid only at vartwo
 }
 
 \NewDocumentCommand \TableSetup { m }
@@ -3035,7 +3036,8 @@
     footnotestyle=arabic,
     stretch=1,
 	linesep=1pt,
-	star={norowcolor}
+	star={norowcolor},
+	protrude=0pt
 }
 
 % \placetable*|[options](caption)<footnote>{tabu}
@@ -3054,6 +3056,10 @@
     \IfValueT{ #4 } { \tl_set:Nn \l_table_caption_tl {#4} }
     \IfValueT{ #5 } { \tl_set:Nn \l_table_footnote {#5} }
     \bool_if:NT \l_table_norowcolor_bool { \taburowcolors{} }
+	\dim_compare:nT { \l_table_protrude_dim > 0pt }
+	{
+		\begin{IfVartwoEnlarge}[-\l_table_protrude_dim]
+	}
     \hbox_set:Nn \l_text_box
     {
         \tl_set:NV \arraystretch \l_table_stretch_tl
@@ -3073,6 +3079,10 @@
         \table_put:
         \object_skip_after:n {\l_table_after_skip}
     }
+	\dim_compare:nT { \l_table_protrude_dim > 0pt }
+	{
+		\end{IfVartwoEnlarge}
+	}
     \group_end:
 }
 
