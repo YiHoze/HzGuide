@@ -772,7 +772,10 @@
     \thispagestyle{empty}
     \tl_if_empty:NF \cover_image_background_front
     {
-        \watermark{x=0, y=0, image=\cover_image_background_front}
+        %\watermark{x=0, y=0, image=\cover_image_background_front}
+		\begin{tikzpicture}[remember~picture,overlay]
+			\node~at~(current~page.center) { \includegraphics{\cover_image_background_front} };
+		\end{tikzpicture}
     }
 	\bool_if:NTF \cover_blank_front_bool
 	{
@@ -809,10 +812,6 @@
 		\end{IfVartwoEnlarge}
 	}
     \cover_after_front
-    \tl_if_empty:NF \cover_image_background_front
-    {
-        \ClearWatermark
-    }    
 }
 
 \NewDocumentCommand \BackCover { }
@@ -821,7 +820,9 @@
 	\thispagestyle{empty}	
 	\tl_if_empty:NF \cover_image_background_back
     {
-        \watermark{x=0, y=0, image=\cover_image_background_back}
+		\begin{tikzpicture}[remember~picture,overlay]
+			\node~at (current~page.center) { \includegraphics{\cover_image_background_back} };
+		\end{tikzpicture}
     }
 	\bool_if:NTF \cover_blank_front_bool
 	{
@@ -1997,6 +1998,8 @@
             \patchcommand{\@makechapterhead}{\begin{adjustwidth}{-\vartwosecindent}{0pt}}{\end{adjustwidth}}
             \patchcommand{\@makeschapterhead}{\begin{adjustwidth}{-\vartwosecindent}{0pt}}{\end{adjustwidth}}
             \patchcommand\printtoctitle{\hspace*{-\vartwosecindent}}{}
+            \patchcommand\printlottitle{\hspace*{-\vartwosecindent}}{}
+            \patchcommand\printloftitle{\hspace*{-\vartwosecindent}}{}
         }  
         \bool_if:NTF \g_section_multiline_bool
         {
