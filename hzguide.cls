@@ -770,10 +770,10 @@
 \NewDocumentCommand \FrontCover { }
 {	
     \thispagestyle{empty}
-    \tl_if_empty:NF \cover_image_background_front
+    \tl_if_empty:NF \cover_image_background_front 
     {
         %\watermark{x=0, y=0, image=\cover_image_background_front}
-		\begin{tikzpicture}[remember~picture,overlay]
+		\begin{tikzpicture}[remember~picture,overlay] 
 			\node~at~(current~page.center) { \includegraphics{\cover_image_background_front} };
 		\end{tikzpicture}
     }
@@ -788,7 +788,7 @@
 			{
 				\includegraphics[scale=\l_image_scale_tl]{\cover_image_logo_front}
 			}
-			\nil\par\vspace{\cover_top_skip}
+			\mbox{}\par\vspace{\cover_top_skip}
 			\begin{minipage}{\linewidth}
 					\cover_title_align\cover_font_i
 					\CoverFontSize{1} \cover_title
@@ -824,7 +824,7 @@
 			\node~at (current~page.center) { \includegraphics{\cover_image_background_back} };
 		\end{tikzpicture}
     }
-	\bool_if:NTF \cover_blank_front_bool
+	\bool_if:NTF \cover_blank_back_bool
 	{
 		\mbox{}
 	}
@@ -1024,14 +1024,14 @@
 
 % letters  --------------------------------------------------------------------
 
-\NewDocumentCommand \nil {}
-{
-    \rule{0pt}{0pt}
-}
+% \NewDocumentCommand \nil {}
+% {
+%     \rule{0pt}{0pt}
+% }
 
 \NewDocumentCommand \AtPageBottom { s }
 {
-    \nil\vfill
+    \mbox{}\vfill
     \IfBooleanTF{#1}{}{ \thispagestyle{empty} }
 }
 
@@ -1765,9 +1765,9 @@
     \color{\sectioncolor}
 }
 
-\NewDocumentCommand\secstyle{}{ \sectionline\secfontsize }
-\NewDocumentCommand\subsecstyle{}{ \sectionline\subsecfontsize }
-\NewDocumentCommand\subsubsecstyle{}{ \sectionline\subsubsecfontsize }
+\newcommand\secstyle{ \sectionline\secfontsize }
+\newcommand\subsecstyle{ \sectionline\subsecfontsize }
+\newcommand\subsubsecstyle{ \sectionline\subsubsecfontsize }
 \setsecheadstyle{ \secstyle }
 \setsubsecheadstyle{ \subsecstyle }
 \setsubsubsecheadstyle{ \subsubsecstyle }
@@ -2253,6 +2253,10 @@
         \IfVartwo{ \hspace*{-\l_tmpb_dim} }[ \hspace*{-.5\l_tmpb_dim} ]
     }
     \group_end:
+	\dim_compare:nT { #1 < \linewidth }
+	{
+		\dim_set_eq:NN #1 \linewidth
+	}
 }
 
 \ObjectSetup{
@@ -2391,6 +2395,7 @@
     flush         	.bool_set:N = \l_image_flush_bool, % flush images into the left margin
     landscape     	.bool_set:N = \l_image_landscape_bool,
     align         	.tl_set:N 	= \l_image_align,
+	middle			.bool_set:N = \l_image_vertical_middle_bool,
     caption       	.tl_set:N 	= \l_image_caption_tl,
 	caption-short  	.tl_set:N 	= \l_image_caption_short_tl,
 	caption-ignore	.bool_set:N = \l_image_caption_ignore_bool,
@@ -2446,30 +2451,40 @@
     \ImageSetup{#3}
     \IfValueT{ #6 }
     { 
-        \tl_set:Nn \l_image_caption_tl {#6} 
+        \tl_set:Nn \l_image_caption_tl { #6 } 
     }
 	\IfValueT{ #7 }
     { 
-        \tl_set:Nn \l_image_caption_short_tl {#7} 
+        \tl_set:Nn \l_image_caption_short_tl { #7 } 
     }
     \tl_if_empty:NT \l_image_label_tl
     {
         \IfValueTF{#5} 
 		{
-            \tl_set:Nn \l_image_label_tl {#4-#5}
+            \tl_set:Nn \l_image_label_tl { #4-#5 }
         }{
-            \tl_set:Nn \l_image_label_tl {#4}
+            \tl_set:Nn \l_image_label_tl { #4 }
         }
     }
-    \image_save:nn {#4} {#5}
+    \image_save:nn { #4 } { #5 }
     \bool_if:NTF \l_image_float_bool {
         \begin{figure}
         \image_put:
         \end{figure}
     }{
-        \object_skip_before:n {\l_image_before_skip}
+		\bool_if:NTF \l_image_vertical_middle_bool
+		{
+			\begin{vplace}
+		}{
+        	\object_skip_before:n {\l_image_before_skip}
+		}
         \image_put:
-        \object_skip_after:n {\l_image_after_skip}
+		\bool_if:NTF \l_image_vertical_middle_bool
+		{
+			\end{vplace}
+		}{
+        	\object_skip_after:n {\l_image_after_skip}
+		}
     }
     \group_end:
 }
@@ -2533,8 +2548,11 @@
 \cs_new:Nn \image_put:
 {
     \bool_if:NTF \l_image_landscape_bool
-        { \image_put_landscape: }
-        { \image_put_portrait: }
+    {
+		\image_put_landscape: 
+	}{ 
+		\image_put_portrait: 
+	}
 }
 
 \cs_new:Nn \image_put_portrait:
@@ -2542,17 +2560,17 @@
     \bool_if:NTF \l_image_flush_bool
     {
         \hspace*{-\vartwosecindent}
-    }{
+    }{		
         \dim_compare:nTF { \g_protrude_dim > 0pt }
         {
             \dim_set_towidth:Nn \l_tmpa_dim { \box_use:N \l_image_box }
-            \object_locate:N \l_tmpa_dim
+            \object_locate:N \l_tmpa_dim			
         }{
-            \dim_set:Nn \l_tmpa_dim { \linewidth }
-        }
+			\dim_set_eq:NN \l_tmpa_dim \linewidth
+		}
     }
     \begin{minipage}{\l_tmpa_dim}
-        \l_image_align\nil
+        \l_image_align\mbox{}
         \box_use:N \l_image_box
         \image_caption:
     \end{minipage}
@@ -2570,7 +2588,7 @@
     }
     \rotatebox{-90}{
         \begin{minipage}{\l_tmpb_dim}
-            \l_image_align\nil
+            \l_image_align\mbox{}
             \box_use:N \l_image_box
             \image_caption:
         \end{minipage}
@@ -2633,9 +2651,10 @@
     valign          .tl_set:N = \l_illustimage_valign_tl,
     caption         .tl_set:N = \l_illustimage_caption,
 	caption-ignore	.bool_set:N = \l_illustimage_caption_ignore_bool,
+	caption-align	.tl_set:N = \l_illustimage_caption_align_tl,
     label           .tl_set:N = \l_illustimage_label,
     legend          .bool_set:N = \l_illustimage_legend_bool,
-    min-width           .dim_set:N = \l_illustimage_minimum_width_dim, 
+    min-width       .dim_set:N = \l_illustimage_minimum_width_dim, 
 	image-align		.tl_set:N = \l_illustimage_image_align_tl, % this is effective when min-width is specified
     broad           .bool_set:N = \l_illustimage_broad_bool, % take the full width in case of vartwo
     flush           .bool_set:N = \l_illustimage_flush_bool,
@@ -2649,6 +2668,10 @@
 \NewDocumentCommand \IllustImageSetup { m }
 {
     \keys_set:nn { illustimage } { #1 }
+	\tl_if_empty:NT \l_illustimage_caption_align_tl
+	{
+		\tl_set:NV \l_illustimage_caption_align_tl \g_caption_align_tl
+	}
 }
 
 \IllustImageSetup{
@@ -2676,9 +2699,13 @@
 	\dim_zero:N \l_illustimage_text_width_dim
     \bool_set_true:N \in_illustimage_bool
     \IfBooleanT {#1}
-        { \exp_args:No \IllustImageSetup{\l_illustimage_star_tl} }
+    { 
+		\exp_args:No \IllustImageSetup{\l_illustimage_star_tl} 
+	}
     \IfBooleanT {#2}
-        { \IllustImageSetup{first=true} }
+    { 
+		\IllustImageSetup{first=true} 
+	}
     \IllustImageSetup{#3}
     \bool_if:NT \l_illustimage_broad_bool
     {
@@ -2811,10 +2838,11 @@
     }
     \tl_if_empty:NF \l_illustimage_caption
     {
+		\captionstyle{\l_illustimage_caption_align_tl}
 		\bool_if:NF \l_illustimage_caption_ignore_bool
 		{
 			\bool_if:NTF \l_illustimage_legend_bool
-			{
+			{				
 				\legend{\l_illustimage_caption}
 			}{
 				\imgcaption{\l_illustimage_caption}
@@ -2829,7 +2857,7 @@
 \NewDocumentEnvironment {IllustImage} { s t^ O{} m d() }
 {
     \IfBooleanT {#1} { 
-        \exp_args:No \IllustImageSetup{\l_illustimage_star_tl} 
+        \exp_args:No \IllustImageSetup{ \l_illustimage_star_tl }
     }
     \IfBooleanT {#2} { 
         \IllustImageSetup{first=true} 
@@ -2887,14 +2915,17 @@
 }
 \NewDocumentEnvironment { IllustEnum } { s t^ o m }
 {
-    \IfBooleanT {#1} {
+    \IfBooleanT {#1} 
+	{
         \IllustImageSetup{first=true}
-        \exp_args:No \IllustImageSetup{\l_illustimage_enum_tl}
+        \exp_args:No \IllustImageSetup{ \l_illustimage_enum_tl }
     }
-    \IfBooleanT {#2} {
-        \exp_args:No \IllustImageSetup{\l_illustimage_star_tl}
+    \IfBooleanT {#2} 
+	{
+        \exp_args:No \IllustImageSetup{ \l_illustimage_star_tl }
     }
-    \IfValueT {#3} { 
+    \IfValueT {#3} 
+	{ 
         \IllustImageSetup{#3} 
     }
     \IfBooleanTF{#1}
@@ -4227,7 +4258,7 @@
 				{
                 	\begin{BBox}*
 				}{
-					\begin{BBox}*
+					\begin{BBox}
 				}
             }{
 				\IfBooleanTF { ##2 }
@@ -4285,6 +4316,7 @@
 \NewBoundedBox{note}{signal=\g_admonition_note_tl, symbol={}}
 \NewBoundedBox{instance}{signal={}, type=RightBar, font=\small}
 \NewBoundedBox{reference}{signal={}, font=\small}
+
 
 %\watermark{x=30,y=30,fontsize=90,color=red,text={...},image=foo,rotate=50}
 % when both text and image are specified, the former is ignored.
