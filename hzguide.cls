@@ -69,7 +69,7 @@
 \RequirePackage{bookmark}
 \RequirePackage{calc} % to allow arithmetic expressions for \setlength 
 
-\hypersetup{pdfencoding=auto, , bookmarksnumbered=true, pdfauthor={hzguide.cls}} 
+\hypersetup{pdfencoding=auto, bookmarksnumbered=true, pdfauthor={hzguide.cls}} 
 
 % TeX: ^^b7
 % LaTeX: ^^^^ac00 ^^^^^^020000  \char44032 \char"AC00 \char'126000 \char`가 \char`^^^^ac00
@@ -2313,7 +2313,7 @@
 	}
 	\IfBooleanTF {#1}
 	{
-		\hypersetup{allcolors=#1}
+		\hypersetup{allcolors=#2}
 	}{
 		\hypersetup{colorlinks=false}
     	\renewcommand{\theTitleReference}[2]{\textcolor{#2}{#3 ##2}}
