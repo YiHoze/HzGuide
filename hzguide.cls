@@ -22,16 +22,6 @@
 % IV. For those of designer interface level:
 %     Follow clause II. However, it is allowed to use lowercase with compound words.
 
-% Frank Mittelbach's recipe for the error from tabu and xcolor
-% \usepackage{etoolbox}
-% \makeatletter
-% \patchcmd\tabu@startpboxmeasure
-%   {\aftergroup\tabu@endpboxmeasure}
-%   {\aftergroup\tabu@endpboxmeasure
-%    \color@begingroup
-%   }{\typeout{tabu patched}}{\typeout{tabu patch failed!}}
-% \makeatletter
-
 % For a breakable color box
 % \usepackage[normalem]{ulem}
 % \def\myhlcolor{yellow!75}
@@ -61,13 +51,14 @@
 \RequirePackage{eso-pic}
 \RequirePackage{tikz, tikzpagenodes}
 \RequirePackage{tcolorbox}
-\RequirePackage{tabu, longtable, multirow}
+\RequirePackage{tabularx, longtable, multirow}
 \RequirePackage[obeyspaces, spaces]{url} %\path{file path}
 % when using \path, redefine \flushleft like below if you don't want spaces above and below it.
 %\def\flushleft{\setlength\topsep{0pt}\trivlist \raggedright\item\relax}
 \RequirePackage{hyperref}
 \RequirePackage{bookmark}
 \RequirePackage{calc} % to allow arithmetic expressions for \setlength 
+\RequirePackage{etoolbox}
 
 \hypersetup{pdfencoding=auto, bookmarksnumbered=true, pdfauthor={hzguide.cls}} 
 
@@ -1046,8 +1037,11 @@
 		\newfontfamily\foreignrmfamily{#2}
 		\newfontfamily\foreignsffamily{#3}
 	}{
-		\newfontfamily\foreignrmfamily{#2}[Ligatures=TeX, AutoFakeBold=1.5]
-		\newfontfamily\foreignsffamily{#3}[Ligatures=TeX, AutoFakeBold=1.5]
+        \sys_if_engine_xetex:T
+        {
+            \newfontfamily\foreignrmfamily{#2}[Ligatures=TeX, AutoFakeBold=1.5]
+            \newfontfamily\foreignsffamily{#3}[Ligatures=TeX, AutoFakeBold=1.5]
+        }
 	}
 }
 \SetForeignFonts{HCR Batang}{HCR Dotum}
@@ -3017,10 +3011,14 @@
 }
 
 % \settable[]{ } ------------------------------------
-\taburowcolors{white .. backgray}
-\NewExpandableDocumentCommand\HeadFont{}{\rowfont{\bfseries}}
-%\rowfont[c]{\bfseries}
-%\newtabulinestyle{thick=1pt}
+%\taburowcolors{white .. backgray}
+%\NewExpandableDocumentCommand\HeadFont{}{\bfseries}
+\rowcolors{1}{white}{backgray}
+
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+
 
 \cs_new:Npn \table_footnotestyle:n #1
 {
@@ -3045,7 +3043,6 @@
     footnote      	.tl_set:N 	= \l_table_footnote,
     footnotestyle 	.code:n 	= { \table_footnotestyle:n {#1} }, % footnotestyle=fnsymbol
     stretch       	.tl_set:N 	= \l_table_stretch_tl,
-	linesep 		.tl_set:N 	= \l_table_linesep_tl,
     norowcolor    	.bool_set:N	= \l_table_norowcolor_bool,
 	star		  	.tl_set:N 	= \l_table_star_tl,
 	vbar		  	.tl_set:N 	= \l_table_vbar_tl,
@@ -3069,12 +3066,12 @@
     fontsize=\small,
     footnotestyle=arabic,
     stretch=1,
-	linesep=1pt,
+    norowcolor=false,
 	star={norowcolor},
 	protrude=0pt
 }
 
-% \placetable*|[options](caption)<footnote>{tabu}
+% \placetable*|[options](caption)<footnote>{tabular}
 \NewDocumentCommand \placetable { s t| O{} d() d<> m }
 {
     \group_begin:	
@@ -3089,15 +3086,19 @@
     \TableSetup{ #3 }
     \IfValueT{ #4 } { \tl_set:Nn \l_table_caption_tl {#4} }
     \IfValueT{ #5 } { \tl_set:Nn \l_table_footnote {#5} }
-    \bool_if:NT \l_table_norowcolor_bool { \taburowcolors{} }
+    \bool_if:NTF \l_table_norowcolor_bool 
+    { 
+        \rowcolors{1}{white}{white}
+    }{
+        \rowcolors{1}{white}{backgray}
+    }
 	\dim_compare:nT { \l_table_protrude_dim > 0pt }
 	{
 		\begin{IfVartwoEnlarge}[-\l_table_protrude_dim]
 	}
     \hbox_set:Nn \l_text_box
     {
-        \tl_set:NV \arraystretch \l_table_stretch_tl
-		\dim_set:Nn \tabulinesep { \l_table_linesep_tl }
+        \tl_set:NV \arraystretch \l_table_stretch_tl		
         \l_table_font_tl
         \l_table_fontsize_tl
         \l_table_hook_tl
@@ -3227,15 +3228,17 @@
 
 \NewEnviron{spectable}{
     \placetable{
-        \begin{tabu}{X[lm]X[1.5lm]}
+        %\begin{tabu}{X[lm]X[1.5lm]}
+        \begin{tabularx}{\linewidth}{XX}
         \hline\BODY\hline
-        \end{tabu}
+        \end{tabularx}
     }
 }
 
 \NewEnviron{spectablex}{
     \placetable{
-        \begin{tabu}{lX[lm]}
+        %\begin{tabu}{lX[lm]}
+        \begin{tabularx}{\linewidth}{lX}
         \hline\BODY\hline
         \end{tabu}
     }
@@ -3252,20 +3255,21 @@
 }
 
 \NewEnviron{imagetableiii}{
-    \placetable[stretch=1.3,font=\small]{
-        \taburowcolors{}
-        \begin{tabu}{X[cm]X[cm]X[cm]}
+    \placetable[stretch=1.3,font=\small,norowcolor]{
+        \rowcolors{1}{white}{backgray}
+        %\begin{tabu}{X[cm]X[cm]X[cm]}
+        \begin{tabularx}{\linewidth}{XXX}
         \BODY
-        \end{tabu}
+        \end{tabularx}
     }
 }
 
 \NewEnviron{imagetableii}{
-    \placetable[stretch=1.3,font=\small]{
-        \taburowcolors{}
-        \begin{tabu}{X[cm]X[cm]}
+    \placetable[stretch=1.3,font=\small,norowcolor]{
+        %\begin{tabu}{X[cm]X[cm]}
+        \begin{tabularx}{\linewidth}{XXX}
         \BODY
-        \end{tabu}
+        \end{tabularx}
     }
 }
 
@@ -3293,8 +3297,7 @@
     \TableSetup{#1}
     \tl_set:Nn \arraystretch {\l_table_stretch_tl}
     \l_table_font_tl
-    \l_table_fontsize_tl
-    \taburowcolors{backgray .. white}
+    \l_table_fontsize_tl    
 }
 
 % \DeclareExpandableDocumentCommand \LongTableHeadFont {}
@@ -3967,6 +3970,7 @@
         %\tightlist
 		\HzJustification
     }{
+        \begin{flushleft}
         \IfValueT {#2} { \int_set:Nn \l_callout_column_int {#2} }
         \NumTabs {\l_callout_column_int}
         \int_zero:N \l_callout_int
@@ -3975,7 +3979,12 @@
             {\cs_set_eq:NN \item \callout_item_space:}
     }
 }{
-    \IfBooleanT {#1} { \end{calloutenum}  }
+    \IfBooleanTF {#1} 
+    { 
+        \end{calloutenum}  
+    }{
+        \end{flushleft}
+    }
     \bool_if:NT \l_callout_rule_bool { \end{RuleBox} }
     \object_skip_after:n {\l_callout_after_skip}
 }
@@ -4922,14 +4931,17 @@
 {
     \par
     \begin{PlaceTable}
-        \begin{tabu}{X[lp]X[lp]X[lp]}\hline
+        %\begin{tabu}{X[lp]X[lp]X[lp]}
+        \begin{tabularx}{\linewidth}{XXX}
+            \hline
             \rowfont{\bfseries} A & B & C \\\hline
             1 & 1 & 1\\
             2 & 2 & 2\\
             3 & 3 & 3\\
             4 & 4 & 4\\
             5 & 5 & 5\\
-        \hline\end{tabu}
+            \hline
+        \end{tabularx}
     \end{PlaceTable}
 }
 
