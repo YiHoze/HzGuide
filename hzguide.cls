@@ -488,8 +488,8 @@
     \sys_if_engine_xetex:TF
 	{
         \usepackage[hangul]{xetexko}
-		% \setmainfont{Noto Serif KR}[UprightFont={*-Light}, BoldFont={*-Medium}] % Script=Hangul, ItalicFont=NotoSerif-LightItalic
-		% \setmainfont{Noto Sans KR}[UprightFont={*-Light}, BoldFont={*-Medium}]
+		% \setmainfont{Noto Serif KR}[UprightFont={*-Light}, BoldFont={*-SemiBold}] % Script=Hangul, ItalicFont=NotoSerif-LightItalic
+        % \setmainfont{Noto Sans KR}[UprightFont={*-Light}, BoldFont={*-Medium}]        
 		% \disablekoreanfonts
 		% \disablehangulspacing
     }{	
@@ -721,7 +721,8 @@
     FontSizeIII		    .tl_set:N = \cover_font_size_iii,
     FontSizeIV			.tl_set:N = \cover_font_size_iv,
 	BlankFront			.bool_set:N = \cover_blank_front_bool,
-	BlankBack			.bool_set:N = \cover_blank_back_bool,
+    BlankBack			.bool_set:N = \cover_blank_back_bool,
+    hook                .tl_set:N = \cover_hook_tl,
 }
 
 \NewDocumentCommand \CoverSetup { m }
@@ -761,9 +762,9 @@
 \NewDocumentCommand \FrontCover { }
 {	
     \thispagestyle{empty}
+    \cover_hook_tl
     \tl_if_empty:NF \cover_image_background_front 
     {
-        %\watermark{x=0, y=0, image=\cover_image_background_front}
 		\begin{tikzpicture}[remember~picture,overlay] 
 			\node~at~(current~page.center) { \includegraphics{\cover_image_background_front} };
 		\end{tikzpicture}
@@ -808,7 +809,8 @@
 \NewDocumentCommand \BackCover { }
 {
     \cover_before_back
-	\thispagestyle{empty}	
+    \thispagestyle{empty}	
+    \cover_hook_tl
 	\tl_if_empty:NF \cover_image_background_back
     {
 		\begin{tikzpicture}[remember~picture,overlay]
@@ -818,23 +820,20 @@
 	\bool_if:NTF \cover_blank_back_bool
 	{
 		\mbox{}
-	}
-	{
+	}{
 		\begin{IfVartwoEnlarge}		
 			\AtPageBottom
 			\setSpacing{1}        
 			\tl_if_empty:NTF \cover_image_logo_back
 			{            
-				\cover_note \\
+                \tl_if_empty:NF
+                {
+                    \cover_note \\
+                }
 			}{
-				%%\includegraphics[scale=\l_image_scale_tl]{\cover_image_logo_back}\\
 				\illustimage[valign=b, afterskip=1ex]{\cover_image_logo_back}{\cover_note} \\
 			}        
-			\IfVartwo{ 
-				\raisebox{-0.25ex}{\rule{\headwidth}{0.5pt}} 
-			}[ 
-				\raisebox{-0.25ex}{\rule{\textwidth}{0.5pt}} 
-			] \\ 
+			\noindent	\raisebox{-0.25ex}{\rule{\headwidth}{0.5pt}} \\
 			© \space \cover_pub_year \space \cover_manufacturer \\ 
 			\cover_manufacturer_address
 		\end{IfVartwoEnlarge}
@@ -1198,7 +1197,6 @@
         {letter}      { \layout_paper_letter: }
         {46D}          { \layout_paper_ivvid: } % 사륙배판 = JIS B5
         {slide}       { \layout_paper_slide: }
-        {smartphone}  { \layout_paper_smartphone: }
         {arbitrary}   { \layout_paper_arbitrary: }
     }
 }
@@ -1246,8 +1244,8 @@
     \dim_gset:Nn \stockheight {250mm}
     \dim_gset:Nn \paperwidth {148mm}
     \dim_gset:Nn \paperheight {210mm}
-    \dim_gset:Nn \ulmargin {12mm}
-    \dim_gset:Nn \lrmargin {18mm}
+    \dim_gset:Nn \lrmargin {19mm}
+    \dim_gset:Nn \ulmargin {17mm}
     \dim_gset:Nn \vartwomargin {10mm}
 }
 
@@ -1296,15 +1294,6 @@
     \tl_gset:Nn \g_layout_type {slide}
 }
 
-\cs_new:Nn \layout_paper_smartphone:
-{
-    \dim_gset:Nn \stockwidth {60mm}
-    \dim_gset:Nn \stockheight {110mm}
-    \dim_gset:Nn \paperwidth {60mm}
-    \dim_gset:Nn \paperheight {110mm}
-    \tl_gset:Nn \g_layout_type {smartphone}
-}
-
 \cs_new:Nn \layout_paper_arbitrary:
 {
     \tl_gset:Nn \g_layout_type {arbitrary}
@@ -1350,16 +1339,6 @@
     \checkandfixthelayout
     \let\evensidemargin\oddsidemargin
     \IfVartwo{ \dim_set:Nn \g_protrude_dim { \marginparwidth } }
-}
-
-\cs_new:Nn \layout_smartphone:
-{
-    \setulmarginsandblock{8mm}{12mm}{*}
-    \setlrmarginsandblock{5mm}{5mm}{*}
-    \setheadfoot{0mm}{5mm}
-    \setlength\headsep{0mm}
-    \g_layout_hook
-    \checkandfixthelayout
 }
 
 \cs_new:Nn \layout_slide:
@@ -1619,7 +1598,6 @@
         { common }    { \layout_settle_common: }
         { vartwo }    { \layout_settle_vartwo: }
         { slide }    { \layout_settle_slide: }
-        { smartphone }  { \layout_settle_smartphone: }
         { arbitrary }  { \layout_settle_arbitrary: }
     }{ 
         \layout_settle_common: 
@@ -1649,18 +1627,6 @@
     \folio_vartwo:
     \tl_set:Nn \chapteralign {\raggedleft}
     \SetObjectAlign{\raggedright}
-}
-
-\cs_new:Nn \layout_settle_smartphone:
-{
-    \layout_smartphone:
-    \tl_set:Nn \hffont {\footnotesize}
-    \makeevenfoot{plain}{}{\hffont\thepage}{}
-    \makeoddfoot{plain}{}{\hffont\thepage}{}
-    \pagestyle{plain}
-    \copypagestyle{chapter}{plain}
-    \SetObjectAlign{\centering}
-    \AtBeginDocument{\sffamily}
 }
 
 \cs_new:Nn \layout_settle_slide:
@@ -1773,7 +1739,6 @@
     \str_case:nn {#1}
     {
         {report}     { \style_type_report: }
-        {smartphone}  { \style_type_smartphone: }
     }
 }
 
@@ -1796,22 +1761,6 @@
     \counterwithout{figure}{chapter}
     \counterwithout{table}{chapter}
     \style_cft_configure:n {section}
-}
-
-\cs_new:Nn \style_type_smartphone:
-{
-    \makechapterstyle{null}{
-        \renewcommand{\chapnamefont}{\LARGE\chapterline\chapternamesize}
-        \renewcommand{\chapnumfont}{\LARGE\chapterline\chapternumbersize}
-        \renewcommand{\chaptitlefont}{\LARGE\chapterline\chaptertitlesize}
-    }
-    \keys_set:nn { HzHeading }
-    {
-        chapterstyle=firmarticle,
-        cftstyle=section,
-        paragraphstyle=indent
-    }
-    \setlist{noitemsep}
 }
 
 \cs_new:Npn \style_cft_configure:n #1
@@ -3255,8 +3204,7 @@
 }
 
 \NewEnviron{imagetableiii}{
-    \placetable[stretch=1.3,font=\small,norowcolor]{
-        \rowcolors{1}{white}{backgray}
+    \placetable[stretch=1.3,font=\small,norowcolor]{        
         %\begin{tabu}{X[cm]X[cm]X[cm]}
         \begin{tabularx}{\linewidth}{XXX}
         \BODY
@@ -3958,9 +3906,12 @@
 }
 
 \NewDocumentEnvironment {callout} { s o }
-{  
-    \object_skip_before:n {\l_callout_before_skip}
-    \bool_if:NT \l_callout_rule_bool { \begin{RuleBox} }
+{
+    \bool_if:NT \l_callout_rule_bool 
+    { 
+        \object_skip_before:n {\l_callout_before_skip}
+        \begin{RuleBox} 
+    }
     %\setfootnoterule{0pt}{0pt}{0pt}
     \l_callout_font_tl    
     \IfBooleanTF {#1}
@@ -3975,8 +3926,11 @@
         \NumTabs {\l_callout_column_int}
         \int_zero:N \l_callout_int
         \bool_if:NTF \l_callout_tab_bool
-            {\cs_set_eq:NN \item \callout_item_tab:}
-            {\cs_set_eq:NN \item \callout_item_space:}
+        { 
+            \cs_set_eq:NN \item \callout_item_tab: 
+        }{ 
+            \cs_set_eq:NN \item \callout_item_space: 
+        }
     }
 }{
     \IfBooleanTF {#1} 
@@ -3985,8 +3939,11 @@
     }{
         \end{flushleft}
     }
-    \bool_if:NT \l_callout_rule_bool { \end{RuleBox} }
-    \object_skip_after:n {\l_callout_after_skip}
+    \bool_if:NT \l_callout_rule_bool 
+    { 
+        \end{RuleBox} 
+        \object_skip_after:n {\l_callout_after_skip}
+    }
 }
 
 
@@ -4206,8 +4163,8 @@
     \str_case_x:nnTF { #1 }
     {
         { shade }{
-            \cs_set_eq:NN \BBox \BreakableShadeBox
-            \cs_set_eq:NN \endBBox \endBreakableShadeBox
+            \cs_set_eq:NN \BBox \ShadeBox
+            \cs_set_eq:NN \endBBox \endShadeBox
         }        
         { shadow }{
             \cs_set_eq:NN \BBox \ShadowBox
