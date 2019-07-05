@@ -1879,9 +1879,11 @@
 
 \cs_new:Nn \style_paragraph_indent:
 {
-    \setlength{\parindent}{\hzparindent}
-    \tl_set:Nn \l_bbox_style_common_tl { \setlength\parindent{\hzparindent}\noindent }
+    % \tl_set:Nn \l_bbox_style_common_tl { \setlength\parindent{\hzparindent}\noindent }    
+    %\tl_set:Nn \l_bbox_style_common_tl { \noindent }    
     \abnormalparskip{0pt}
+    \setlength{\parindent}{\hzparindent}
+    \SetTextStyle{\setlength\parindent{\hzparindent}\noindent}
     \setlist{partopsep=0pt, topsep=.25\baselineskip, itemsep=.25ex}
     \setlist[itemize]{labelindent=.5em,labelwidth=1em,labelsep=.5em}
     \setlist[enumerate]{labelindent=.5em,labelwidth=1.25em,labelsep=.5em}
@@ -1890,8 +1892,8 @@
 
 \cs_new:Nn \style_paragraph_interval:
 {
-    \setlength{\parindent}{0em}
     \abnormalparskip{\hzparskip}
+    \setlength{\parindent}{0em}    
     \setlist{partopsep=0pt, topsep=.5ex, itemsep=0pt}
     \setlist[itemize]{labelindent=0em,labelwidth=1em,labelsep=.5em}
     \setlist[enumerate]{labelindent=0em,labelwidth=1.25em,labelsep=.5em}
@@ -2077,12 +2079,15 @@
 \newcounter{unsec}[chapter] % when \setsecnumdepth{chapter} is declared
 \newcounter{unsubsec}[unsec]
 
-\tl_new:N \HzJustification
-\NewDocumentCommand \SetJustification { m }
+\tl_new:N \g_common_text_style 
+\NewDocumentCommand \SetTextStyle { m o } 
 {
-    #1
-    \tl_gset:Nn \HzJustification {#1}
-    \renewcommand{\@makefntext}[1]{\makefootmark#1 ##1}
+    \tl_gset:Nn \g_common_text_style {#1}
+    \IfValueT { #2 }
+    {
+        #2
+        \renewcommand{\@makefntext}[1]{\makefootmark#2 ##1}
+    }
 }
 
 \AtBeginDocument{    
@@ -2684,7 +2689,7 @@
     \hbox_set:Nn \l_text_box
     {
         \begin{minipage}{\l_illustimage_text_width_dim}
-            \HzJustification\l_illustimage_textstyle_tl #6
+            \g_common_text_style\l_illustimage_textstyle_tl #6
         \end{minipage}
     }
 	% restore image & text
@@ -2947,7 +2952,7 @@
     \bool_if:NT { \l_lineimg_showfilename_bool}
     {
         \group_begin:
-            \tiny \tl_to_str:n { #2 }
+        \allowbreak \tiny \tl_to_str:n { #2 }
         \group_end:
     }
 }
@@ -3919,7 +3924,7 @@
         \renewcommand\labelenumi{\l_callout_label_enum_tl}
         \begin{calloutenum}
         %\tightlist
-		\HzJustification
+		\g_common_text_style
     }{
         \begin{flushleft}
         \IfValueT {#2} { \int_set:Nn \l_callout_column_int {#2} }
@@ -3994,7 +3999,7 @@
     font=\sffamily\footnotesize\bfseries,
     fgcolor=white,
     bgcolor=black,
-    sep=0.5pt,
+    sep=1pt,
     raise=-.5ex,
     base=9
 }
@@ -4111,7 +4116,7 @@
 \tl_new:N \l_bbox_style_tl
 \tl_new:N \l_bbox_style_common_tl
 \tl_set:Nn \l_bbox_style_tl {
-    \HzJustification
+    \g_common_text_style
     \l_bbox_style_common_tl
     \l_bbox_style_extra_tl
 }
