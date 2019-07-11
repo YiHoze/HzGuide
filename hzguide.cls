@@ -2293,12 +2293,12 @@
 
 \keys_define:nn  { HzCaption }{
 
-    beforeskip  .skip_set:N = \g_caption_before_skip,
-    afterskip   .skip_set:N = \g_caption_after_skip,
-    align       .tl_set:N = \g_caption_align_tl,
-	align-short .tl_set:N = \g_caption_align_short_tl,
-    font        .tl_set:N = \g_caption_font_tl,
-    delimiter   .tl_set:N = \g_caption_delimiter_tl
+    beforeskip  .skip_gset:N = \g_caption_before_skip,
+    afterskip   .skip_gset:N = \g_caption_after_skip,
+    align       .tl_gset:N = \g_caption_align_tl,
+	align-short .tl_gset:N = \g_caption_align_short_tl,
+    font        .tl_gset:N = \g_caption_font_tl,
+    delimiter   .tl_gset:N = \g_caption_delimiter_tl
 }
 
 \NewDocumentCommand \CaptionSetup { m }
@@ -2310,6 +2310,7 @@
     \captiontitlefont{ \g_caption_font_tl }
     \captiondelim{ \g_caption_delimiter_tl }
     \captionstyle[\g_caption_align_short_tl]{ \g_caption_align_tl }
+    %\captionstyle{ \g_caption_align_tl }
 }
 
 \CaptionSetup{
@@ -3282,9 +3283,9 @@
 
 \NewDocumentCommand \SetObjectAlign { m }
 {
-    \CaptionSetup { align = #1 }
-    \ImageSetup { align = #1 }
-    \TableSetup { align = #1 }
+    \CaptionSetup{ align-short=#1, align=#1 }
+    \ImageSetup{ align=#1 }
+    \TableSetup{ align=#1 }
 }
 
 \NewDocumentCommand \ShowImageFilename { s }
@@ -3675,6 +3676,19 @@
     \dim_set:Nn \l_tmpa_dim { \box_ht:N \l_tmpb_box }
     \raisebox{\l_tmpa_dim}{ \smash{\box_use:N \l_tmpa_box} }
 }
+\cs_new:Npn \terms_label_verbatim:n #1
+{
+    \int_gincr:N \l_terms_int
+    \str_set:Nn \l_tmpa_str { #1 }
+    \bool_if:NT \l_terms_index_bool { \index{\l_tmpa_str} }
+    \group_begin:
+        \color{\l_terms_color_tl}
+        \l_terms_marker
+        \l_terms_font_tl 
+		\terms_label_anchor:n { \l_tmpa_str }
+    \group_end:
+    \l_terms_delimiter_tl
+}
 \cs_new:Npn \terms_label_type_set:n #1
 {
     \skip_set:Nn \partopsep { 0pt }
@@ -3695,6 +3709,10 @@
         { multiline }{
             \dim_set_eq:NN \labelwidth \l_terms_label_width_dim
             \cs_set_eq:NN \makelabel \terms_label_multiline:n
+        }
+        { verbatim }{
+            \dim_set_eq:NN \labelwidth \l_terms_label_width_dim
+            \cs_set_eq:NN \makelabel \terms_label_verbatim:n
         }
     }
     \skip_set_eq:NN \labelsep \l_terms_label_sep_skip
