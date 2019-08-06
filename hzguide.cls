@@ -60,7 +60,7 @@
 \RequirePackage{calc} % to allow arithmetic expressions for \setlength 
 \RequirePackage{etoolbox}
 
-\hypersetup{pdfencoding=auto, bookmarksnumbered=true, pdfauthor={hzguide.cls}} 
+\hypersetup{pdfencoding=auto, bookmarksnumbered=true, linktoc=all, pdfauthor={hzguide.cls}} 
 
 % TeX: ^^b7
 % LaTeX: ^^^^ac00 ^^^^^^020000  \char44032 \char"AC00 \char'126000 \char`가 \char`^^^^ac00
@@ -488,10 +488,10 @@
     \sys_if_engine_xetex:TF
 	{
         \usepackage[hangul]{xetexko}
-		% \setmainfont{Noto Serif KR}[UprightFont={*-Light}, BoldFont={*-SemiBold}] % Script=Hangul, ItalicFont=NotoSerif-LightItalic
-        % \setmainfont{Noto Sans KR}[UprightFont={*-Light}, BoldFont={*-Medium}]        
+        % \setmainhangulfont{Noto Serif KR}[UprightFont={*-Light}, BoldFont={*-SemiBold}, Script=Hangul] % ItalicFont=NotoSerif-LightItalic
+        % \setsanshangulfont{Noto Sans KR}[UprightFont={*-Light}, BoldFont={*-Medium}, Script=Hangul]
 		% \disablekoreanfonts
-		% \disablehangulspacing
+        % \disablehangulspacing        
     }{	
         \sys_if_engine_luatex:T
 		{
