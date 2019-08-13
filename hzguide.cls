@@ -3938,11 +3938,9 @@
     %\setfootnoterule{0pt}{0pt}{0pt}
     \l_callout_font_tl    
     \IfBooleanTF {#1}
-    {
-        \renewcommand\labelenumi{\l_callout_label_enum_tl}
+    {        
         \begin{calloutenum}
-        %\tightlist
-		\g_common_text_style
+        %\tightlist	
     }{
         \begin{flushleft}
         \IfValueT {#2} { \int_set:Nn \l_callout_column_int {#2} }
@@ -4017,7 +4015,7 @@
     font=\sffamily\footnotesize\bfseries,
     fgcolor=white,
     bgcolor=black,
-    sep=1pt,
+    sep=0.25pt,
     raise=-.5ex,
     base=9
 }
