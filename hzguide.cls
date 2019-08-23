@@ -60,6 +60,8 @@
 \RequirePackage{calc} % to allow arithmetic expressions for \setlength 
 \RequirePackage{etoolbox}
 
+\tcbuselibrary{listings}
+
 \hypersetup{pdfencoding=auto, bookmarksnumbered=true, linktoc=all, pdfauthor={hzguide.cls}} 
 
 % TeX: ^^b7
@@ -1879,11 +1881,9 @@
 
 \cs_new:Nn \style_paragraph_indent:
 {
-    % \tl_set:Nn \l_bbox_style_common_tl { \setlength\parindent{\hzparindent}\noindent }    
-    %\tl_set:Nn \l_bbox_style_common_tl { \noindent }    
     \abnormalparskip{0pt}
     \setlength{\parindent}{\hzparindent}
-    \SetTextStyle{\setlength\parindent{\hzparindent}\noindent}
+    \SetTextStyle{\noindent\setlength\parindent{\hzparindent}}
     \setlist{partopsep=0pt, topsep=.25\baselineskip, itemsep=.25ex}
     \setlist[itemize]{labelindent=.5em,labelwidth=1em,labelsep=.5em}
     \setlist[enumerate]{labelindent=.5em,labelwidth=1.25em,labelsep=.5em}
@@ -4130,12 +4130,7 @@
 }
 
 \tl_new:N \l_bbox_style_tl
-\tl_new:N \l_bbox_style_common_tl
-\tl_set:Nn \l_bbox_style_tl {
-    \g_common_text_style
-    \l_bbox_style_common_tl
-    \l_bbox_style_extra_tl
-}
+\tl_set:Nn \l_bbox_style_tl { \g_common_text_style\l_bbox_style_extra_tl }
 
 \keys_define:nn { BoundedBox }
 {
@@ -4227,8 +4222,8 @@
         \NewDocumentEnvironment % \begin{bbox}*=nolinesep|=nobreakable[options](title)
     }{ #2 }{ s t| O{} d() }
     {
-        \keys_set:nn { BoundedBox }{ #3 }
         \exp_args:Nno \keys_set:nn { BoundedBox }{ \g_bounded_box_options_tl }
+        \keys_set:nn { BoundedBox }{ #3 }
         \group_begin:
             \keys_set:nn { BoundedBox }{ ##3 } 
 			\IfValueT { ##4 }
@@ -4257,8 +4252,8 @@
             }
                 \bool_if:NT \l_bbox_wrapping_bool { \wrappingon }
                 \l_bbox_style_tl
-                \color{\l_bbox_font_color_tl}
                 \l_bbox_font_tl
+                \color{\l_bbox_font_color_tl}
     }{
                 \end{BBox}
             \IfBooleanF{##1}{
@@ -5007,14 +5002,7 @@
 %    \end{verbsave}
 %    \verbread
 
-\ExplSyntaxOn
-\NewDocumentCommand \vitem { v }
-{
-    \item[#1]
-}
-\ExplSyntaxOff
-
-\def\tmpverbfile{tmp.vrb}
+\def\tmpverbfile{\jobname.vrb}
 % Leave nothing after \end{} in the same line
 \def\verbsave{%
     \@bsphack
@@ -5031,8 +5019,14 @@
 
 \ExplSyntaxOn
 
-\RenewDocumentCommand \verb {v} {
+\RenewDocumentCommand \verb {v} 
+{
     \texttt{#1}
+}
+
+\NewDocumentCommand \vitem { v }
+{
+    \item[#1]
 }
 
 \NewDocumentCommand \verbread { O{ \tmpverbfile } }
