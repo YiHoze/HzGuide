@@ -100,12 +100,6 @@
 
 \IfHangul{
 	\RequirePackage[hangul]{kotex}
-	\ifXeTeX
-		\xetexkofontregime{hangul}[alphs=latin, nums=prevfont, parens=prevfont, quotes=prevfont, colons=prevfont, hyphens=prevfont, puncts=prevfont, cjksymbols=hangul]
-	\fi
-	\setmainhangulfont{KoPubBatang}[Ligatures=TeX,Scale=MatchUppercase,UprightFont={*PL},BoldFont={*PM}]
-	\setsanshangulfont{KoPubDotum}[Ligatures=TeX,Scale=MatchUppercase,UprightFont={*PM},BoldFont={*PB}]
-	\setmonohangulfont{KoPubDotum}[Scale=MatchLowercase,UprightFont={*PL},BoldFont={*PM}]
 }
 
 % Bookmark frame titles
@@ -229,8 +223,7 @@
 			{ \dim_set:Nn \l_tmpa_dim {\g_image_height} }
 			{ \dim_set:Nn \l_tmpa_dim {#3\textheight} }
 		\hbox_set:Nn \l_tmpa_box { \includegraphics[height=\l_tmpa_dim]{#4} }		
-	}
-	{
+	}{
 		\IfNoValueTF{#3}
 			{ \dim_set:Nn \l_tmpa_dim {\g_image_width} }
 			{ \dim_set:Nn \l_tmpa_dim {#3\textwidth} }
