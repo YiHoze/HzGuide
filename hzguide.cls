@@ -4074,7 +4074,7 @@
     boxsep=0.5ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
     titlerule=0.75pt, toptitle=0.25ex, bottomtitle=0.5ex,
     colbacktitle=darkgray, coltitle=white,
-    drop~fuzzy~shadow={scale=2}, fonttitle=\bfseries, title=#2, 
+    drop~fuzzy~shadow={scale=2}, fonttitle=\l_bbox_title_font_tl, title=#2, 
 	IfBooleanTF={#1}{
 		breakable=\l_bbox_breakable_adhoc_tl
 	}{
@@ -4089,7 +4089,7 @@
     boxsep=0.5ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
     titlerule=0.75pt, toptitle=0.5ex, bottomtitle=0.5ex,
     colbacktitle=lightgray, coltitle=black,
-    fonttitle=\bfseries, title=#2,
+    fonttitle=\l_bbox_title_font_tl, title=#2,
 	IfBooleanTF={#1}{
 		breakable=\l_bbox_breakable_adhoc_tl
 	}{
@@ -4121,7 +4121,7 @@
     colbacktitle=white, coltitle=black,
     attach~boxed~title~to~top~left={xshift=.5cm, yshift=-1.75mm},
     boxed~title~style={size=minimal, enhanced, boxrule=0.25pt, colframe=white},
-    fonttitle=\bfseries, title=#2, 
+    fonttitle=\l_bbox_title_font_tl, title=#2, 
 	IfBooleanTF={#1}{
 		breakable=\l_bbox_breakable_adhoc_tl
 	}{
@@ -4142,6 +4142,7 @@
     before-signal		.tl_set:N = \l_bbox_before_signal_tl,
     after-signal		.tl_set:N = \l_bbox_after_signal_tl,
     style       		.tl_set:N = \l_bbox_style_extra_tl,
+    title-font           .tl_set:N = \l_bbox_title_font_tl,
     font        		.tl_set:N = \l_bbox_font_tl,
     font-color  		.tl_set:N = \l_bbox_font_color_tl,
     wrapping    		.bool_set:N = \l_bbox_wrapping_bool,
@@ -4159,6 +4160,7 @@
     after-skip = 0pt,
     type = shade,
     font-color = black,
+    title-font = \bfseries,
 	breakable-default = true,
 	breakable-adhoc = false
 }
