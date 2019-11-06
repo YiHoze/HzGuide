@@ -828,7 +828,7 @@
 			\setSpacing{1}        
 			\tl_if_empty:NTF \cover_image_logo_back
 			{            
-                \tl_if_empty:NF
+                \tl_if_empty:NF \cover_note
                 {
                     \cover_note \\
                 }
@@ -922,9 +922,7 @@
 {
     \bool_if:NF \l_pending_hide_bool
     {
-		\textcolor{\l_pending_beforecolor_tl}{
-			\l_pending_font_tl #1
-		}
+        { \color{\l_pending_beforecolor_tl}\l_pending_font_tl #1 }
     }
 }
 
