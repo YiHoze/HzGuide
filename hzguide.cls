@@ -76,6 +76,22 @@
 
 \ExplSyntaxOn
 
+\NewDocumentCommand \ifengine { m o }
+{
+    \sys_if_engine_xetex:TF
+    {
+        #1
+    }{
+        \IfValueT { #2 }
+        {
+            \sys_if_engine_luatex:T
+            {
+                #2
+            }
+        }
+    }
+}
+
 \keys_define:nn { HzGuide }
 {
     language    .code:n = { \LanguageSetup {#1} },

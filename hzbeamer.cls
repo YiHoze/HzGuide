@@ -347,7 +347,12 @@
 
 \tl_new:N \WithHangul
 \IfHangul{ 
-	\tl_set:Nn \WithHangul {\disablekoreanfonts} 
+	\sys_if_engine_xetex:TF
+	{
+		\tl_set:Nn \WithHangul { \disablekoreanfonts } 
+	}{
+		\tl_set:Nn \WithHangul {}
+	}
 }
 
 \NewDocumentCommand \foreign {s o m}
