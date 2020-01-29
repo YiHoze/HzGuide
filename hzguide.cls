@@ -287,8 +287,8 @@
 \IfLang{chi}
 {
     \RequirePackage{xeCJK}
-    \setCJKmainfont{SourceHanSerifSC}[UprightFont={*-Regular},BoldFont={*-SemiBold}]
-    \setCJKsansfont{SourceHanSansSC}[UprightFont={*-Regular},BoldFont={*-Medium}]
+    \setCJKmainfont{Noto Serif CJK SC}[BoldFont={* Bold}]
+    \setCJKsansfont{Noto Sans CJK SC}[UprightFont={* Regular},BoldFont={* Bold}]
     \punctstyle{fullwidth}
     \renewcommand*{\abstractname}{摘要}
     \renewcommand*{\contentsname}{目录}
@@ -2424,12 +2424,12 @@
     {
         \IfValueTF{#5} 
 		{
-            \tl_set:Nn \l_image_label_tl { #4-#5 }
+            \tl_set:No \l_image_label_tl { #4-#5 }
         }{
-            \tl_set:Nn \l_image_label_tl { #4 }
+            \tl_set:No \l_image_label_tl { #4 }
         }
     }
-    \image_save:nn { #4 } { #5 }
+    \exp_args:Nxx \image_save:nn { #4 } { #5 }
     \bool_if:NTF \l_image_float_bool {
         \begin{figure}
         \image_put:
@@ -2981,12 +2981,12 @@
 
 % \settable[]{ } ------------------------------------
 %\taburowcolors{white .. backgray}
+%\rowcolors{1}{white}{backgray}
 %\NewExpandableDocumentCommand\HeadFont{}{\bfseries}
-\rowcolors{1}{white}{backgray}
 
-\newcolumntype{L}{>{\raggedright\arraybackslash}X}
-\newcolumntype{C}{>{\centering\arraybackslash}X}
-\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+% \newcolumntype{L}{>{\raggedright\arraybackslash}X}
+% \newcolumntype{C}{>{\centering\arraybackslash}X}
+% \newcolumntype{R}{>{\raggedleft\arraybackslash}X}
 
 
 \cs_new:Npn \table_footnotestyle:n #1
@@ -4243,8 +4243,8 @@
         \group_begin:
             \keys_set:nn { BoundedBox }{ ##3 } 
 			\IfValueT { ##4 }
-			{
-				\tl_set:Nn \l_bbox_signal_tl { ##4 }
+			{                
+                \tl_set:Nn \l_bbox_signal_tl { ##4 }
 			}
             \bbox_type_set:n { \l_bbox_type_tl }
             \IfBooleanF{ ##1 }{ 
