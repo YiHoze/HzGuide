@@ -1,11 +1,3 @@
-% For xelatex to use truetype and opentype fonts:
-% #> fc-cache -f -v 
-% For lualatex to use truetype and opentype fonts:
-% #> luaotfload-tool --update --force
-% #> luaotfload-tool --find="Palatino Linotype" --inspect
-% To name filenames in Hangul
-% texmf.cnf: command_line_encoding=utf8 
-
 % Variables beginning with "Hz" or "hz" are intended to be effective through the entire document.
 
 % Obey these naming rules for command macros, environment macros, variables, and parameter keys.
@@ -21,17 +13,6 @@
 %        when those are intended to be limitedly used with specific purposes at user interface level, such as cover design.
 % IV. For those of designer interface level:
 %     Follow clause II. However, it is allowed to use lowercase with compound words.
-
-% For a breakable color box
-% \usepackage[normalem]{ulem}
-% \def\myhlcolor{yellow!75}
-% \newcommand\hl{%
-%     \bgroup \markoverwith{%
-%     \kern-.1pt%
-%     \raisebox{-.15\baselineskip}%
-%     {\hbox{\color{\myhlcolor}\rule{1pt}{12pt}}}%
-%     }\ULon
-% }
 
 \ProvidesClass{hzguide}[2018/08/13]
 
@@ -52,9 +33,10 @@
 \RequirePackage{tikz, tikzpagenodes}
 \RequirePackage{tcolorbox}
 \RequirePackage{tabularx, longtable, multirow}
-\RequirePackage[obeyspaces, spaces]{url} %\path{file path}
-% when using \path, redefine \flushleft like below if you don't want spaces above and below it.
-%\def\flushleft{\setlength\topsep{0pt}\trivlist \raggedright\item\relax}
+\RequirePackage[obeyspaces, spaces]{url} 
+    %\path{file path}
+    % when using \path, redefine \flushleft as below if you don't want spaces above and below it.
+    %\def\flushleft{\setlength\topsep{0pt}\trivlist \raggedright\item\relax}
 \RequirePackage{hyperref}
 \RequirePackage{bookmark}
 \RequirePackage{calc} % to allow arithmetic expressions for \setlength 
@@ -66,8 +48,7 @@
 
 % TeX: ^^b7
 % LaTeX: ^^^^ac00 ^^^^^^020000  \char44032 \char"AC00 \char'126000 \char`가 \char`^^^^ac00
-% \let\cleardoublepage\relax to inhibit \mainmatter from producing a blank page
-% \patchcommand\tableofcontents{\clearpage}{}
+% when needed, \let\cleardoublepage\relax to inhibit \mainmatter from producing a blank page
 
 % \begin{minipage}[pos][height][contentpos]{width} text \end{minipage}
 % \parbox[pos][height][contentpos]{width}{text}
@@ -76,32 +57,16 @@
 
 \ExplSyntaxOn
 
-\NewDocumentCommand \ifengine { m o }
-{
-    \sys_if_engine_xetex:TF
-    {
-        #1
-    }{
-        \IfValueT { #2 }
-        {
-            \sys_if_engine_luatex:T
-            {
-                #2
-            }
-        }
-    }
-}
-
 \keys_define:nn { HzGuide }
 {
     language    .code:n = { \LanguageSetup {#1} },
     styleset    .tl_set:N = \g_style_set_tl,
     doctype     .code:n = { \SetDocType {#1} },
+    Noto        .bool_set:N = \g_Noto_bool,
     smallerfont .bool_set:N = \g_smallerfont_bool,
     minted    	.bool_set:N = \g_minted_bool,
     pairquote   .bool_set:N = \g_pairquote_bool,
     uprightmath .bool_set:N = \g_upright_math_bool,
-    %bitmap      .bool_set:N = \g_bitmap_bool
 }
 
 \tl_new:N \HzLang
@@ -144,8 +109,11 @@
 \NewDocumentCommand \IfLang { m +m o }
 {
     \str_if_eq:VnTF \HzLang {#1}
-        { #2 }
-        { \IfValueT {#3} {#3} }
+    { 
+        #2 
+    }{ 
+        \IfValueT {#3} {#3} 
+    }
 }
 
 % if this document's type is ...
@@ -204,7 +172,6 @@
     minted = false,    
     language = english,
     pairquote = true,
-    %bitmap = false,
 }
 
 \ProcessKeysOptions { HzGuide }
@@ -241,21 +208,6 @@
     \setmathfont[math-style=upright]{TeX~Gyre~Pagella}
 }
 
-% \NewDocumentCommand \PrioritizeBitmap {}
-% {
-%     \DeclareGraphicsExtensions{.png,.jpg,.pdf}
-% }
-% \NewDocumentCommand \PrioritizeVector {}
-% {
-%     \DeclareGraphicsExtensions{.pdf,.jpg,.png}
-% }
-% \bool_if:NTF \g_bitmap_bool
-% { 
-%     \PrioritizeBitmap 
-% }{ 
-%     \PrioritizeVector 
-% }
-
 \cs_set_eq:NN \Sup \textsuperscript
 \cs_set_eq:NN \Sub \textsubscript
 
@@ -287,8 +239,8 @@
 \IfLang{chi}
 {
     \RequirePackage{xeCJK}
-    \setCJKmainfont{Noto Serif CJK SC}[BoldFont={* Bold}]
-    \setCJKsansfont{Noto Sans CJK SC}[UprightFont={* Regular},BoldFont={* Bold}]
+    \setCJKmainfont{Noto Serif CJK SC}
+    \setCJKsansfont{Noto Sans CJK SC}
     \punctstyle{fullwidth}
     \renewcommand*{\abstractname}{摘要}
     \renewcommand*{\contentsname}{目录}
@@ -321,8 +273,8 @@
 \IfLang{TC}
 {
     \RequirePackage{xeCJK}
-    \setCJKmainfont[BoldFont=STZhongsong]{STSong}
-    \setCJKsansfont[BoldFont=STHeiti]{STXihei}
+    \setCJKmainfont{Noto Serif CJK TC}
+    \setCJKsansfont{Noto Sans CJK TC}
     \punctstyle{fullwidth}
     \renewcommand*{\abstractname}{要約}
     \renewcommand*{\contentsname}{目錄}
@@ -468,8 +420,8 @@
 \IfLang{jap}
 {
     \RequirePackage{xeCJK}
-    \setCJKmainfont[BoldFont=HiraMinPro-W6]{HiraMinPro-W3}
-    \setCJKsansfont[BoldFont=HiraKakuPro-W3]{HiraKakuPro-W3}
+    \setCJKmainfont{Noto Serif CJK JP}
+    \setCJKsansfont{Noto Sans CJK JP}
     \punctstyle{fullwidth}
     \renewcommand*{\abstractname}{概要}
     \renewcommand*{\contentsname}{目次}
@@ -502,20 +454,26 @@
 \IfLang{kor}
 {
 	%\XeTeXcharclass"201C = \XKlatinopening
-	%\XeTeXcharclass"201D = \XKlatinclosing	
+    %\XeTeXcharclass"201D = \XKlatinclosing	
+    % how to use different fonts for the same font command
+    % \newhangulfontfamily\gungseo{GungSeo}[SlantedFont=*]
+    % \newhangulfontfamily\pilgi{Pilgi}[ItalicFont=*]
+    % \edef\slshape{\unexpanded\expandafter{\slshape\gungseo}}
+    % \edef\itshape{\unexpanded\expandafter{\itshape\pilgi}}
     \sys_if_engine_xetex:TF
 	{
-        \usepackage[hangul]{xetexko}
-        % \setmainhangulfont{Noto Serif KR}[UprightFont={*-Light}, BoldFont={*-SemiBold}, Script=Hangul] % ItalicFont=NotoSerif-LightItalic
-        % \setsanshangulfont{Noto Sans KR}[UprightFont={*-Light}, BoldFont={*-Medium}, Script=Hangul]
-		% \disablekoreanfonts
-        % \disablehangulspacing        
+        \RequirePackage[hangul]{xetexko}        
     }{	
         \sys_if_engine_luatex:T
 		{
-            \usepackage[hangul]{luatexko}
+            \RequirePackage[hangul]{luatexko}
         }
-	}
+    }
+    \bool_if:NT \g_Noto_bool
+    {
+        \setmainhangulfont{Noto~Serif~CJK~KR}[BoldFont={*~SemiBold}]
+        \setsanshangulfont{Noto~Sans~CJK~KR}
+    }
     \AtBeginDocument{
         \renewcommand*{\contentsname}{차례}
         \AdmonitionSetup {
@@ -689,28 +647,30 @@
     \dim_set:Nn #1 { \box_ht:N \l_tmpc_box + \box_dp:N \l_tmpc_box }
 }
 
-% a style -----------------------------------------------------------------
-% \keys_define:nn { adhoc }
-% {
-%     layout      .bool_set:N = \g_adhoc_layout_bool,
-%     heading      .bool_set:N = \g_adhoc_heading_bool,
-% }
+% To enable default configuration, especially for Sphinx and Jupyter ------------------------------
+% \IfNoAdhoc{layout}{\LayoutSetup{paper=A4,column=...}}
+% \IfNoAdhoc{heading}{\HeadingSetup{...}}
+\keys_define:nn { adhoc }
+{
+    layout      .bool_set:N = \g_adhoc_layout_bool,
+    heading      .bool_set:N = \g_adhoc_heading_bool,
+}
 
-% \NewDocumentCommand \AdhocSetup { m }
-% {
-%     \keys_set:nn { adhoc }{ #1 }
-% }
+\NewDocumentCommand \AdhocSetup { m }
+{
+    \keys_set:nn { adhoc }{ #1 }
+}
 
-% \AdhocSetup{layout=false, heading=false}
+\AdhocSetup{layout=false, heading=false}
 
-% \NewDocumentCommand \IfNoAdhoc { m m }
-% {
-%     \str_case:nn { #1 }
-%     {
-%         { layout }  { \bool_if:NF \g_adhoc_layout_bool {#2} }
-%         { heading } { \bool_if:NF \g_adhoc_heading_bool {#2} }
-%     }
-% }
+\NewDocumentCommand \IfNoAdhoc { m m }
+{
+    \str_case:nn { #1 }
+    {
+        { layout }  { \bool_if:NF \g_adhoc_layout_bool {#2} }
+        { heading } { \bool_if:NF \g_adhoc_heading_bool {#2} }
+    }
+}
 
 % covers ----------------------------------------------------------------------
 \keys_define:nn { cover }
@@ -1054,13 +1014,12 @@
 	}{
         \sys_if_engine_xetex:T
         {
-            \newfontfamily\foreignrmfamily{#2}[Ligatures=TeX, AutoFakeBold=1.5]
-            \newfontfamily\foreignsffamily{#3}[Ligatures=TeX, AutoFakeBold=1.5]
+            \newfontfamily\foreignrmfamily{#2}[AutoFakeBold=1.5]
+            \newfontfamily\foreignsffamily{#3}[AutoFakeBold=1.5]
         }
 	}
 }
 \SetForeignFonts{HCR Batang}{HCR Dotum}
-%\SetForeignFonts{Noto Serif}{Noto Sans}
 
 \NewDocumentCommand \foreign {s o m}
 {
@@ -1609,7 +1568,7 @@
         \setstocksize{\paperheight}{\paperwidth}
         \settrimmedsize{\paperheight}{\paperwidth}{*}
     }
-    \str_case_x:nnF { \g_layout_type }
+    \str_case:VnF \g_layout_type
     {
         { common }    { \layout_settle_common: }
         { vartwo }    { \layout_settle_vartwo: }
@@ -1754,28 +1713,29 @@
 {
     \str_case:nn {#1}
     {
-        {report}     { \style_type_report: }
+        {article}     { \style_type_article: }
     }
 }
 
-\cs_new:Nn \style_type_report:
+\cs_new:Nn \style_type_article:
 {
     \IfVartwo
     { 
-        \copypagestyle{report}{vartwo} 
+        \copypagestyle{article}{vartwo} 
     }[ 
-        \copypagestyle{report}{plain} 
+        \copypagestyle{article}{plain} 
     ]
-    \makeheadrule{report}{0pt}{0pt}
-    \makeoddhead{report}{}{}{}
-    \makeoddfoot{report}{}{\hffont\thepage}{}
-    \makeevenhead{report}{}{}{}
-    \makeevenfoot{report}{}{\hffont\thepage}{}
-    \pagestyle{report}
-    \aliaspagestyle{chapter}{report}
+    \makeheadrule{article}{0pt}{0pt}
+    \makeoddhead{article}{}{}{}
+    \makeoddfoot{article}{}{\hffont\thepage}{}
+    \makeevenhead{article}{}{}{}
+    \makeevenfoot{article}{}{\hffont\thepage}{}
+    \pagestyle{article}
+    \aliaspagestyle{chapter}{article}
     \counterwithout{section}{chapter}
     \counterwithout{figure}{chapter}
     \counterwithout{table}{chapter}
+    % \setsecnumdepth{section}
     \style_cft_configure:n {section}
 }
 
@@ -1814,7 +1774,7 @@
 {
     \clist_map_variable:nNn {#1} \l_tmpa_tl
     {
-        \str_case_x:nn { \l_tmpa_tl }
+        \str_case:Vn \l_tmpa_tl
         {
             { firm }      { \style_section_firm: }
             { sparse }    { \style_section_sparse: }
@@ -2722,7 +2682,7 @@
 
 \cs_new:Nn \illustimage_put:
 {
-    \str_case_x:nn { \l_illustimage_position_tl }
+    \str_case:Vn \l_illustimage_position_tl 
     {
         { left } { \illustimage_put_left: }
         { right } { \illustimage_put_right: }
@@ -2980,14 +2940,6 @@
 }
 
 % \settable[]{ } ------------------------------------
-%\taburowcolors{white .. backgray}
-%\rowcolors{1}{white}{backgray}
-%\NewExpandableDocumentCommand\HeadFont{}{\bfseries}
-
-% \newcolumntype{L}{>{\raggedright\arraybackslash}X}
-% \newcolumntype{C}{>{\centering\arraybackslash}X}
-% \newcolumntype{R}{>{\raggedleft\arraybackslash}X}
-
 
 \cs_new:Npn \table_footnotestyle:n #1
 {
@@ -3225,7 +3177,6 @@
 
 \NewEnviron{imagetableiii}{
     \placetable[stretch=1.3,font=\small,norowcolor]{        
-        %\begin{tabu}{X[cm]X[cm]X[cm]}
         \begin{tabularx}{\linewidth}{XXX}
         \BODY
         \end{tabularx}
@@ -3234,7 +3185,6 @@
 
 \NewEnviron{imagetableii}{
     \placetable[stretch=1.3,font=\small,norowcolor]{
-        %\begin{tabu}{X[cm]X[cm]}
         \begin{tabularx}{\linewidth}{XXX}
         \BODY
         \end{tabularx}
@@ -3267,31 +3217,6 @@
     \l_table_font_tl
     \l_table_fontsize_tl    
 }
-
-% \DeclareExpandableDocumentCommand \LongTableHeadFont {}
-% {
-%     \rowcolor{white}\rowfont{\bfseries}
-% }
-
-%\NewDocumentEnvironment { LongTable }{ O{} }
-%{
-%  \group_begin:
-%  \TableCommon
-%}{
-%  \group_end:
-%}
-
-%\begin{longtabu}to \linewidth{X[c]X[2]X[2]X[2]}
-%\hline \LongTableHeadFont $x$ (°) & $\sin x$ & $\cos x$ & $\tan x$ \\ \hline \endfirsthead
-%\hline \LongTableHeadFont $x$ (°) & $\sin x$ & $\cos x$ & $\tan x$ \\ \hline \endhead
-%\hline \endfoot
-%\hline \endlastfoot
-%0 & 0 & 1 & 0 \\
-%1 & 0.0174524 & 0.99984769 & 0.01745506 \\
-%2 & 0.03489949 & 0.99939082 & 0.03492076 \\
-%89 & 0.99984769 & 0.0174524 & 57.28996148 \\
-%90 & 1 & 0 & $\infty$ % Leave out "\\" from the last row.
-%\end{longtabu}
 
 % object utilities ------------------------------------------------------------
 
@@ -3538,12 +3463,12 @@
     \enit@endenumerate
 }
 
-\RenewDocumentEnvironment {itemize} { s t| O{} }
+\RenewDocumentEnvironment {itemize} { s O{} }
 {  
     \IfBooleanTF {#1} { 		
-        \enit@itemize\enitdp@itemize{item}\thr@@{noitemsep, #3}
+        \enit@itemize\enitdp@itemize{item}\thr@@{noitemsep, #2}
     }{
-        \enit@itemize\enitdp@itemize{item}\thr@@{#3}
+        \enit@itemize\enitdp@itemize{item}\thr@@{#2}
     }
     \g_hzlist_itemize_style
 }{
@@ -3616,7 +3541,7 @@
     label-type = default,
     offset = 0em,
     marker = {{},\textbullet},
-    marker-sep = 0.25em,
+    marker-sep = 0.5em,
     base = MM,
     font = \bfseries,
     color = black,
@@ -3709,7 +3634,7 @@
     \skip_set_eq:NN \topsep \l_terms_top_sep_skip
     \skip_set_eq:NN \itemsep \l_terms_item_sep_skip
     \skip_set:Nn \listparindent { 0pt }
-    \str_case_x:nn { #1 }
+    \str_case:on { #1 }
     {
         { default }{
             \dim_set_towidth:Nn \labelwidth { \l_terms_marker\l_terms_font_tl\l_terms_base_tl\l_terms_delimiter_tl }
@@ -4192,7 +4117,7 @@
 
 \cs_new:Npn \bbox_type_set:n #1
 {
-    \str_case_x:nnTF { #1 }
+    \str_case:onTF { #1 }
     {
         { shade }{
             \cs_set_eq:NN \BBox \ShadeBox
@@ -4923,7 +4848,7 @@
         %\begin{tabu}{X[lp]X[lp]X[lp]}
         \begin{tabularx}{\linewidth}{XXX}
             \hline
-            \rowfont{\bfseries} A & B & C \\\hline
+            \textbf{A} & \textbf{B} & \textbf{C} \\\hline
             1 & 1 & 1\\
             2 & 2 & 2\\
             3 & 3 & 3\\
@@ -5104,10 +5029,18 @@
 % default setup * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 % font
-% \setmainfont{Linux Biolinum O}
-\setmainfont{TeX Gyre Pagella}
-\setsansfont{TeX Gyre Heros}
-%\setmonofont{TeX Gyre Cursor}
+\ExplSyntaxOn
+\bool_if:NTF \g_Noto_bool
+{
+    \setmainfont{Noto~Serif}
+    \setsansfont{Noto~Sans}
+}{
+    \setmainfont{TeX~Gyre~Pagella}
+    \setsansfont{TeX~Gyre~Heros}
+    %\setmonofont{TeX Gyre Cursor}
+}
+\setmonofont{zco} % to type space (␣) 
+\ExplSyntaxOff
 
 % sectional divisions
 \setsecnumdepth{section}
@@ -5304,11 +5237,3 @@
     }
 }
 \endinput
-
---------------------------------------------------------------------------------
-
-% how to use different fonts for the same font command
-\newhangulfontfamily\gungseo{GungSeo}[SlantedFont=*]
-\newhangulfontfamily\pilgi{Pilgi}[ItalicFont=*]
-\edef\slshape{\unexpanded\expandafter{\slshape\gungseo}}
-\edef\itshape{\unexpanded\expandafter{\itshape\pilgi}}

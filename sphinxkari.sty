@@ -1,25 +1,24 @@
 \ProvidesPackage{sphinxkari}
 
 % font ------------------------------------------------------------------------
-\setmainfont{TeX Gyre Pagella}[Mapping=tex-text-sq]
-\setsansfont{TeX Gyre Heros}[Mapping=tex-text-sq]
-\setmonofont{zco} %Nimbus 15
-\@ifpackageloaded{xetexko}{
-    % \xetexkofontregime{latin}[cjksymbols=hangul]
-    \setmainhangulfont{KoPubBatang}[UprightFont={* Light}, BoldFont={* Bold}, Mapping=tex-text-sq, ItalicFont={* Bold}]
-    \setsanshangulfont{KoPubDotum}[UprightFont={* Light}, BoldFont={* Bold}, Mapping=tex-text-sq, , ItalicFont={* Bold}]
-}
 
-% call by font name
-% \setmainfont{Noto Serif}[UprightFont={* Light}, BoldFont={* SemiBold}]
-% \setsansfont{Noto Sans}[UprightFont={* Light}, BoldFont={* Medium}]
-% \setmainhangulfont{Noto Serif KR}[UprightFont={* Light}, BoldFont={* SemiBold}, Script=Hangul]
-% \setsanshangulfont{Noto Sans KR}[UprightFont={* Light}, BoldFont={* Medium}, Script=Hangul]
-% call by filename
-% \setmainfont{NotoSerif-Light.ttf}[BoldFont=NotoSerif-SemiBold.ttf]
-% \setsansfont{NotoSans-Light.ttf}[BoldFont=NotoSans-Medium.ttf]
-% \setmainhangulfont{NotoSerifKR-Light.otf}[BoldFont=NotoSerifKR-SemiBold.otf, Script=Hangul]
-% \setsanshangulfont{NotoSansKR-Light.otf}[BoldFont=NotoSansKR-Medium.otf, Script=Hangul]
+% Hangul by font name
+\@ifpackageloaded{xetexko}{    
+    \setmainhangulfont{Noto Serif CJK KR}[BoldFont={* SemiBold}, ItalicFont={* SemiBold}]
+    \setsanshangulfont{Noto Sans CJK KR}
+    \xetexkofontregime{hangul}
+}
+% \@ifpackageloaded{xetexko}{    
+%     \setmainhangulfont{KoPubBatang}[ItalicFont={* Bold}]
+%     \setsanshangulfont{KoPubDotum}[ItalicFont={* Bold}]
+%     \xetexkofontregime{hangul}
+% }
+
+% Hangul by file name
+% \@ifpackageloaded{xetexko}{    
+%     \setmainhangulfont{NotoSerifCJKkr-Regular.otf}[BoldFont=NotoSerifCJKkr-SemiBold.otf, ItalicFont=NotoSerifCJKkr-SemiBold.otf]
+%     \setsanshangulfont{NotoSansCJKkr-Regular.otf}
+% }
 
 % front matter ---------------------------------------------------------------
 \DeclareDocumentCommand\sphinxmaketitle{}
@@ -335,7 +334,30 @@
 }{
     \end{note}
 }
+
+\RenewTColorBox{ShadeBox}{ s O{} }
+{
+    before~skip=0pt, after~skip=0pt,
+    boxrule=0.75pt, colframe=white, colback=backgray, arc=0.5ex,
+    boxsep=0ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
+    titlerule=0.75pt, toptitle=0.5ex, bottomtitle=0.5ex,
+    colbacktitle=lightgray, coltitle=black,
+    fonttitle=\l_bbox_title_font_tl, title=#2,
+	IfBooleanTF={#1}{
+		breakable=\l_bbox_breakable_adhoc_tl
+	}{
+		breakable=\l_bbox_breakable_default_tl
+	}
+}
 \ExplSyntaxOff
+
+\RenewBoundedBox{reference}{
+    signal={}, 
+    style=\raggedright,
+    font=\ttfamily\small,
+    breakable-default = false,
+	breakable-adhoc = true
+}
 
 % literal ---------------------------------------------------------------------
 {\catcode`\ =\active\gdef\vobeyspaces{\catcode`\ =\active\let =\@xobeysp}}
@@ -343,11 +365,15 @@
 {\catcode`\^^M=\active\gdef\vobeylines{\catcode`\^^M=\active\let^^M=\x@vobeylines}}
 \def\x@vobeylines{\par\leavevmode\relax}
 
+\renewcommand*\sphinxafterbreak{\spx@opt@verbatimcontinued}
 \DeclareDocumentEnvironment {sphinxVerbatim} { o }
 {  
     \begin{reference}
     \setSpacing{1}
-    \vobeyspaces\vobeylines
+    \sphinxbreaksatspecials    
+    \sphinxbreaksviaactive    
+    \vobeyspaces
+    \vobeylines
 }{
     \vspace{-\baselineskip}
     \end{reference}
@@ -356,3 +382,7 @@
 % bibliography & index -------------------------------------------------------
 \BookmarkIndexHead
 \makeindex
+
+% layout & heading settings ---------------------------------------------------
+\IfNoAdhoc{layout}{\LayoutSetup{paper=A4,column=vartwo}}
+\IfNoAdhoc{heading}{\HeadingSetup{}}

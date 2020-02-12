@@ -1,19 +1,14 @@
-\ProvidesPackage{karijupyter}[2018/01/01]
-\RequirePackage{fancyvrb}
-\RequirePackage{amsmath} % Equations
-\RequirePackage{amssymb} % Equations
+\ProvidesPackage{karijupyter}[2020/04/01]
 
-% \RequirePackage{caption}
-% \DeclareCaptionLabelFormat{nolabel}{}
-% \captionsetup{labelformat=nolabel}
-% \RequirePackage{textcomp} 
-% \AtBeginDocument{%
-%     \def\PYZsq{\textquotesingle}
-% }
-% \RequirePackage{upquote} 
-% \RequirePackage{eurosym} 
-% \RequirePackage{grffile} 
-% \RequirePackage[inline]{enumitem} 
+\RequirePackage{fancyvrb}
+\RequirePackage{amsmath} 
+\RequirePackage{amssymb} 
+
+\@ifpackageloaded{xetexko}{    
+    \setmainhangulfont{Noto Serif CJK KR}[BoldFont={* SemiBold}, ItalicFont={* SemiBold}]
+    \setsanshangulfont{Noto Sans CJK KR}
+    \xetexkofontregime{hangul}
+}
 
 % Colors for the hyperref package
 \definecolor{urlcolor}{rgb}{0,.145,.698}
@@ -24,11 +19,17 @@
       colorlinks=true,
       urlcolor=urlcolor,
       linkcolor=linkcolor,
-      citecolor=citecolor,
+      citecolor=citecolor
       }
+% \hypersetup{
+%     linkcolor=MidnightBlue, 
+%     citecolor=MidnightBlue, 
+%     urlcolor=MidnightBlue
+% }
 
-%\definecolor{incolor}{rgb}{0.0, 0.0, 0.5}
-%\definecolor{outcolor}{rgb}{0.545, 0.0, 0.0}
+% \definecolor{incolor}{rgb}{0.0, 0.0, 0.5}
+% \definecolor{outcolor}{rgb}{0.545, 0.0, 0.0}
+% ANSI colors
 \definecolor{ansi-black}{HTML}{3E424D}
 \definecolor{ansi-black-intense}{HTML}{282C36}
 \definecolor{ansi-red}{HTML}{E75C58}
@@ -46,6 +47,8 @@
 \definecolor{ansi-white}{HTML}{C5C1B4}
 \definecolor{ansi-white-intense}{HTML}{A1A6B2}
 
+% commands and environments needed by pandoc snippets
+\newenvironment{Shaded}{}{}
 \newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
 \newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{{#1}}}
 \newcommand{\DecValTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
@@ -90,45 +93,43 @@
 \def\x@vobeylines{\par\leavevmode\relax}
 
 \ExplSyntaxOn
-	% \renewtcolorbox{BreakableShadeBox}[1][]{
-	%     before~skip=0pt, after~skip=0pt,
-	%     boxrule=0.75pt, colframe=white, colback=backgray, arc=0.5ex,
-	%     boxsep=1ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
-	%     titlerule=0.75pt, toptitle=0.5ex, bottomtitle=0.5ex,
-	%     colbacktitle=lightgray, coltitle=black,
-	%     fonttitle=\bfseries, breakable=true, title=#1
-	% }
-% \InstanceSetup{
-%     beforeskip=.4\baselineskip,
-%     afterskip=.6\baselineskip,
-%     type=Shadow, 
-%     style=\raggedright,
-%     font=\ttfamily\small
-% }
-\BoundedBoxInitialize{
-	before-skip=.4\baselineskip,
-    after-skip=.6\baselineskip,
-    type=BreakableShade, 
-    style=\raggedright,    
+\RenewTColorBox{ShadeBox}{ s O{} }
+{
+    before~skip=0pt, after~skip=0pt,
+    boxrule=0.75pt, colframe=white, colback=backgray, arc=0.5ex,
+    boxsep=0ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
+    titlerule=0.75pt, toptitle=0.5ex, bottomtitle=0.5ex,
+    colbacktitle=lightgray, coltitle=black,
+    fonttitle=\l_bbox_title_font_tl, title=#2,
+	IfBooleanTF={#1}{
+		breakable=\l_bbox_breakable_adhoc_tl
+	}{
+		breakable=\l_bbox_breakable_default_tl
+	}
 }
-\RenewBoundedBox{instance}{font=\ttfamily\small, type=shadow, signal={}}
+
+\RenewBoundedBox{reference}{
+    signal={}, 
+    style=\raggedright,
+    font=\ttfamily\small,
+    breakable-default = false,
+	breakable-adhoc = true
+}
 
 \RenewDocumentEnvironment {Verbatim} { o }
 {  
-    \begin{instance}
+    \begin{reference}
     \setSpacing{1}
     \vobeyspaces\vobeylines
 }{
     \vspace{-\baselineskip}
-    \end{instance}
+    \end{reference}
 }
 
 \cs_set_eq:NN \quote \reference
 \cs_set_eq:NN \endquote \endreference
 \cs_set_eq:NN \Highlighting \Verbatim
 \cs_set_eq:NN \endHighlighting \endVerbatim
-% \cs_set_eq:NN \Shaded \instance
-% \cs_set_eq:NN \endShaded \endinstance
 
 \DeclareDocumentEnvironment { figure } { o }
 {
@@ -177,8 +178,6 @@
 \ExplSyntaxOff
 
 \renewcommand\caption[1]{}
-\hypersetup{linkcolor=MidnightBlue, citecolor=MidnightBlue, urlcolor=MidnightBlue}
-
 
 %\AdmonitionSetup{indent=1.5em}
 \setsecnumdepth{chapter}
@@ -186,4 +185,4 @@
 \styleinput{PreDoc.tex}
 
 \IfNoAdhoc{layout}{\LayoutSetup{paper=A4,column=one}}
-\IfNoAdhoc{heading}{\HeadingSetup{type=report}}
+\IfNoAdhoc{heading}{\HeadingSetup{type=article}}
