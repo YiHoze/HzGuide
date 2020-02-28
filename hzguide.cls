@@ -35,20 +35,22 @@
 \RequirePackage{tabularx, longtable, multirow}
 \RequirePackage[obeyspaces, spaces]{url} 
     %\path{file path}
-    % when using \path, redefine \flushleft as below if you don't want spaces above and below it.
+    % when using \path and, if necessary, redefine \flushleft as below to avoid spaces above and below it.
     %\def\flushleft{\setlength\topsep{0pt}\trivlist \raggedright\item\relax}
 \RequirePackage{hyperref}
 \RequirePackage{bookmark}
 \RequirePackage{calc} % to allow arithmetic expressions for \setlength 
 \RequirePackage{etoolbox}
 
-\tcbuselibrary{listings}
+% ^^^^ac00 
+% ^^^^^^020000  
+% \char44032 
+% \char"AC00 
+% \char'126000 
+% \char`가 
+% \char`^^^^ac00
 
-\hypersetup{pdfencoding=auto, bookmarksnumbered=true, linktoc=all, pdfauthor={hzguide.cls}} 
-
-% TeX: ^^b7
-% LaTeX: ^^^^ac00 ^^^^^^020000  \char44032 \char"AC00 \char'126000 \char`가 \char`^^^^ac00
-% when needed, \let\cleardoublepage\relax to inhibit \mainmatter from producing a blank page
+% if necessary, \let\cleardoublepage\relax to inhibit \mainmatter from producing a blank page
 
 % \begin{minipage}[pos][height][contentpos]{width} text \end{minipage}
 % \parbox[pos][height][contentpos]{width}{text}
@@ -56,12 +58,13 @@
 % class options * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 \ExplSyntaxOn
-
 \keys_define:nn { HzGuide }
 {
-    language    .code:n = { \LanguageSetup {#1} },
+    english     .code:n = { \LanguageSetup{ english } },
+    korean      .code:n = { \LanguageSetup{ korean } },
+    language    .code:n = { \LanguageSetup{ #1 } },
     styleset    .tl_set:N = \g_style_set_tl,
-    doctype     .code:n = { \SetDocType {#1} },
+    doctype     .code:n = { \SetDocType{#1} },
     Noto        .bool_set:N = \g_Noto_bool,
     smallerfont .bool_set:N = \g_smallerfont_bool,
     minted    	.bool_set:N = \g_minted_bool,
@@ -167,14 +170,24 @@
     \IfNotDocType{ #1 }{ \BODY }
 }
 
-\keys_set:nn { HzGuide }
+
+\NewDocumentCommand \ClassSetup { m }
 {
-    minted = false,    
-    language = english,
-    pairquote = true,
+    \keys_set:nn { HzGuide }{ #1 }
 }
 
-\ProcessKeysOptions { HzGuide }
+% default class options
+\ClassSetup
+{
+    %minted = false,    
+    language = korean,
+    %pairquote = false,
+}
+
+\ProcessKeysOptions{ HzGuide }
+\tcbuselibrary{listings}
+\hypersetup{pdfencoding=auto, bookmarksnumbered=true, linktoc=all, pdfauthor={hzguide.cls}} 
+
 
 \bool_if:NT \g_smallerfont_bool %\documentclass[9pt, smallerfont]
 {
@@ -653,7 +666,7 @@
 \keys_define:nn { adhoc }
 {
     layout      .bool_set:N = \g_adhoc_layout_bool,
-    heading      .bool_set:N = \g_adhoc_heading_bool,
+    heading     .bool_set:N = \g_adhoc_heading_bool,
 }
 
 \NewDocumentCommand \AdhocSetup { m }
@@ -761,7 +774,7 @@
 			\mbox{}\par\vspace{\cover_top_skip}
 			\begin{minipage}{\linewidth}
 					\cover_title_align\cover_font_i
-					\CoverFontSize{1} \cover_title
+					\CoverFontSize{1} \cover_title                    
 					\par\medskip
 					\CoverFontSize{2} \cover_subtitle
 			\end{minipage}      
@@ -1019,7 +1032,7 @@
         }
 	}
 }
-\SetForeignFonts{HCR Batang}{HCR Dotum}
+% \SetForeignFonts{Noto Serif CJK KR}{Noto Sans CJK KR}
 
 \NewDocumentCommand \foreign {s o m}
 {
@@ -1431,7 +1444,7 @@
 
 \NewDocumentCommand \PageStyleSettle { m }
 {
-    %\makerunningwidth{#1}{\headwidth}    
+    % \makerunningwidth{#1}{\headwidth}    
     \bool_if:NTF \g_ps_headrule_bool
     {
         \makeheadrule{#1}{\headwidth}{\normalrulethickness}   
@@ -1450,7 +1463,7 @@
     \makeoddfoot{#1}{\hffont\g_ps_oddfootleft_tl}{\hffont\g_ps_oddfootcenter_tl}{\hffont\g_ps_oddfootright_tl}
     \pagestyle{#1}
     \copypagestyle{chapter}{#1}
-    \copypagestyle{adhoc}{#1}
+    \copypagestyle{normal}{#1} % for Sphinx
     \bool_if:NF \g_ps_chapterpage_bool
     {
         \makeheadrule{chapter}{0pt}{0pt}
@@ -2397,7 +2410,7 @@
     }{
 		\bool_if:NTF \l_image_vertical_middle_bool
 		{
-			\begin{vplace}
+			\begin{vplace} % vertically centering
 		}{
         	\object_skip_before:n {\l_image_before_skip}
 		}
@@ -3316,7 +3329,7 @@
         \par\textbf{##1}\nopagebreak
     }
 }
-% Use \IndexingEnable disable the indexing function of term-related macros including \term.
+% Use \IndexingEnable to enable the indexing function of term-related macros including \term.
 
 \NewDocumentCommand \IndexingEnable { s }
 {
@@ -3913,7 +3926,10 @@
 }
 
 \ExplSyntaxOff
+
 \usetikzlibrary{shapes}
+\usetikzlibrary{shadows}
+
 \ExplSyntaxOn
 
 \NewDocumentCommand\cirnumdraw{ m m m m m m m }
@@ -4160,7 +4176,7 @@
     \IfBooleanTF{ #1 }{
         \RenewDocumentEnvironment
     }{
-        \NewDocumentEnvironment % \begin{bbox}*=nolinesep|=nobreakable[options](title)
+        \NewDocumentEnvironment % *=nobottomsep|=nobreakable[options](title)
     }{ #2 }{ s t| O{} d() }
     {
         \exp_args:Nno \keys_set:nn { BoundedBox }{ \g_bounded_box_options_tl }
@@ -4749,7 +4765,7 @@
     \int_do_while:nNnn {\l_tmpa_int} < {4}
     {
         \int_incr:N \l_tmpa_int
-        \str_if_eq_x:nnTF {terms} {#1}
+        \str_if_eq:nnTF {terms} {#1}
             { \template_item_label: {#2} }
             { \template_item: {#2} }
     }
@@ -5026,58 +5042,6 @@
 }
 \ExplSyntaxOff
 
-% default setup * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-
-% font
-\ExplSyntaxOn
-\bool_if:NTF \g_Noto_bool
-{
-    \setmainfont{Noto~Serif}
-    \setsansfont{Noto~Sans}
-}{
-    \setmainfont{TeX~Gyre~Pagella}
-    \setsansfont{TeX~Gyre~Heros}
-    %\setmonofont{TeX Gyre Cursor}
-}
-\setmonofont{zco} % to type space (␣) 
-\ExplSyntaxOff
-
-% sectional divisions
-\setsecnumdepth{section}
-\settocdepth{subsection}
-\HeadingSetup{
-    chapterstyle=hzchapter,
-    paragraphstyle=interval
-}
-
-% header & footer
-\nouppercaseheads
-
-% TOC
-%\setlength{\cftchapternumwidth}{4.0em}
-%\setlength\cftsectionnumwidth{2.5em}
-%\setlength\cftsubsectionnumwidth{3.5em}
-
-% justification & alignment
-% Use \RaggedRight instead of \raggedright when using bidi
-% \sloppy
-\raggedbottom % \flushbottom
-
-% colors
-\definecolor{backgray}{gray}{0.9}
-
-\LoadStyleset
-
-% cross-reference
-\renewcommand{\chapterrefname}{\chaptername~}
-\renewcommand{\tablerefname}{\tablename}
-\renewcommand{\figurerefname}{\figurename}
-
-\@ifpackageloaded{minted}{
-    \setminted{encoding=UTF8, fontsize=\footnotesize, tabsize=2, breaklines=true, linenos=false, frame=none}
-    \patchcmd{\FV@ListVSpace}{\@topsepadd\topsep}{\vspace{.25\baselineskip}}{}{}
-}{}
-
 % page layout thanks to https://www.kockoc.com/newgari/1119255
 
 \newlength\memoirPleftodd \newlength\memoirPrightodd
@@ -5236,4 +5200,59 @@
         \end{tikzpicture}
     }
 }
+
+% default setup * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+% font
+\ExplSyntaxOn
+\bool_if:NTF \g_Noto_bool
+{
+    \setmainfont{Noto~Serif}
+    \setsansfont{Noto~Sans}
+}{
+    \setmainfont{TeX~Gyre~Pagella}
+    \setsansfont{TeX~Gyre~Heros}
+    %\setmonofont{TeX Gyre Cursor}
+}
+\setmonofont{zco} % to type space (␣) 
+\ExplSyntaxOff
+\SetForeignFonts{Noto Serif CJK KR}{Noto Sans CJK KR}
+
+% sectional divisions
+\setsecnumdepth{section}
+\settocdepth{subsection}
+\HeadingSetup{
+    chapterstyle=hzchapter,
+    paragraphstyle=interval
+}
+
+% header & footer
+\nouppercaseheads
+
+% TOC
+%\setlength{\cftchapternumwidth}{4.0em}
+%\setlength\cftsectionnumwidth{2.5em}
+%\setlength\cftsubsectionnumwidth{3.5em}
+
+% justification & alignment
+% Use \RaggedRight instead of \raggedright when using bidi
+% \sloppy
+\raggedbottom % \flushbottom
+
+% colors
+\definecolor{backgray}{gray}{0.9}
+
+\LoadStyleset
+
+% cross-reference
+\renewcommand{\chapterrefname}{\chaptername~}
+\renewcommand{\tablerefname}{\tablename}
+\renewcommand{\figurerefname}{\figurename}
+
+\@ifpackageloaded{minted}{
+    \setminted{encoding=UTF8, fontsize=\footnotesize, tabsize=2, breaklines=true, linenos=false, frame=none}
+    \patchcmd{\FV@ListVSpace}{\@topsepadd\topsep}{\vspace{.25\baselineskip}}{}{}
+}{}
+
+
 \endinput

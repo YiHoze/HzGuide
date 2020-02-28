@@ -1,11 +1,14 @@
 \ProvidesPackage{sphinxkari}
 
+\RequirePackage[absolute]{textpos}
+
 % font ------------------------------------------------------------------------
 
 % Hangul by font name
 \@ifpackageloaded{xetexko}{    
     \setmainhangulfont{Noto Serif CJK KR}[BoldFont={* SemiBold}, ItalicFont={* SemiBold}]
     \setsanshangulfont{Noto Sans CJK KR}
+    \setmonohangulfont{Noto Sans Mono CJK KR}
     \xetexkofontregime{hangul}
 }
 % \@ifpackageloaded{xetexko}{    
@@ -106,7 +109,7 @@
 \NewDocumentCommand \ReportCoverSetup { m }
 {
     \keys_set:nn { ReportCover } { #1 }
-    \PagestyleSetup{
+    \PageStyleSetup{
         headrule=false,    
         headouter=\cover_code,
         headinner=\cover_version,
@@ -114,8 +117,8 @@
         footouter=\thepage,
         chapterpage=true
     } 
-    \makeevenfoot{adhoc}{}{\hffont\cover_proprietary_detail}{}
-    \makeoddfoot{adhoc}{}{\hffont\cover_proprietary_detail}{}
+    \makeevenfoot{normal}{}{\hffont\cover_proprietary_detail}{}
+    \makeoddfoot{normal}{}{\hffont\cover_proprietary_detail}{}
 }
 
 \NewDocumentCommand \ReportCover {}
@@ -123,11 +126,11 @@
     \frontmatter     
     \begin{IfVartwoEnlarge}
     \thispagestyle{empty}
-    \begin{textblock*}{.25\textwidth}(.75\paperwidth, .05\paperheight)
+    \begin{textblock*}{.3\textwidth}(.75\paperwidth, .05\paperheight)
         \raggedleft
         \cover_version
     \end{textblock*}
-    \nil\vspace{.15\textheight}
+    \rule{0pt}{0pt}\vspace{.15\textheight}
     \begin{center}
         \Huge\bfseries 
         \cover_title
@@ -159,16 +162,15 @@
     \end{textblock*}
     \end{IfVartwoEnlarge}
     \newpage    
-    \thispagestyle{adhoc}
     \begin{IfVartwoEnlarge}
-    \nil\vspace{.2\textheight}
+    \rule{0pt}{0pt}\vspace{.2\textheight}
     \begin{center}
         \Huge\bfseries 
         \cover_title
     \end{center}
     \par\vspace{.2\textheight}
     \begin{minipage}{.4\linewidth}\bfseries
-        Prepared by: \par\vspace{7mm}
+        Prepared~by: \par\vspace{7mm}
         \rule{\linewidth}{1pt} \\
         \cover_preparer_name \par
         \cover_preparer_title \\
@@ -176,7 +178,7 @@
     \end{minipage}
     \hfill
     \begin{minipage}{.4\linewidth}\bfseries
-        Reviewed by: \par\vspace{7mm}
+        Reviewed~by: \par\vspace{7mm}
         \rule{\linewidth}{1pt} \\
         \cover_reviewer_name \par
         \cover_reviewer_title \\
@@ -186,7 +188,7 @@
     \begin{minipage}{.4\linewidth}
     \end{minipage}\hfill
     \begin{minipage}{.4\linewidth}\bfseries
-        Approved by: \par\vspace{7mm}
+        Approved~by: \par\vspace{7mm}
         \rule{\linewidth}{1pt} \\
         \cover_approver_name \par
         \cover_approver_title \\
@@ -207,8 +209,9 @@
 
 % list ------------------------------------------------------------------------
 \RenewTerms{terms}{
-    label-type=newline, marker={{},{}}, font=\bfseries, index=false,
-    star={label-type=default, delimiter=\hfill, item-sep=-1ex}
+    label-type=default, marker={{},{}}, font=\sffamily, index=true,
+    base=MMMMMMMM, delimiter=\hfill,
+    star={index=false, base=MMMMMM, font=\ttfamily}
 }
 
 \DeclareDocumentEnvironment{ optionlist }{ m }
@@ -218,13 +221,9 @@
     \end{terms}
 }
 
-\DeclareDocumentEnvironment{ description }{ s }
-{
-    \IfBooleanTF {#1} { 
-    \begin{terms}* 
-    }{ 
-    \begin{terms} 
-    }
+\DeclareDocumentEnvironment{ description }{}
+{   
+    \begin{terms}
 }{
     \end{terms}
 }
@@ -254,75 +253,76 @@
     {  
         \def\@captype{figure}
     }{}
-
-    \DeclareDocumentCommand \sphinxincludegraphics { o m }
-    {
-        \group_begin:        
-        \tl_set:Nn \l_tmpa_tl { ##2 }
-        \tl_replace_once:Nnn \l_tmpa_tl {.svg}{.pdf}
-        \tl_if_in:NnTF \l_tmpa_tl {.pdf}
-        {
-            \par\image[scale=\g_image_scale_vector]{\l_tmpa_tl}
-        }{
-            \par\image[scale=\g_image_scale_bitmap]{\l_tmpa_tl}              
-        }
-        \group_end:
-    }
 }
 
 \NewDocumentCommand \EnableFigureFloat {}
 {
     \cs_set_eq:NN \figure \orgfigure
     \cs_set_eq:NN \endfigure \orgendfigure
-
-    \DeclareDocumentCommand \sphinxincludegraphics { o m }
-    {
-        \group_begin:  
-        \tl_set:Nn \l_tmpa_tl {##2}
-        \tl_replace_once:Nnn \l_tmpa_tl {.svg}{.pdf}
-        \tl_if_in:NnTF \l_tmpa_tl {.pdf}
-        {
-            \hbox_set:Nn \l_image_box{
-                \includegraphics[scale=\g_image_scale_vector]{\l_tmpa_tl}
-            }
-        }{
-            \hbox_set:Nn \l_image_box{
-                \includegraphics[scale=\g_image_scale_bitmap]{\l_tmpa_tl}
-            }
-        }
-        \dim_set_towidth:Nn \l_tmpa_dim { \box_use:N \l_image_box }
-        \dim_compare:nTF { \l_tmpa_dim > \linewidth }
-        {
-            \includegraphics[width=\linewidth]{\l_tmpa_tl}
-        }{
-            \object_locate:N \l_tmpa_dim
-            \box_use:N \l_image_box
-        }
-        \group_end:
-    }
 }
 
-\DisableFigureFloat 
+%\DisableFigureFloat 
+
+\DeclareDocumentCommand \sphinxincludegraphics { o m }
+{
+    \group_begin:  
+    \tl_set:Nn \l_tmpa_tl {#2}
+    \tl_replace_once:Nnn \l_tmpa_tl {.svg}{.pdf}    
+    \tl_if_in:NnTF \l_tmpa_tl {.pdf}
+    {
+        \exp_args:Nx \sphinx_includegraphics_vector:n { \l_tmpa_tl }
+    }{
+        \exp_args:Nx \sphinx_includegraphics_vector:n { \l_tmpa_tl }
+    }
+    \dim_set_towidth:Nn \l_tmpa_dim { \box_use:N \l_image_box }
+    \dim_compare:nTF { \l_tmpa_dim > \linewidth }
+    {        
+        \exp_args:Nx \sphinx_includegraphics_width:n { \l_tmpa_tl }
+    }{
+        \object_locate:N \l_tmpa_dim
+        \box_use:N \l_image_box
+    }
+    \group_end:
+}
+
+\cs_new:Npn \sphinx_includegraphics_vector:n #1
+{
+    \hbox_set:Nn \l_image_box{
+        \includegraphics[scale=\g_image_scale_vector]{#1}
+    }
+}
+\cs_new:Npn \sphinx_includegraphics_bitmap:n #1
+{
+    \hbox_set:Nn \l_image_box{
+        \includegraphics[scale=\g_image_scale_bitmap]{#1}
+    }
+}
+\cs_new:Npn \sphinx_includegraphics_width:n #1
+{
+    \includegraphics[width=\linewidth]{#1}    
+}
+
+
 \cs_set_eq:NN \nbsphinxincludegraphics \sphinxincludegraphics
 \cs_set_eq:NN \sphinxsafeincludegraphics \sphinxincludegraphics
 
 \AtBeginDocument{
-    \ImageSetup{
-        beforeskip=.75\baselineskip,
-        afterskip=.5\baselineskip,
-        align=\centering,
-        fitline=true
-    }
+    % \ImageSetup{
+    %     beforeskip=.75\baselineskip,
+    %     afterskip=.5\baselineskip,
+    %     align=\centering,
+    %     fitline=true
+    % }
     \CaptionSetup{
-        beforeskip=0.5ex,
-        afterskip=0.5ex,
-        align=\centering
-    }    
+        beforeskip=0.75ex,
+        afterskip=0.75ex,        
+        align-short = \centering        
+    }       
 }
 \ExplSyntaxOff
 
 % table ---------------------------------------------------------------------
-\rowcolors{1}{white}{backgray}
+% \rowcolors{1}{white}{backgray}
 
 % admonition ------------------------------------------------------------------
 \ExplSyntaxOn
@@ -355,8 +355,7 @@
     signal={}, 
     style=\raggedright,
     font=\ttfamily\small,
-    breakable-default = false,
-	breakable-adhoc = true
+    breakable-default = true
 }
 
 % literal ---------------------------------------------------------------------
@@ -381,8 +380,12 @@
 
 % bibliography & index -------------------------------------------------------
 \BookmarkIndexHead
-\makeindex
 
 % layout & heading settings ---------------------------------------------------
 \IfNoAdhoc{layout}{\LayoutSetup{paper=A4,column=vartwo}}
-\IfNoAdhoc{heading}{\HeadingSetup{}}
+\IfNoAdhoc{heading}{
+    \HeadingSetup{
+        parskip=.35\baselineskip,
+        paragraphstyle=interval
+    }
+}
