@@ -903,7 +903,7 @@
 \PendingSetup{
     before-color=purple,
     after-color=blue,
-    font=\small,
+    font=\foreignrmfamily\small,
     hide=false
 }
 
@@ -982,11 +982,11 @@
         {
             \textcolor{\l_pending_beforecolor_tl}{\sout{#3}}
         }{
-            \IfValueTF {#2}
+            \IfNoValueTF {#2}
             {
+                \textcolor{\l_pending_aftercolor_tl}{#3}
+            }{
                 \textcolor{\l_pending_beforecolor_tl}{\sout{#2}}~
-                \textcolor{\l_pending_aftercolor_tl}{#3}                
-            }{                
                 \textcolor{\l_pending_aftercolor_tl}{#3}
             }
         }
@@ -1012,6 +1012,54 @@
 {
     \mbox{}\vfill
     \IfBooleanTF{#1}{}{ \thispagestyle{empty} }
+}
+
+% \foreign[Arial]{Philanthropy}
+% \foreign*{263A}
+ \NewDocumentCommand \SetForeignFonts { s m m }
+{
+	\let\foreignrmfamily\relax
+	\let\foreignsffamily\relax
+	\IfBooleanTF{ #1 }
+	{
+		\newfontfamily\foreignrmfamily{#2}
+		\newfontfamily\foreignsffamily{#3}
+	}{
+        \sys_if_engine_xetex:T
+        {
+            \newfontfamily\foreignrmfamily{#2}[AutoFakeBold=1.5]
+            \newfontfamily\foreignsffamily{#3}[AutoFakeBold=1.5]
+        }
+	}
+}
+% \SetForeignFonts{Noto Serif CJK KR}{Noto Sans CJK KR}
+
+\NewDocumentCommand \foreign {s o m}
+{
+    \group_begin:
+        \disablekoreanfonts
+        \ifx\f@family\rmdefault
+            \IfNoValueTF { #2 }{ \foreignrmfamily }{ \fontspec{#2} }
+        \else
+            \IfNoValueTF { #2 }{ \foreignsffamily }{ \fontspec{#2} }
+        \fi
+        \IfBooleanTF { #1 }{ \char"#3 }{ #3 }
+    \group_end:
+}
+
+% symbols
+\NewDocumentCommand \yea { s }
+{
+    \IfBooleanTF {#1}
+    { 
+        \foreign*{25B3} %△
+    }{ 
+        \foreign*{2713} %✓
+    }
+}
+\NewDocumentCommand \nay {}
+{
+    \foreign*{2716} %✖
 }
 
 % alphanumeric segment display
@@ -2199,8 +2247,9 @@
 		plainpages=false,
 	}
 	\IfBooleanTF {#1}
-	{		
-		\hypersetup{allcolors=#2} % colorlinks=true
+	{
+		\hypersetup{colorlinks=true}
+		\hypersetup{allcolors=#2}
 	}{
 		\hypersetup{colorlinks=false}
     	\renewcommand{\theTitleReference}[2]{\textcolor{#2}{#3 ##2}}
@@ -3750,8 +3799,8 @@
 
 % option list
 \int_new:N \l_opt_cnt_int
-\cs_new_nopar:Nn \opt_selected: { ☑ } 
-\cs_new_nopar:Nn \opt_unselected: { ☐ }
+\cs_new_nopar:Nn \opt_selected: { \foreign*{2611} } % ☑
+\cs_new_nopar:Nn \opt_unselected: { \foreign*{2610} } % ☐
 \cs_new_nopar:Nn \opt_label:
 {
     \int_gincr:N \l_opt_cnt_int
@@ -3948,17 +3997,6 @@
 \tcbuselibrary{breakable, skins, xparse}
 \tcbset{enhanced}
 
-\NewTColorBox{FrameBox}{ s }
-{
-    colframe=gray, colback=white,
-    boxrule=0.5pt, arc=0pt, 
-    boxsep=0.5ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
-	IfBooleanTF={#1}{
-		breakable=\l_bbox_breakable_adhoc_tl
-	}{
-		breakable=\l_bbox_breakable_default_tl
-	}
-}
 \NewTColorBox{LeftBarBox}{ s }
 {
     before~skip=0pt, after~skip=0pt, breakable=false,
@@ -4098,10 +4136,6 @@
 {
     \str_case:onTF { #1 }
     {
-        { frame }{
-            \cs_set_eq:NN \BBox \FrameBox
-            \cs_set_eq:NN \endBBox \endFrameBox
-        }        
         { shade }{
             \cs_set_eq:NN \BBox \ShadeBox
             \cs_set_eq:NN \endBBox \endShadeBox
@@ -4126,7 +4160,8 @@
             \cs_set_eq:NN \BBox \RightBarBox
             \cs_set_eq:NN \endBBox \endRightBarBox
         }
-	}{}        
+	}
+	{}        
 	{ \AdhocBoxType } % define like below
 }
 % \newtcolorbox{FooBox}{...} 
@@ -5181,6 +5216,7 @@
 }
 \setmonofont{zco} % to type space (␣) 
 \ExplSyntaxOff
+\SetForeignFonts{Noto Serif CJK KR}{Noto Sans CJK KR}
 
 % sectional divisions
 \setsecnumdepth{section}

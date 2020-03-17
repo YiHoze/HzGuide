@@ -4,24 +4,15 @@
 
 % font ------------------------------------------------------------------------
 
+\setmainfont{Noto Serif}[BoldFont={* SemiBold}]
+\setmainfont{Noto Sans}[BoldFont={* SemiBold}]
+
 % Hangul by font name
 \@ifpackageloaded{xetexko}{    
     \setmainhangulfont{Noto Serif CJK KR}[BoldFont={* SemiBold}, ItalicFont={* SemiBold}]
-    \setsanshangulfont{Noto Sans CJK KR}
+    \setsanshangulfont{Noto Sans CJK KR}[BoldFont={* Medium}, ItalicFont={* Medium}]
     \setmonohangulfont{Noto Sans Mono CJK KR}
-    \xetexkofontregime{hangul}
 }
-% \@ifpackageloaded{xetexko}{    
-%     \setmainhangulfont{KoPubBatang}[ItalicFont={* Bold}]
-%     \setsanshangulfont{KoPubDotum}[ItalicFont={* Bold}]
-%     \xetexkofontregime{hangul}
-% }
-
-% Hangul by file name
-% \@ifpackageloaded{xetexko}{    
-%     \setmainhangulfont{NotoSerifCJKkr-Regular.otf}[BoldFont=NotoSerifCJKkr-SemiBold.otf, ItalicFont=NotoSerifCJKkr-SemiBold.otf]
-%     \setsanshangulfont{NotoSansCJKkr-Regular.otf}
-% }
 
 % front matter ---------------------------------------------------------------
 \DeclareDocumentCommand\sphinxmaketitle{}
@@ -205,28 +196,52 @@
 \renewcommand\paragraph[1]{\subsubsection*{#1}}
 
 % inline ---------------------------------------------------------------------
-\DecolorHyperlinks
+%\DecolorHyperlinks*
+\hypersetup{
+		pdfborder={0 0 0}, 
+		plainpages=false,
+	    colorlinks=true,
+		allcolors=darkgray
+}
 
 % list ------------------------------------------------------------------------
-\RenewTerms{terms}{
-    label-type=default, marker={{},{}}, font=\sffamily, index=true,
-    base=MMMMMMMM, delimiter=\hfill,
-    star={index=false, base=MMMMMM, font=\ttfamily}
+\AtBeginDocument{
+    \setlist[itemize]{itemsep=-.25ex}
 }
 
+\RenewTerms{terms}{
+    label-type=default, 
+    marker={{},{}}, 
+    font=\sffamily, 
+    index=true,
+    base=MMMMMMMMMM, 
+    delimiter=\hfill,  
+    star={index=false, base=MMMM} 
+}
+% \DeclareDocumentEnvironment{ description }{}
+% {   
+%     \begin{Terms}
+% }{
+%     \end{Terms}
+% }
+\RenewEnviron{description}{ \alignterms[]{\BODY} }
+
+\NewTerms{optionlistkari}{
+    label-type=default, 
+    marker={{},{}}, 
+    font=\ttfamily,
+    index=false, 
+    base=MMMMMM, 
+    delimiter=\hfill    
+}
 \DeclareDocumentEnvironment{ optionlist }{ m }
 {
-    \begin{terms}*
+    \begin{optionlistkari}
 }{
-    \end{terms}
+    \end{optionlistkari}
 }
 
-\DeclareDocumentEnvironment{ description }{}
-{   
-    \begin{terms}
-}{
-    \end{terms}
-}
+
 
 % image ----------------------------------------------------------------------
 \ExplSyntaxOn
@@ -239,10 +254,11 @@
 {
     \keys_set:nn { imagescale }{ #1 }
 }
-\SetImageScale{
-    bitmap = 0.9,
-    vector = 0.75
-}
+\IfVartwo{ 
+    \SetImageScale{ bitmap=1,  vector = 0.75 }
+}[
+    \SetImageScale{ bitmap=1,  vector = 0.9 }
+]
 
 \cs_set_eq:NN \orgfigure \figure
 \cs_set_eq:NN \orgendfigure \endfigure
@@ -272,7 +288,7 @@
     {
         \exp_args:Nx \sphinx_includegraphics_vector:n { \l_tmpa_tl }
     }{
-        \exp_args:Nx \sphinx_includegraphics_vector:n { \l_tmpa_tl }
+        \exp_args:Nx \sphinx_includegraphics_bitmap:n { \l_tmpa_tl }
     }
     \dim_set_towidth:Nn \l_tmpa_dim { \box_use:N \l_image_box }
     \dim_compare:nTF { \l_tmpa_dim > \linewidth }
@@ -349,14 +365,49 @@
 		breakable=\l_bbox_breakable_default_tl
 	}
 }
+\RenewTColorBox{FrameBox}{ s }
+{
+    colframe=gray, colback=white,
+    boxrule=0.5pt, arc=0pt, boxsep=3pt, 
+    top=0pt, bottom=0pt, left=0pt, right=0pt,    
+	IfBooleanTF={#1}{
+		breakable=\l_bbox_breakable_adhoc_tl
+	}{
+		breakable=\l_bbox_breakable_default_tl
+	}
+}
 \ExplSyntaxOff
+
 
 \RenewBoundedBox{reference}{
     signal={}, 
     style=\raggedright,
     font=\ttfamily\small,
-    breakable-default = true
+    breakable-default=true
 }
+
+\def\nbsphinxfancyaddprompt{    
+    \ifvoid\nbsphinxpromptbox\else
+    \kern\fboxrule\kern\fboxsep    
+    \llap{\copy\nbsphinxpromptbox\,}
+    \kern-\ht\nbsphinxpromptbox\kern-\dp\nbsphinxpromptbox
+    \kern-\fboxsep\kern-\fboxrule\nointerlineskip
+    \fi
+}
+
+\NewBoundedBox{versatile}{
+    type=frame,
+    style=\raggedright,
+    font=\ttfamily\small,
+    breakable-default=true
+}
+\renewenvironment{nbsphinxfancyoutput}{
+    \begin{versatile}
+        \nbsphinxfancyaddprompt        
+}{
+    \end{versatile}
+}
+
 
 % literal ---------------------------------------------------------------------
 {\catcode`\ =\active\gdef\vobeyspaces{\catcode`\ =\active\let =\@xobeysp}}
@@ -382,7 +433,9 @@
 \BookmarkIndexHead
 
 % layout & heading settings ---------------------------------------------------
-\IfNoAdhoc{layout}{\LayoutSetup{paper=A4,column=vartwo}}
+\IfNoAdhoc{layout}{
+    \LayoutSetup{paper=A4,column=one}
+}
 \IfNoAdhoc{heading}{
     \HeadingSetup{
         parskip=.35\baselineskip,
