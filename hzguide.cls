@@ -4516,7 +4516,7 @@
 }
 %\urlstyle{sf}
 
-\NewDocumentCommand \skiplines { O {1} }
+\NewDocumentCommand \skiplines { O{1} }
 {
     \vspace{#1\baselineskip}
 }
@@ -4671,6 +4671,64 @@
     }
 }
 \cs_set_eq:NN \anota \annotate
+
+% Reading TSV
+\ior_new:N \l_tsv_ior
+\NewDocumentCommand \ReadTSV { m o }
+{
+    \IfValueTF{#2}
+    {
+        \TabPositions{#2}
+    }{
+        \TabPositions{0pt, 0.25\linewidth, 0.5\linewidth, 0.75\linewidth}
+    }
+	\ior_open:Nn \l_tsv_ior { #1 }
+	\ior_str_map_inline:Nn \l_tsv_ior
+	{
+		\str_set:Nn \l_tmpa_str { ##1 }
+		\regex_replace_all:nnN { \t }{ | } \l_tmpa_str
+		\seq_set_split:NnV \l_tmpa_seq { | } \l_tmpa_str
+		\tsv_str_to_tl:N \l_tmpa_seq	
+	}
+    \ior_close:N \l_tsv_ior   
+}
+
+\cs_new:Npn \tsv_str_to_tl:N #1
+{
+    \exp_args:NNx \int_set:Nn \l_tmpa_int { \seq_count:N #1 }    
+	\int_compare:nTF { \l_tmpa_int = 1 }
+	{
+        \seq_pop:NN #1 \l_tmpa_str
+        \str_if_empty:NF \l_tmpa_str
+        {
+            \TSVadhoc{ \l_tmpa_str }
+        }
+	}{
+		\int_zero:N \l_tmpb_int
+		\seq_map_inline:Nn #1
+		{	
+            \tl_set_rescan:Nnn \l_tmpa_tl {}{ ##1 }
+            \tl_if_empty:NTF \l_tmpa_tl 
+            {
+                \null
+            }{
+                \l_tmpa_tl
+            }
+            \int_incr:N \l_tmpb_int
+			\int_compare:nTF { \l_tmpb_int < \l_tmpa_int }
+			{
+				\tab
+			}{
+				\newline
+			}
+		}
+	}
+}
+\NewDocumentCommand \TSVadhoc { m }
+{
+	\section{ #1 }
+}
+
 
 % templates for document elements  * * * * * * * * * * * * * * * * * * * * *
 
@@ -5173,8 +5231,8 @@
 \ExplSyntaxOn
 \bool_if:NTF \g_Noto_bool
 {
-    \setmainfont{Noto~Serif}[BoldFont={* SemiBold}]
-    \setsansfont{Noto~Sans}[BoldFont={* SemiBold}]
+    \setmainfont{Noto~Serif}[BoldFont={*~SemiBold}]
+    \setsansfont{Noto~Sans}[BoldFont={*~SemiBold}]
 }{
     \setmainfont{TeX~Gyre~Pagella}
     \setsansfont{TeX~Gyre~Heros}
