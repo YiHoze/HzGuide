@@ -4672,30 +4672,56 @@
 }
 \cs_set_eq:NN \anota \annotate
 
-% Reading TSV
+% Reading TSV --------------------------------
+\clist_new:N \l_tsv_renderers_clist
+\int_new:N \l_tsv_renderers_int
+\keys_define:nn { TSV }
+{
+    tabs                .tl_set:N = \l_tsv_tabs_tl,
+    renderers           .code:n = { \clist_set:Nn \l_tsv_renderers_clist {#1} }
+}
+\NewDocumentCommand \texttsv { m }{ #1 }
+\NewDocumentCommand \TSVsetup { m }
+{
+    \keys_set:nn { TSV }{ #1 }     
+}
+
+\TSVsetup{
+    tabs = { 0pt, 0.25\linewidth, 0.5\linewidth, 0.75\linewidth }
+}
+
 \ior_new:N \l_tsv_ior
 \NewDocumentCommand \ReadTSV { m o }
 {
-    \IfValueTF{#2}
+    \IfValueT{#2}
     {
-        \TabPositions{#2}
-    }{
-        \TabPositions{0pt, 0.25\linewidth, 0.5\linewidth, 0.75\linewidth}
+        \TSVsetup{ #2 }
     }
-	\ior_open:Nn \l_tsv_ior { #1 }
-	\ior_str_map_inline:Nn \l_tsv_ior
-	{
-		\str_set:Nn \l_tmpa_str { ##1 }
-		\regex_replace_all:nnN { \t }{ | } \l_tmpa_str
-		\seq_set_split:NnV \l_tmpa_seq { | } \l_tmpa_str
-		\tsv_str_to_tl:N \l_tmpa_seq	
-	}
+    \exp_args:No \TabPositions{ \l_tsv_tabs_tl }
+    \int_set:Nn \l_tsv_renderers_int { 
+        \clist_count:N \l_tsv_renderers_clist
+    }   
+    \ior_open:Nn \l_tsv_ior { #1 }
+    \group_begin:
+        \ior_str_map_inline:Nn \l_tsv_ior
+        {
+            \str_set:Nn \l_tmpa_str { ##1 }
+            \regex_replace_all:nnN { \t }{ | } \l_tmpa_str
+            \seq_set_split:NnV \l_tmpa_seq { | } \l_tmpa_str
+            \tsv_render:N \l_tmpa_seq	
+        }
+    \group_end:
     \ior_close:N \l_tsv_ior   
 }
 
-\cs_new:Npn \tsv_str_to_tl:N #1
+\NewDocumentCommand \TSVadhoc { m }
 {
-    \exp_args:NNx \int_set:Nn \l_tmpa_int { \seq_count:N #1 }    
+	\section{ #1 }
+}
+
+\cs_new:Npn \tsv_render:N #1
+{
+    \int_set:Nn \l_tmpa_int { \seq_count:N #1 }    
 	\int_compare:nTF { \l_tmpa_int = 1 }
 	{
         \seq_pop:NN #1 \l_tmpa_str
@@ -4707,28 +4733,34 @@
 		\int_zero:N \l_tmpb_int
 		\seq_map_inline:Nn #1
 		{	
-            \tl_set_rescan:Nnn \l_tmpa_tl {}{ ##1 }
-            \tl_if_empty:NTF \l_tmpa_tl 
+            \int_incr:N \l_tmpb_int
+            \tl_if_empty:nTF { ##1 } 
             {
                 \null
             }{
-                \l_tmpa_tl
+                \tsv_render_item:Nn \l_tmpb_int { ##1 }
             }
-            \int_incr:N \l_tmpb_int
 			\int_compare:nTF { \l_tmpb_int < \l_tmpa_int }
 			{
 				\tab
 			}{
-				\newline
+				\par
 			}
 		}
 	}
 }
-\NewDocumentCommand \TSVadhoc { m }
-{
-	\section{ #1 }
-}
 
+\cs_new:Npn \tsv_render_item:Nn #1 #2
+{
+    \tl_set_rescan:Nnn \l_tmpa_tl {}{ #2 }
+    \int_compare:nTF { \l_tsv_renderers_int < #1 }
+    {
+        \texttsv{\l_tmpa_tl}
+    }{
+        \clist_item:Nn \l_tsv_renderers_clist { #1 } 
+        \l_tmpa_tl
+    }
+}
 
 % templates for document elements  * * * * * * * * * * * * * * * * * * * * *
 
