@@ -4677,6 +4677,7 @@
 \int_new:N \l_tsv_renderers_int
 \keys_define:nn { TSV }
 {
+    heading             .code:n = { \cs_set_eq:NN \TSVheading #1 },
     tabs                .tl_set:N = \l_tsv_tabs_tl,
     renderers           .code:n = { \clist_set:Nn \l_tsv_renderers_clist {#1} }
 }
@@ -4687,6 +4688,7 @@
 }
 
 \TSVsetup{
+    heading = \section,
     tabs = { 0pt, 0.25\linewidth, 0.5\linewidth, 0.75\linewidth }
 }
 
@@ -4714,11 +4716,6 @@
     \ior_close:N \l_tsv_ior   
 }
 
-\NewDocumentCommand \TSVadhoc { m }
-{
-	\section{ #1 }
-}
-
 \cs_new:Npn \tsv_render:N #1
 {
     \int_set:Nn \l_tmpa_int { \seq_count:N #1 }    
@@ -4727,7 +4724,7 @@
         \seq_pop:NN #1 \l_tmpa_str
         \str_if_empty:NF \l_tmpa_str
         {
-            \TSVadhoc{ \l_tmpa_str }
+            \TSVheading{ \l_tmpa_str }
         }
 	}{
 		\int_zero:N \l_tmpb_int
