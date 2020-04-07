@@ -1678,7 +1678,7 @@
 {
     \str_case:nn {#1}
     {
-        {article}     { \style_type_article: }
+        { article }     { \style_type_article: }
     }
 }
 
@@ -1813,8 +1813,8 @@
 {
     \str_case:nn {#1}
     {
-        {indent}   { \style_paragraph_indent: }
-        {interval}   { \style_paragraph_interval: }
+        { indent }   { \style_paragraph_indent: }
+        { interval }   { \style_paragraph_interval: }
     }
 }
 
@@ -4678,6 +4678,7 @@
 \keys_define:nn { TSV }
 {
     heading             .code:n = { \cs_set_eq:NN \TSVheading #1 },
+    tab                 .code:n = { \cs_set_eq:NN \TSVtab #1 },
     tabs                .tl_set:N = \l_tsv_tabs_tl,
     renderers           .code:n = { \clist_set:Nn \l_tsv_renderers_clist {#1} }
 }
@@ -4689,6 +4690,7 @@
 
 \TSVsetup{
     heading = \section,
+    tab = \tab,
     tabs = { 0pt, 0.25\linewidth, 0.5\linewidth, 0.75\linewidth }
 }
 
@@ -4709,8 +4711,8 @@
         {
             \str_set:Nn \l_tmpa_str { ##1 }
             \regex_replace_all:nnN { \t }{ | } \l_tmpa_str
-            \seq_set_split:NnV \l_tmpa_seq { | } \l_tmpa_str
-            \tsv_render:N \l_tmpa_seq	
+            \seq_set_split:NnV \l_tmpa_seq { | } \l_tmpa_str                        
+            \tsv_render:N \l_tmpa_seq	            
         }
     \group_end:
     \ior_close:N \l_tsv_ior   
@@ -4739,7 +4741,7 @@
             }
 			\int_compare:nTF { \l_tmpb_int < \l_tmpa_int }
 			{
-				\tab
+				\TSVtab
 			}{
 				\par
 			}
