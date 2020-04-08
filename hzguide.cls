@@ -5011,6 +5011,27 @@
 \ExplSyntaxOff
 
 % verbatim & literal -----------------------------------------------------------
+\ExplSyntaxOn
+\cs_new:Nn \obey_hspaces: { \penalty\z@\mbox{}\space }
+\NewDocumentCommand \obeyhspaces { }
+{
+    \char_set_active_eq:nN {32} \obey_hspaces:
+    \char_set_catcode_active:n {32}   
+}
+\cs_new:Nn \obey_vlines: { \leavevmode\newline }
+\NewDocumentCommand \obeyvlines { }
+{
+    \char_set_active_eq:nN {13} \obey_vlines:
+    \char_set_catcode_active:n {13}  
+}
+\ExplSyntaxOff
+\NewDocumentEnvironment {lyrics} { }
+{  
+    \obeyhspaces    
+    \obeyvlines
+}{}
+
+
 % USE THIS METHOD:
 %    \begin{reference}
 %    \begin{verbatim}

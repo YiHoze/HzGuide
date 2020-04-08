@@ -410,22 +410,24 @@
 
 
 % literal ---------------------------------------------------------------------
-{\catcode`\ =\active\gdef\vobeyspaces{\catcode`\ =\active\let =\@xobeysp}}
-\def\@xobeysp{\penalty\z@\mbox{}\space\penalty\z@}
-{\catcode`\^^M=\active\gdef\vobeylines{\catcode`\^^M=\active\let^^M=\x@vobeylines}}
-\def\x@vobeylines{\par\leavevmode\relax}
+% {\catcode`\ =\active\gdef\xobeyspaces{\catcode`\ =\active\let =\@xobeyspaces}}
+% {\catcode`\^^M=\active\gdef\xobeylines{\catcode`\^^M=\active\let^^M=\@xobeylines}}
+% \def\@xobeyspaces{\penalty\z@\mbox{}\space\penalty\z@}
+% \def\@xobeylines{\par\leavevmode\relax}
 
 \renewcommand*\sphinxafterbreak{\spx@opt@verbatimcontinued}
 \DeclareDocumentEnvironment {sphinxVerbatim} { o }
 {  
     \begin{reference}
     \setSpacing{1}
-    \sphinxbreaksatspecials    
+    \sphinxbreaksatspecials
     \sphinxbreaksviaactive    
-    \vobeyspaces
-    \vobeylines
+    % \xobeyspaces
+    % \xobeylines
+    \obeyhspaces
+    \obeyvlines
 }{
-    \vspace{-\baselineskip}
+    \vspace{-.5\baselineskip}
     \end{reference}
 }
 
