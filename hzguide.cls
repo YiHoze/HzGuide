@@ -4678,7 +4678,7 @@
 \keys_define:nn { TSV }
 {
     heading             .code:n = { \cs_set_eq:NN \TSVheading #1 },
-    tab                 .code:n = { \cs_set_eq:NN \TSVtab #1 },
+    space               .tl_set:N = \l_tsv_space_tl,
     tabs                .tl_set:N = \l_tsv_tabs_tl,
     renderers           .code:n = { \clist_set:Nn \l_tsv_renderers_clist {#1} }
 }
@@ -4690,7 +4690,7 @@
 
 \TSVsetup{
     heading = \section,
-    tab = \tab,
+    space = \tab,
     tabs = { 0pt, 0.25\linewidth, 0.5\linewidth, 0.75\linewidth }
 }
 
@@ -4741,7 +4741,7 @@
             }
 			\int_compare:nTF { \l_tmpb_int < \l_tmpa_int }
 			{
-				\TSVtab
+                \tl_use:N \l_tsv_space_tl                
 			}{
 				\par
 			}
@@ -4756,6 +4756,15 @@
     {
         \texttsv{\l_tmpa_tl}
     }{
+        % \exp_args:NNo \tl_set:Nn \l_tmpb_tl {
+        %     \clist_item:Nn \l_tsv_renderers_clist { #1 } 
+        % }
+        % \tl_if_head_eq_charcode:fNTF { \l_tmpb_tl } \
+        % {
+        %     \l_tmpb_tl
+        % }{
+        %     \use:c { \tl_use:N \l_tmpb_tl }
+        % }
         \clist_item:Nn \l_tsv_renderers_clist { #1 } 
         \l_tmpa_tl
     }
