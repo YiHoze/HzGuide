@@ -5024,13 +5024,12 @@
     \char_set_active_eq:nN {13} \obey_vlines:
     \char_set_catcode_active:n {13}  
 }
-\ExplSyntaxOff
 \NewDocumentEnvironment {lyrics} { }
 {  
     \obeyhspaces    
     \obeyvlines
 }{}
-
+\ExplSyntaxOff
 
 % USE THIS METHOD:
 %    \begin{reference}
