@@ -486,6 +486,7 @@
     {
         \setmainhangulfont{Noto~Serif~CJK~KR}[BoldFont={*~SemiBold}]
         \setsanshangulfont{Noto~Sans~CJK~KR}[BoldFont={*~Medium}]
+        \setmonohangulfont{Noto Sans Mono CJK KR}
     }
     \AtBeginDocument{
         \renewcommand*{\contentsname}{차례}
@@ -3493,6 +3494,7 @@
 	anchor		.bool_set:N = \l_terms_anchor_bool, % for glossary
     top-sep     .skip_set:N = \l_terms_top_sep_skip,
     item-sep    .skip_set:N  = \l_terms_item_sep_skip,
+    style       .tl_set:N = \l_terms_style_tl,
     before-list .tl_set:N = \l_terms_before_list_tl,
     after-list  .tl_set:N = \l_terms_after_list_tl,
     star        .tl_set:N = \l_terms_star_tl,
@@ -3667,6 +3669,7 @@
                 \tl_set:Nn \l_terms_base_tl { ##4 }
             }
             \terms_label_type_set:n { \l_terms_label_type_tl }
+            \l_terms_style_tl
         }
     }{
         % \cs_set_eq:NN \uitem \item

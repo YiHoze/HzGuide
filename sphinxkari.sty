@@ -43,7 +43,7 @@
 
 \ExplSyntaxOn
 \NewDocumentCommand \SwitchToReportStyle {}
-{
+{ 
     \cs_set_eq:NN \FrontCover \ReportCover
     \cs_set_eq:NN \CoverSetup \ReportCoverSetup        
     \DeclareDocumentCommand \sphinxtableofcontents {}
@@ -215,15 +215,11 @@
     font=\sffamily, 
     index=true,
     base=MMMMMMMMMM, 
-    delimiter=\hfill,  
+    delimiter=\hfill,
+    % style=\raggedright,  
     star={index=false, base=MMMM} 
 }
-% \DeclareDocumentEnvironment{ description }{}
-% {   
-%     \begin{Terms}
-% }{
-%     \end{Terms}
-% }
+
 \RenewEnviron{description}{ \alignterms[]{\BODY} }
 
 \NewTerms{optionlistkari}{
@@ -232,7 +228,8 @@
     font=\ttfamily,
     index=false, 
     base=MMMMMM, 
-    delimiter=\hfill    
+    delimiter=\hfill,
+    % style=\raggedright
 }
 \DeclareDocumentEnvironment{ optionlist }{ m }
 {
@@ -444,3 +441,5 @@
         paragraphstyle=interval
     }
 }
+
+\copypagestyle{plain}{normal}

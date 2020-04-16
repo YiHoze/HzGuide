@@ -96,10 +96,11 @@
 %% fonts
 \setsansfont{TeX Gyre Heros}
 \setmonofont{Latin Modern Mono}
-%\setmonofont{TeX Gyre Cursor}
 
 \IfHangul{
 	\RequirePackage[hangul]{kotex}
+	\setmainhangulfont{Noto Sans CJK KR}[BoldFont={* Medium}]
+    \setmonohangulfont{Noto Sans Mono CJK KR}
 }
 
 % Bookmark frame titles
@@ -207,10 +208,9 @@
 \dim_new:N \g_image_height
 \IfSlide
 {
-	\dim_gset:Nn \g_image_width {.9\textwidth}
-	\dim_gset:Nn \g_image_height {.8\textheight}
-}
-[
+	\dim_gset:Nn \g_image_width {.95\textwidth}
+	\dim_gset:Nn \g_image_height {.85\textheight}
+}[
 	\dim_gset:Nn \g_image_width {.8\textwidth}
 	\dim_gset:Nn \g_image_height {.3\textheight}
 ]
@@ -337,70 +337,70 @@
 \setbeamertemplate{description~item}{\insertdescriptionitem\hfill}
 
 %% characters & letters
-\NewDocumentCommand \SetForeignFonts { m m }
-{
-	\newfontfamily\foreignrmfamily{#1}
-	\newfontfamily\foreignsffamily{#2}
-}
+% \NewDocumentCommand \SetForeignFonts { m m }
+% {
+% 	\newfontfamily\foreignrmfamily{#1}
+% 	\newfontfamily\foreignsffamily{#2}
+% }
 
-\SetForeignFonts{HCR Batang}{HCR Dotum}
+% \SetForeignFonts{HCR Batang}{HCR Dotum}
 
-\tl_new:N \WithHangul
-\IfHangul{ 
-	\sys_if_engine_xetex:TF
-	{
-		\tl_set:Nn \WithHangul { \disablekoreanfonts } 
-	}{
-		\tl_set:Nn \WithHangul {}
-	}
-}
+% \tl_new:N \WithHangul
+% \IfHangul{ 
+% 	\sys_if_engine_xetex:TF
+% 	{
+% 		\tl_set:Nn \WithHangul { \disablekoreanfonts } 
+% 	}{
+% 		\tl_set:Nn \WithHangul {}
+% 	}
+% }
 
-\NewDocumentCommand \foreign {s o m}
-{
-	\group_begin:
-		\WithHangul
-		\ifx\f@family\rmdefault
-			\IfNoValueTF {#2} {\foreignrmfamily} {\fontspec{#2}}
-		\else
-			\IfNoValueTF {#2} {\foreignsffamily} {\fontspec{#2}}
-		\fi
-		\IfBooleanTF {#1} {\char"#3} {#3}
-	\group_end:
-}
+% \NewDocumentCommand \foreign {s o m}
+% {
+% 	\group_begin:
+% 		\WithHangul
+% 		\ifx\f@family\rmdefault
+% 			\IfNoValueTF {#2} {\foreignrmfamily} {\fontspec{#2}}
+% 		\else
+% 			\IfNoValueTF {#2} {\foreignsffamily} {\fontspec{#2}}
+% 		\fi
+% 		\IfBooleanTF {#1} {\char"#3} {#3}
+% 	\group_end:
+% }
 
-\NewDocumentCommand \smiley {} 
-{ 
-	{\color{red}\bfseries\foreign*{263A}~} 
-}
+% \NewDocumentCommand \smiley {} 
+% { 
+% 	{\color{red}\bfseries\foreign*{263A}~} 
+% }
 
-\NewDocumentCommand \frowny {} 
-{ 
-	{\color{blue}\bfseries\foreign*{2639}~}
-}
+% \NewDocumentCommand \frowny {} 
+% { 
+% 	{\color{blue}\bfseries\foreign*{2639}~}
+% }
 
-\NewDocumentCommand \prefer {s} 
-{ 
-	\IfBooleanTF{#1}
-		{ \smiley }
-		{ \item[\smiley] } 
-}
+% \NewDocumentCommand \prefer {s} 
+% { 
+% 	\IfBooleanTF{#1}
+% 		{ \smiley }
+% 		{ \item[\smiley] } 
+% }
 
-\NewDocumentCommand \avoid {s} 
-{ 
-	\IfBooleanTF{#1}
-		{ \frowny }
-		{ \item[\frowny] } 
-}
+% \NewDocumentCommand \avoid {s} 
+% { 
+% 	\IfBooleanTF{#1}
+% 		{ \frowny }
+% 		{ \item[\frowny] } 
+% }
 
-\NewDocumentCommand \Vdots { } 
-{ 
-	\foreign*{22EE}
-}
+% \NewDocumentCommand \Vdots { } 
+% { 
+% 	\foreign*{22EE}
+% }
 
-\NewDocumentCommand \changeto { } 
-{ 
-	\textbf{\large\textrightarrow}~ 
-}
+% \NewDocumentCommand \changeto { } 
+% { 
+% 	\textbf{\large\textrightarrow}~ 
+% }
 
 \NewDocumentCommand \ui {m} 
 { 
