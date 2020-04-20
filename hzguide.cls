@@ -486,7 +486,7 @@
     {
         \setmainhangulfont{Noto~Serif~CJK~KR}[BoldFont={*~SemiBold}]
         \setsanshangulfont{Noto~Sans~CJK~KR}[BoldFont={*~Medium}]
-        \setmonohangulfont{Noto Sans Mono CJK KR}
+        \setmonohangulfont{Noto~Sans~Mono~CJK~KR}
     }
     \AtBeginDocument{
         \renewcommand*{\contentsname}{차례}
@@ -4738,7 +4738,7 @@
             \int_incr:N \l_tmpb_int
             \tl_if_empty:nTF { ##1 } 
             {
-                \null
+                \mbox{}
             }{
                 \tsv_render_item:Nn \l_tmpb_int { ##1 }
             }
@@ -4759,15 +4759,6 @@
     {
         \texttsv{\l_tmpa_tl}
     }{
-        % \exp_args:NNo \tl_set:Nn \l_tmpb_tl {
-        %     \clist_item:Nn \l_tsv_renderers_clist { #1 } 
-        % }
-        % \tl_if_head_eq_charcode:fNTF { \l_tmpb_tl } \
-        % {
-        %     \l_tmpb_tl
-        % }{
-        %     \use:c { \tl_use:N \l_tmpb_tl }
-        % }
         \clist_item:Nn \l_tsv_renderers_clist { #1 } 
         \l_tmpa_tl
     }
