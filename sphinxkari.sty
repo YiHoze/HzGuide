@@ -287,7 +287,8 @@
     }{
         \exp_args:Nx \sphinx_includegraphics_bitmap:n { \l_tmpa_tl }
     }
-    \dim_set_towidth:Nn \l_tmpa_dim { \box_use:N \l_image_box }
+    \dim_set_towidth:Nn \l_tmpa_dim { \box_use:N \l_image_box }   
+    \mbox{}
     \dim_compare:nTF { \l_tmpa_dim > \linewidth }
     {        
         \exp_args:Nx \sphinx_includegraphics_width:n { \l_tmpa_tl }
@@ -312,9 +313,8 @@
 }
 \cs_new:Npn \sphinx_includegraphics_width:n #1
 {
-    \includegraphics[width=\linewidth]{#1}    
+    \includegraphics[width=\linewidth]{#1}
 }
-
 
 \cs_set_eq:NN \nbsphinxincludegraphics \sphinxincludegraphics
 \cs_set_eq:NN \sphinxsafeincludegraphics \sphinxincludegraphics
@@ -335,7 +335,8 @@
 \ExplSyntaxOff
 
 % table ---------------------------------------------------------------------
-% \rowcolors{1}{white}{backgray}
+\newcolumntype{T}{L}
+\tymin=4em
 
 % admonition ------------------------------------------------------------------
 \ExplSyntaxOn
@@ -407,10 +408,8 @@
 
 
 % literal ---------------------------------------------------------------------
-% {\catcode`\ =\active\gdef\xobeyspaces{\catcode`\ =\active\let =\@xobeyspaces}}
-% {\catcode`\^^M=\active\gdef\xobeylines{\catcode`\^^M=\active\let^^M=\@xobeylines}}
-% \def\@xobeyspaces{\penalty\z@\mbox{}\space\penalty\z@}
-% \def\@xobeylines{\par\leavevmode\relax}
+\renewcommand*\sphinxbreaksafteractivelist{\do\.\do\,\do\:\do\;\do\?\do\!\do\/\do\>\do\-\do\=}
+
 
 \renewcommand*\sphinxafterbreak{\spx@opt@verbatimcontinued}
 \DeclareDocumentEnvironment {sphinxVerbatim} { o }
@@ -424,12 +423,15 @@
     \obeyhspaces
     \obeyvlines
 }{
-    \vspace{-.5\baselineskip}
+    % \vspace{-.5\baselineskip}
     \end{reference}
 }
 
 % bibliography & index -------------------------------------------------------
 \BookmarkIndexHead
+
+\renewcommand\spxentry[1]{\texttt{#1}}
+\renewcommand\spxextra[1]{ (\emph{#1})}
 
 % layout & heading settings ---------------------------------------------------
 \IfNoAdhoc{layout}{

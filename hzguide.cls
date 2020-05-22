@@ -2201,7 +2201,7 @@
 	}
 	\IfBooleanTF {#1}
 	{		
-		\hypersetup{allcolors=#2} % colorlinks=true
+		\hypersetup{colorlinks=true, allcolors=#2}
 	}{
 		\hypersetup{colorlinks=false}
     	\renewcommand{\theTitleReference}[2]{\textcolor{#2}{#3 ##2}}
@@ -2473,7 +2473,7 @@
         \dim_set_toheight:Nn \l_tmpa_dim { \box_use:N \l_image_box }
         \object_locate:N \l_tmpa_dim
     }{
-            \dim_set:Nn \l_tmpb_dim { \linewidth }
+        \dim_set:Nn \l_tmpb_dim { \linewidth }
     }
     \rotatebox{-90}{
         \begin{minipage}{\l_tmpb_dim}
@@ -2665,7 +2665,7 @@
     }
     \begin{minipage}{\linewidth} 
         \begin{minipage}[\l_illustimage_valign_tl]{\l_illustimage_image_width_dim}
-            \vspace{0pt}			
+            \vspace{0pt}
             \bool_if:NT \l_illustimage_broad_bool
             {
                 \bool_if:NT \l_illustimage_flush_bool { \hfill }
@@ -4132,8 +4132,9 @@
 	}{}        
 	{ \AdhocBoxType } % define like below
 }
+
 % \newtcolorbox{FooBox}{...} 
-% \NenewBoundedBox{foo}{type=FooBox}
+% \RenewBoundedBox{foo}{type=FooBox}
 % \NewDocumentCommand \AdhocBoxType { }
 % {
 % 	\cs_set_eq:NN \BBox \FooBox
@@ -4528,7 +4529,8 @@
 {
     gap      	.tl_set:N = \l_wraprule_gap,
     thickness	.tl_set:N = \l_wraprule_thickness,
-    raise		.dim_set:N = \l_wraprule_raise
+    raise		.dim_set:N = \l_wraprule_raise,
+    font        .tl_set:N = \l_wraprule_font
 }
 
 \NewDocumentCommand \WrapruleSetup { m }
@@ -4538,22 +4540,31 @@
 
 \WrapruleSetup{
     gap=\enspace,
-    thickness = 0.75pt,
-    raise=0.5ex
+    thickness=0.75pt,
+    raise=0.5ex,
+    font=\ttfamily
 }
 
-\NewDocumentCommand \wraprule { O{} m }
+\NewDocumentCommand \wraprule { s O{} m }
 {
     \group_begin:
-        \WrapruleSetup{#1}
-        \hbox_set:Nn \l_tmpa_box {\l_wraprule_gap #2 \l_wraprule_gap}
-        \dim_set:Nn \l_tmpa_dim { \box_wd:N \l_tmpa_box }
-        \dim_set:Nn \l_tmpb_dim { \linewidth - \l_tmpa_dim }
+    \WrapruleSetup{#2}
+    \hbox_set:Nn \l_tmpa_box {\l_wraprule_gap \l_wraprule_font #3 \l_wraprule_gap}
+    \dim_set:Nn \l_tmpa_dim { \box_wd:N \l_tmpa_box }
+    \dim_set:Nn \l_tmpb_dim { \linewidth - \l_tmpa_dim }
+    \IfBooleanTF {#1}
+    {
+        \noindent\raisebox{\l_wraprule_raise}{            
+            \raisebox{-\l_wraprule_raise}{\box_use:N \l_tmpa_box}
+            \rule{\l_tmpb_dim}{\l_wraprule_thickness}
+        }       
+    }{
         \noindent\raisebox{\l_wraprule_raise}{
             \rule{.5\l_tmpb_dim}{\l_wraprule_thickness}
             \raisebox{-\l_wraprule_raise}{\box_use:N \l_tmpa_box}
-            \rule{.5\l_tmpb_dim}{\l_wraprule_thickness}
-        }
+            \rule{.5\l_tmpb_dim}{\l_wraprule_thickness}      
+        }  
+    }
     \group_end:
 }
 
@@ -4688,7 +4699,8 @@
 \NewDocumentCommand \texttsv { m }{ #1 }
 \NewDocumentCommand \TSVsetup { m }
 {
-    \keys_set:nn { TSV }{ #1 }     
+    \keys_set:nn { TSV }{ #1 }   
+    \exp_args:No \TabPositions{ \l_tsv_tabs_tl }  
 }
 
 \TSVsetup{
@@ -4700,16 +4712,15 @@
 \ior_new:N \l_tsv_ior
 \NewDocumentCommand \ReadTSV { m o }
 {
+    \group_begin:
     \IfValueT{#2}
     {
         \TSVsetup{ #2 }
-    }
-    \exp_args:No \TabPositions{ \l_tsv_tabs_tl }
+    }    
     \int_set:Nn \l_tsv_renderers_int { 
         \clist_count:N \l_tsv_renderers_clist
     }   
     \ior_open:Nn \l_tsv_ior { #1 }
-    \group_begin:
         \ior_str_map_inline:Nn \l_tsv_ior
         {
             \str_set:Nn \l_tmpa_str { ##1 }
@@ -4717,8 +4728,8 @@
             \seq_set_split:NnV \l_tmpa_seq { | } \l_tmpa_str                        
             \tsv_render:N \l_tmpa_seq	            
         }
-    \group_end:
     \ior_close:N \l_tsv_ior   
+    \group_end:
 }
 
 \cs_new:Npn \tsv_render:N #1
@@ -5002,10 +5013,10 @@
         }
     }
 }
-\ExplSyntaxOff
+
 
 % verbatim & literal -----------------------------------------------------------
-\ExplSyntaxOn
+
 \cs_new:Nn \obey_hspaces: { \penalty\z@\mbox{}\space }
 \NewDocumentCommand \obeyhspaces { }
 {
@@ -5023,36 +5034,59 @@
     \obeyhspaces    
     \obeyvlines
 }{}
-\ExplSyntaxOff
 
-% USE THIS METHOD:
-%    \begin{reference}
-%    \begin{verbatim}
-%    ...    
-%    \end{verbatim}
-%    \end{reference}
-% AN ALTERNATIVE METHOD IS
-%    \begin{verbsave}
-%    ...
-%    \end{verbsave}
-%    \verbread
+\tl_set:Nx \tmpvrb { \jobname.vrb }
 
-\def\tmpverbfile{\jobname.vrb}
-% Leave nothing after \end{} in the same line
-\def\verbsave{%
-    \@bsphack
-    \immediate\openout \verbatim@out \tmpverbfile
-    \let\do\@makeother\dospecials
-    \catcode`\^^M\active
-    \def\verbatim@processline{%
-        \immediate\write\verbatim@out
-            {\the\verbatim@line}}%
-    \verbatim@start}
-\def\endverbsave{%	
-    \immediate\closeout\verbatim@out	
-    \@esphack}
+\NewDocumentEnvironment { code }{ s }
+{
+    \group_begin:
+    \exp_args:Nx \verbatimoutput { \tmpvrb }
+}{
+    \endverbatimoutput
+    \group_end: 
+    
+    \IfBooleanF { #1 } 
+    {
+        \coderead
+    }
+}
 
-\ExplSyntaxOn
+\NewDocumentCommand \coderead {}
+{
+    \begin{reference}
+        \bool_if:NTF \g_minted_bool
+        {
+            \mbox{}\vspace{-.5\baselineskip}
+            \inputminted{ latex }{ \tmpvrb }
+        }{            
+            \mbox{}\vspace{-\baselineskip}
+            \verbatiminput{ \tmpvrb }
+        }
+    \end{reference}  
+}
+
+% \NewDocumentCommand \coderender { s }
+% {
+%     \IfBooleanTF { #1 }
+%     {
+%         \begin{IfVartwoEnlarge}\noindent
+%         \begin{minipage}{.55\linewidth}            
+%             \coderead
+%         \end{minipage}
+%         \hfill
+%         \begin{minipage}{.44\linewidth}
+%             \begin{instance}
+%                 \input{ \tmpvrb }
+%             \end{instance}
+%         \end{minipage}
+%         \end{IfVartwoEnlarge}
+%     }{
+%         \coderead
+%         \begin{instance}
+%             \input{ \tmpvrb }
+%         \end{instance}
+%     }
+% }
 
 \RenewDocumentCommand \verb {v} 
 {
@@ -5062,61 +5096,6 @@
 \NewDocumentCommand \vitem { v }
 {
     \item[#1]
-}
-
-\NewDocumentCommand \verbread { O{ \tmpverbfile } }
-{  
-	\begin{reference}
-		\bool_if:NTF \g_minted_bool
-		{
-			\inputminted{latex}{#1}
-		}{
-			%\wrappingon
-			\verbatimindent=0pt
-			\verbatiminput{#1}
-		}
-    \end{reference}
-}
-
-\NewDocumentCommand \verbinput { O{ \tmpverbfile } }
-{
-	
-	\begin{instance}
-		\input{#1}
-	\end{instance}
-}
-
-\NewDocumentCommand \verbrender{ s O{ \tmpverbfile } }
-{
-    \IfBooleanTF {#1}
-    {
-        \verb_render_below:n { #2 }
-    }{
-        \verb_render_side:n { #2 }
-    }    
-}
-
-\cs_new:Npn \verb_render_below:n #1
-{
-    \verbread[#1]   
-	\ExplSyntaxOn
-    \verbinput[#1]	
-	\ExplSyntaxOff 
-}
-
-\cs_new:Npn \verb_render_side:n #1
-{    
-    \begin{IfVartwoEnlarge}\noindent
-		\begin{minipage}{.55\linewidth}
-			\verbread[#1]			
-        \end{minipage}
-        \hfill
-        \begin{minipage}{.44\linewidth}
-			\ExplSyntaxOn			
-            \verbinput[#1]
-			\ExplSyntaxOff
-        \end{minipage}
-    \end{IfVartwoEnlarge}
 }
 \ExplSyntaxOff
 
