@@ -220,7 +220,7 @@
     star={index=false, base=MMMM} 
 }
 
-\RenewEnviron{description}{ \alignterms[]{\BODY} }
+%\RenewEnviron{description}{ \alignterms[]{\BODY} }
 
 \NewTerms{optionlistkari}{
     label-type=default, 
@@ -334,9 +334,54 @@
 }
 \ExplSyntaxOff
 
+% docstring label ----------------------------------------------------------------
+\let\sphinxupquoteorg\sphinxupquote
+\ExplSyntaxOn
+\NewDocumentCommand \spxuqnormal {}
+{
+    \let\sphinxupquote\sphinxupquoteorg
+}
+\NewDocumentCommand \spxuqadhoc {}
+{
+    \RenewDocumentCommand \sphinxupquote { m }
+    {
+        \str_if_eq:nnF {##1}{class~}
+        {
+            \sphinxupquoteorg{##1}
+        }
+    }
+}
+\ExplSyntaxOff
+
+
 % table ---------------------------------------------------------------------
-\newcolumntype{T}{L}
-\tymin=4em
+% \newenvironment{quote}%
+%                {\list{}{\rightmargin\leftmargin}%
+%                 \item[]}%
+%                {\endlist}
+% \DeclareRobustCommand\centering{%
+%   \let\\\@centercr
+%   \rightskip\@flushglue\leftskip\@flushglue
+%   \parindent\z@\parfillskip\z@skip}
+\let\centeringorg\centering
+% \def\sphinxattablestart{\par\vskip\dimexpr\sphinxtablepre\relax}%
+\def\sphinxattablestart{\let\centering\relax\footnotesize\ttfamily}
+\def\sphinxstyletheadfamily{\bfseries}
+% \newcolumntype{\X}[2]{p{\dimexpr
+%       (\linewidth-\arrayrulewidth)*#1/#2-\tw@\tabcolsep-\arrayrulewidth\relax}}
+% \newcolumntype{\Y}[1]{p{\dimexpr
+%       #1\dimexpr\linewidth-\arrayrulewidth\relax-\tw@\tabcolsep-\arrayrulewidth\relax}}
+% \newcolumntype{T}{J}%
+\newcolumntype{\X}[2]{p{.1\linewidth}}
+\newcolumntype{T}{p{.1\linewidth}}
+
+\tabcolsep=1pt
+\arrayrulewidth=0.25pt
+% \tymin=4em
+
+
+% mat -------------------
+\def\gt{<}
 
 % admonition ------------------------------------------------------------------
 \ExplSyntaxOn
