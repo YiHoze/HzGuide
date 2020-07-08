@@ -334,24 +334,30 @@
 }
 \ExplSyntaxOff
 
-% docstring label ----------------------------------------------------------------
-\let\sphinxupquoteorg\sphinxupquote
-\ExplSyntaxOn
-\NewDocumentCommand \spxuqnormal {}
-{
-    \let\sphinxupquote\sphinxupquoteorg
-}
-\NewDocumentCommand \spxuqadhoc {}
-{
-    \RenewDocumentCommand \sphinxupquote { m }
-    {
-        \str_if_eq:nnF {##1}{class~}
-        {
-            \sphinxupquoteorg{##1}
-        }
-    }
-}
-\ExplSyntaxOff
+% docstring ----------------------------------------------------------------
+\setlistdepth{9}
+\renewlist{enumerate}{enumerate}{9}
+\def\FV@FontSize{\fontsize{6pt}{6pt}\selectfont}
+
+% \let\sphinxupquoteorg\sphinxupquote
+% \ExplSyntaxOn
+% \NewDocumentCommand \spxuqnormal {}
+% {
+%     \let\sphinxupquote\sphinxupquoteorg
+% }
+% \NewDocumentCommand \spxuqadhoc {}
+% {
+%     \RenewDocumentCommand \sphinxupquote { m }
+%     {
+%         \str_if_eq:nnF {##1}{class~}
+%         {
+%             \tl_set:No \l_tmp_tl { \str_uppercase:n {##1} }
+%             \pdfbookmark[3]{\l_tmp_tl}{##1}
+%             \exp_args:Nx \sphinxupquoteorg{\l_tmp_tl}
+%         }
+%     }
+% }
+% \ExplSyntaxOff
 
 
 % table ---------------------------------------------------------------------
@@ -359,55 +365,38 @@
 %                {\list{}{\rightmargin\leftmargin}%
 %                 \item[]}%
 %                {\endlist}
-% \DeclareRobustCommand\centering{%
-%   \let\\\@centercr
-%   \rightskip\@flushglue\leftskip\@flushglue
-%   \parindent\z@\parfillskip\z@skip}
-\let\centeringorg\centering
-% \def\sphinxattablestart{\par\vskip\dimexpr\sphinxtablepre\relax}%
-\def\sphinxattablestart{\let\centering\relax\footnotesize\ttfamily}
-\def\sphinxstyletheadfamily{\bfseries}
-% \newcolumntype{\X}[2]{p{\dimexpr
-%       (\linewidth-\arrayrulewidth)*#1/#2-\tw@\tabcolsep-\arrayrulewidth\relax}}
+
 % \newcolumntype{\Y}[1]{p{\dimexpr
 %       #1\dimexpr\linewidth-\arrayrulewidth\relax-\tw@\tabcolsep-\arrayrulewidth\relax}}
-% \newcolumntype{T}{J}%
-\newcolumntype{\X}[2]{p{.1\linewidth}}
-\newcolumntype{T}{p{.1\linewidth}}
 
-\tabcolsep=1pt
+\def\sphinxstyletheadfamily{\bfseries}
+\tabcolsep=0.75pt
 \arrayrulewidth=0.25pt
 % \tymin=4em
+\def\sphinxattablestart{\par\vskip\dimexpr\sphinxtablepre\relax\small}
 
+\newcommand\beforeAPI{
+    \let\centeringorg\centering
+    \def\sphinxattablestart{\let\centering\relax\ttfamily\footnotesize}
+    \newcolumntype{T}{p{.1\linewidth}}
+    \newcolumntype{\X}[2]{p{.1\linewidth}}
 
-% mat -------------------
+}
+\newcommand\afterAPI{
+    \let\centering\centeringorg
+    \def\sphinxattablestart{\par\vskip\dimexpr\sphinxtablepre\relax\small}
+    \newcolumntype{T}{J}
+    \newcolumntype{\X}[2]{p{\dimexpr(\linewidth-\arrayrulewidth)*##1/##2-\tw@\tabcolsep-\arrayrulewidth\relax}}
+}
+
+% math -------------------
 \def\gt{<}
 
 % admonition ------------------------------------------------------------------
 \ExplSyntaxOn
-\DeclareDocumentEnvironment {sphinxadmonition} { mm }
-{   
-    \str_set:Nx \l_tmpa_str { #2 }
-    \str_remove_all:Nn \l_tmpa_str {:}
-    \begin{note}(\l_tmpa_str)
-}{
-    \end{note}
-}
+\definecolor{admontitleback}{RGB/cmyk}{106,176,222/0.52,0.21,0,0.13}
+\definecolor{admonback}{RGB/cmyk}{231,242,250/0.08,0.03,0,0.02}
 
-\RenewTColorBox{ShadeBox}{ s O{} }
-{
-    before~skip=0pt, after~skip=0pt,
-    boxrule=0.75pt, colframe=white, colback=backgray, arc=0.5ex,
-    boxsep=0ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
-    titlerule=0.75pt, toptitle=0.5ex, bottomtitle=0.5ex,
-    colbacktitle=lightgray, coltitle=black,
-    fonttitle=\l_bbox_title_font_tl, title=#2,
-	IfBooleanTF={#1}{
-		breakable=\l_bbox_breakable_adhoc_tl
-	}{
-		breakable=\l_bbox_breakable_default_tl
-	}
-}
 \RenewTColorBox{FrameBox}{ s }
 {
     colframe=gray, colback=white,
@@ -419,7 +408,33 @@
 		breakable=\l_bbox_breakable_default_tl
 	}
 }
+
+\RenewTColorBox{ShadeBox}{ s O{} }
+{
+    before~skip=0pt, after~skip=0pt,
+    boxrule=0.75pt, colframe=white, colback=admonback, arc=0.5ex,
+    boxsep=0.5ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
+    titlerule=0.75pt, toptitle=0.5ex, bottomtitle=0.5ex,
+    colbacktitle=admontitleback, coltitle=white,
+    fonttitle=\l_bbox_title_font_tl, title=#2,
+	IfBooleanTF={#1}{
+		breakable=\l_bbox_breakable_adhoc_tl
+	}{
+		breakable=\l_bbox_breakable_default_tl
+	}
+}
+
+\RenewBoundedBox{note}{type=shade, title-font=\sffamily\bfseries}
+\DeclareDocumentEnvironment {sphinxadmonition} { mm }
+{   
+    \str_set:Nx \l_tmpa_str { #2 }
+    \str_remove_all:Nn \l_tmpa_str {:}
+    \begin{note}(\space\l_tmpa_str\space)
+}{
+    \end{note}
+}
 \ExplSyntaxOff
+
 
 
 \RenewBoundedBox{reference}{
@@ -429,48 +444,47 @@
     breakable-default=true
 }
 
-\def\nbsphinxfancyaddprompt{    
-    \ifvoid\nbsphinxpromptbox\else
-    \kern\fboxrule\kern\fboxsep    
-    \llap{\copy\nbsphinxpromptbox\,}
-    \kern-\ht\nbsphinxpromptbox\kern-\dp\nbsphinxpromptbox
-    \kern-\fboxsep\kern-\fboxrule\nointerlineskip
-    \fi
-}
+% \def\nbsphinxfancyaddprompt{    
+%     \ifvoid\nbsphinxpromptbox\else
+%     \kern\fboxrule\kern\fboxsep    
+%     \llap{\copy\nbsphinxpromptbox\,}
+%     \kern-\ht\nbsphinxpromptbox\kern-\dp\nbsphinxpromptbox
+%     \kern-\fboxsep\kern-\fboxrule\nointerlineskip
+%     \fi
+% }
 
-\NewBoundedBox{versatile}{
-    type=frame,
-    style=\raggedright,
-    font=\ttfamily\small,
-    breakable-default=true
-}
-\renewenvironment{nbsphinxfancyoutput}{
-    \begin{versatile}
-        \nbsphinxfancyaddprompt        
-}{
-    \end{versatile}
-}
+% \NewBoundedBox{versatile}{
+%     type=frame,
+%     style=\raggedright,
+%     font=\ttfamily\small,
+%     breakable-default=true
+% }
+% \renewenvironment{nbsphinxfancyoutput}{
+%     \begin{versatile}
+%         \nbsphinxfancyaddprompt        
+% }{
+%     \end{versatile}
+% }
 
 
 % literal ---------------------------------------------------------------------
-\renewcommand*\sphinxbreaksafteractivelist{\do\.\do\,\do\:\do\;\do\?\do\!\do\/\do\>\do\-\do\=}
+% \renewcommand*\sphinxbreaksafteractivelist{\do\.\do\,\do\:\do\;\do\?\do\!\do\/\do\>\do\-\do\=}
 
-
-\renewcommand*\sphinxafterbreak{\spx@opt@verbatimcontinued}
-\DeclareDocumentEnvironment {sphinxVerbatim} { o }
-{  
-    \begin{reference}
-    \setSpacing{1}
-    \sphinxbreaksatspecials
-    \sphinxbreaksviaactive    
-    % \xobeyspaces
-    % \xobeylines
-    \obeyhspaces
-    \obeyvlines
-}{
-    % \vspace{-.5\baselineskip}
-    \end{reference}
-}
+% \renewcommand*\sphinxafterbreak{\spx@opt@verbatimcontinued}
+% \DeclareDocumentEnvironment {sphinxVerbatim} { o }
+% {  
+%     \begin{reference}
+%     \setSpacing{1}
+%     \sphinxbreaksatspecials
+%     \sphinxbreaksviaactive    
+%     % \xobeyspaces
+%     % \xobeylines
+%     \obeyhspaces
+%     \obeyvlines
+% }{
+%     % \vspace{-.5\baselineskip}
+%     \end{reference}
+% }
 
 % bibliography & index -------------------------------------------------------
 \BookmarkIndexHead

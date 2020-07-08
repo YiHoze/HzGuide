@@ -19,7 +19,7 @@
 \LoadClassWithOptions{memoir}
 
 %\RequirePackage{iftex}
-\RequirePackage{expl3,xparse,l3keys2e}
+\RequirePackage{xparse,l3keys2e}
 \RequirePackage{environ}
 \RequirePackage{fontspec}
 \RequirePackage{ragged2e}
