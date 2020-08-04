@@ -764,8 +764,7 @@
 	\bool_if:NTF \cover_blank_front_bool
 	{
 		\mbox{}
-	}
-	{
+	}{
 		\begin{IfVartwoEnlarge}		
 			\setSpacing{1}
 			\tl_if_empty:NF \cover_image_logo_front

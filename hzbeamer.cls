@@ -2,6 +2,7 @@
 \RequirePackage{xparse, l3keys2e}
 
 \ExplSyntaxOn
+
 \keys_define:nn { hzbeamer }
 {
 	flier	.bool_set:N = \g_flier_bool,
@@ -98,8 +99,9 @@
 \setmonofont{Latin Modern Mono}
 
 \IfHangul{
-	\RequirePackage[hangul]{kotex}
-	\setmainhangulfont{Noto Sans CJK KR}[BoldFont={* Medium}]
+	\RequirePackage{kotex}
+	\setsanshangulfont{Noto Sans CJK KR}[BoldFont={* Medium}]
+	\setsanshanjafont{Noto Sans CJK KR}[BoldFont={* Medium}]	
     \setmonohangulfont{Noto Sans Mono CJK KR}
 }
 
@@ -336,6 +338,16 @@
 %%\defbeamertemplate{description~item}{align~left}{\insertdescriptionitem\hfill}
 \setbeamertemplate{description~item}{\insertdescriptionitem\hfill}
 
+\newfontfamily\symbfont{Noto~Sans~Symbols2}
+\NewDocumentCommand \foreign { s o m }
+{
+	\group_begin:
+	\IfValueTF { #2 }{ \fontspec{#2} }{ \symbfont }	
+	\IfBooleanTF { #1 }{ \char"#3 }{ #3 }
+	\group_end:
+}
+
+
 %% characters & letters
 % \NewDocumentCommand \SetForeignFonts { m m }
 % {
@@ -368,59 +380,6 @@
 % 	\group_end:
 % }
 
-% \NewDocumentCommand \smiley {} 
-% { 
-% 	{\color{red}\bfseries\foreign*{263A}~} 
-% }
-
-% \NewDocumentCommand \frowny {} 
-% { 
-% 	{\color{blue}\bfseries\foreign*{2639}~}
-% }
-
-% \NewDocumentCommand \prefer {s} 
-% { 
-% 	\IfBooleanTF{#1}
-% 		{ \smiley }
-% 		{ \item[\smiley] } 
-% }
-
-% \NewDocumentCommand \avoid {s} 
-% { 
-% 	\IfBooleanTF{#1}
-% 		{ \frowny }
-% 		{ \item[\frowny] } 
-% }
-
-% \NewDocumentCommand \Vdots { } 
-% { 
-% 	\foreign*{22EE}
-% }
-
-% \NewDocumentCommand \changeto { } 
-% { 
-% 	\textbf{\large\textrightarrow}~ 
-% }
-
-\NewDocumentCommand \ui {m} 
-{ 
-	\textcolor{darkgray}{\textbf{#1}} 
-}
-
-\NewDocumentCommand \opt {s m}
-{
-	\IfBooleanTF{#1}
-		{\small\foreign*{2611}~#2\quad}%% ballot box with check
-		{\small\foreign*{2610}~#2\quad}%% ballot box
-}
-
-\NewDocumentCommand \oitem {s}
-{
-	\IfBooleanTF{#1}
-		{\item[\foreign*{2611}]}
-		{\item[\foreign*{2610}]}
-}
-
 \keys_define:nn { annotate }
 {
 	opening		.tl_set:N = \l_annotate_opening_tl,
@@ -442,7 +401,6 @@
 	closing=),
 	raise=.75ex
 }
-
 
 \NewDocumentCommand \annotate { O{} m }
 {
@@ -475,7 +433,7 @@
 }
 
 %% tables
-\taburowcolors{white .. lightgray}
+% \taburowcolors{white .. lightgray}
 \NewExpandableDocumentCommand\TableHeadFont{}{\rowfont{\bfseries}}
 \NewDocumentCommand \cellhead {m}
 {
