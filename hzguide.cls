@@ -2761,13 +2761,24 @@
     \endIllustratedImage
 }
 
-% as environment for symbol
-\NewDocumentEnvironment { IllustSymbol } { O{} m }
+
+
+\tl_new:N \l_illust_symbol_options
+\NewDocumentCommand \SymbolSetup { m }
 {
-    \IllustImageSetup{frame=false, voffset=0.75ex, valign=m, #1} 
-    \IllustratedImage{#2}
-}{
-    \endIllustratedImage
+    \tl_set:Nn \l_illust_symbol_options {#1}
+}
+
+% \SymbolSetup{
+%     frame=false, voffset=0.75ex, valign=m
+% }
+
+\NewDocumentCommand\illustsymbol{ O{} m +m }
+{
+    \group_begin:
+    \exp_args:No \IllustImageSetup{ \l_illust_symbol_options }
+    \illustimage[#1]{#2}{#3}
+    \group_end:
 }
 
 % as environment for itemize
@@ -2865,7 +2876,7 @@
     \group_end:
 }
 
-% \lineimg[]{foo} -------------------------------------------------------------
+% \img[]{foo} -------------------------------------------------------------
 \keys_define:nn { lineimg }
 {
     scale      .tl_set:N = \l_lineimg_scale,
@@ -2897,7 +2908,7 @@
     }
 }
 
-\cs_set_eq:NN \lineimg \img
+% \cs_set_eq:NN \lineimg \img
 
 \NewDocumentCommand \listimg { m }
 {
@@ -2929,7 +2940,7 @@
     footnote      	.tl_set:N 	= \l_table_footnote,
     footnotestyle 	.code:n 	= { \table_footnotestyle:n {#1} }, % footnotestyle=fnsymbol
     stretch       	.tl_set:N 	= \l_table_stretch_tl,
-    norowcolor    	.bool_set:N	= \l_table_norowcolor_bool,
+    rowcolor    	.bool_set:N	= \l_table_rowcolor_bool,
 	star		  	.tl_set:N 	= \l_table_star_tl,
 	vbar		  	.tl_set:N 	= \l_table_vbar_tl,
 	protrude		.dim_set:N  = \l_table_protrude_dim % valid only at vartwo
@@ -2938,7 +2949,7 @@
 \NewDocumentCommand \TableSetup { m }
 {
     \keys_set:nn { table } { #1 }
-	\exp_args:NNx \def\fps@table { \l_image_float_placement_tl }
+	%\exp_args:NNx \def\fps@table { \l_image_float_placement_tl }
 }
 
 \TableSetup{
@@ -2952,8 +2963,8 @@
     fontsize=\small,
     footnotestyle=arabic,
     stretch=1,
-    norowcolor=false,
-	star={norowcolor},
+    rowcolor=false,
+	star={rowcolor},
 	protrude=0pt
 }
 
@@ -2972,11 +2983,11 @@
     \TableSetup{ #3 }
     \IfValueT{ #4 } { \tl_set:Nn \l_table_caption_tl {#4} }
     \IfValueT{ #5 } { \tl_set:Nn \l_table_footnote {#5} }
-    \bool_if:NTF \l_table_norowcolor_bool 
+    \bool_if:NTF \l_table_rowcolor_bool 
     { 
-        \rowcolors{1}{white}{white}
-    }{
         \rowcolors{1}{white}{backgray}
+    }{
+        \rowcolors{1}{white}{white}
     }
 	\dim_compare:nT { \l_table_protrude_dim > 0pt }
 	{
@@ -3141,7 +3152,7 @@
 }
 
 \NewEnviron{imagetableiii}{
-    \placetable[stretch=1.3,font=\small,norowcolor]{        
+    \placetable[stretch=1.3,font=\small,rowcolor]{        
         \begin{tabularx}{\linewidth}{XXX}
         \BODY
         \end{tabularx}
@@ -3149,7 +3160,7 @@
 }
 
 \NewEnviron{imagetableii}{
-    \placetable[stretch=1.3,font=\small,norowcolor]{
+    \placetable[stretch=1.3,font=\small,rowcolor]{
         \begin{tabularx}{\linewidth}{XXX}
         \BODY
         \end{tabularx}
@@ -3222,7 +3233,7 @@
         {
             {\image}        { \tl_set:Nn \l_image_scale_tl {#1} }
             {\illustimage}  { \tl_set:Nn \l_illustimage_scale_tl {#1} }
-            {\lineimg}      { \tl_set:Nn \l_lineimg_scale {#1} }
+            {\img}          { \tl_set:Nn \l_lineimg_scale {#1} }
         }
     }
 }
@@ -3705,9 +3716,9 @@
     delimiter = \hfill,
     item-sep = 1ex, 
 }
-\NewDocumentCommand \imgitem { m }
+\NewDocumentCommand \imgitem { r[] }
 {
-    \item[\lineimg{#1}]
+    \item[\img{#1}]
 }
 
 \cs_new:Npn \terms_label_tmp:n #1
@@ -3742,13 +3753,6 @@
     \end{terms}
 }
 \NewEnviron{Terms}[1][]{ \alignterms[#1]{\BODY} }
-
-
-\tl_new:N \l_symbol_options
-\NewDocumentCommand \SymbolsSetup { m }
-{
-    \tl_set:Nn \l_symbol_options {#1}
-}
 
 % option list
 \int_new:N \l_opt_cnt_int
@@ -4217,8 +4221,8 @@
     note = NOTE
 }
 
-\NewBoundedBox{danger}{signal=\g_admonition_danger_tl, symbol={\lineimg{AlertSymbol}~}}
-\NewBoundedBox{warning}{signal=\g_admonition_warning_tl, symbol={\lineimg{AlertSymbol}~}}
+\NewBoundedBox{danger}{signal=\g_admonition_danger_tl, symbol={\img{AlertSymbol}~}}
+\NewBoundedBox{warning}{signal=\g_admonition_warning_tl, symbol={\img{AlertSymbol}~}}
 \NewBoundedBox{caution}{signal=\g_admonition_caution_tl, symbol={}}
 \NewBoundedBox{notice}{signal=\g_admonition_notice_tl, symbol={}}
 \NewBoundedBox{note}{signal=\g_admonition_note_tl, symbol={}}
@@ -4858,9 +4862,9 @@
     \par\image{uncertain}
 }
 
-\NewDocumentCommand \tpllineimg {}
+\NewDocumentCommand \tplimg {}
 {
-    \lineimg{uncertain}
+    \img{uncertain}
 }
 
 \NewDocumentCommand \tplimagetable {}
@@ -4868,9 +4872,9 @@
     \tplpara
     \par
     \begin{ImageTable}
-        \tpllineimg & \tpllineimg & \tpllineimg \\
+        \tplimg & \tplimg & \tplimg \\
         First~item & Second~item & Third~item \\
-        \tpllineimg & \tpllineimg & \tpllineimg \\
+        \tplimg & \tplimg & \tplimg \\
         Fourth~item & Fifth~item & Sixth~item \\
     \end{ImageTable}
 }
