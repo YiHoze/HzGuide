@@ -2915,7 +2915,11 @@
     \par\img[0pt]{#1}
 }
 
-% \settable[]{ } ------------------------------------
+% table ------------------------------------
+% \newcolumntype{L}{>{\raggedright\arraybackslash}X}
+% \newcolumntype{C}{>{\centering\arraybackslash}X}
+% \newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+
 
 \cs_new:Npn \table_footnotestyle:n #1
 {
@@ -3152,7 +3156,7 @@
 }
 
 \NewEnviron{imagetableiii}{
-    \placetable[stretch=1.3,font=\small,rowcolor]{        
+    \placetable[stretch=1.3,font=\small,rowcolor=false]{        
         \begin{tabularx}{\linewidth}{XXX}
         \BODY
         \end{tabularx}
@@ -3160,8 +3164,8 @@
 }
 
 \NewEnviron{imagetableii}{
-    \placetable[stretch=1.3,font=\small,rowcolor]{
-        \begin{tabularx}{\linewidth}{XXX}
+    \placetable[stretch=1.3,font=\small,rowcolor=false]{
+        \begin{tabularx}{\linewidth}{XX}
         \BODY
         \end{tabularx}
     }
