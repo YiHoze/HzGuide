@@ -2670,17 +2670,14 @@
                 \bool_if:NT \l_illustimage_flush_bool { \hfill }
             }
 			\l_illustimage_image_align_tl
-            \leavevmode \box_use:N \l_image_box      
+            \box_use:N \l_image_box      
             \illustimage_caption:      
         \end{minipage}
         \hfill 
         \begin{minipage}[\l_illustimage_valign_tl]{\l_illustimage_text_width_dim}
             \vspace{0pt}
-            \begin{minipage}{\linewidth}        
-                \vspace{\l_illustimage_voffset_skip}
-                \box_use:N \l_text_box        
-            \end{minipage}
-            \vspace{0pt}
+            \vspace{\l_illustimage_voffset_skip}
+            \box_use:N \l_text_box        
         \end{minipage}        
     \end{minipage}
     \object_skip_after:n {\l_illustimage_after_skip}
@@ -2697,11 +2694,8 @@
     \begin{minipage}{\linewidth}	
         \begin{minipage}[\l_illustimage_valign_tl]{\l_illustimage_text_width_dim}
             \vspace{0pt}
-            \begin{minipage}{\linewidth}        
-                \vspace{\l_illustimage_voffset_skip}
-                \box_use:N \l_text_box        
-            \end{minipage}
-            \vspace{0pt}
+            \vspace{\l_illustimage_voffset_skip}
+            \box_use:N \l_text_box        
         \end{minipage}
         \hfill
         \begin{minipage}[\l_illustimage_valign_tl]{\l_illustimage_image_width_dim}			
@@ -2711,7 +2705,7 @@
                 \bool_if:NT \l_illustimage_flush_bool { \hfill }
             }
 			\l_illustimage_image_align_tl
-            \leavevmode \box_use:N \l_image_box
+            \box_use:N \l_image_box
             \illustimage_caption:
         \end{minipage}
     \end{minipage}
@@ -3268,6 +3262,8 @@
     {
         \tl_set:Nn \l_tmpa_tl { ##1 }
         \tl_trim_spaces:N \l_tmpa_tl
+        % if hash(#) is in filename
+        \regex_replace_all:nnN { \cP\# } { \cO\# } \l_tmpa_tl
         \tl_if_empty:NF { \l_tmpa_tl }
         {            
             \int_incr:N \l_tmpa_int

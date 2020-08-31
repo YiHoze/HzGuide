@@ -4,8 +4,10 @@
 
 % font ------------------------------------------------------------------------
 
-\setmainfont{Noto Serif}[BoldFont={* SemiBold}]
-\setmainfont{Noto Sans}[BoldFont={* SemiBold}]
+\RequirePackage{mathptmx}
+
+\setmainfont{Noto Serif}[BoldFont={* SemiBold}, Mapping=tex-text-sq]
+\setsansfont{Noto Sans}[BoldFont={* SemiBold}, Mapping=tex-text-sq]
 
 % Hangul by font name
 \@ifpackageloaded{xetexko}{    
@@ -14,7 +16,7 @@
     \setmonohangulfont{Noto Sans Mono CJK KR}
 }
 
-% front matter ---------------------------------------------------------------
+ % front matter ---------------------------------------------------------------
 \DeclareDocumentCommand\sphinxmaketitle{}
 {
     \IfFileExists{colophon.tex}{
