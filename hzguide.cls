@@ -18,7 +18,6 @@
 
 \LoadClassWithOptions{memoir}
 
-%\RequirePackage{iftex}
 \RequirePackage{xparse,l3keys2e}
 \RequirePackage{environ}
 \RequirePackage{fontspec}
@@ -236,8 +235,21 @@
     \newcommand\prenum{第}
 }
 
-\IfLang{kor}
-{
+\IfLang{kor}{
+    
+    \sys_if_engine_luatex:TF
+    {
+        \RequirePackage[hangul]{luatexko}
+    }{
+        \RequirePackage[hangul]{xetexko}
+    }
+
+    \bool_if:NT \g_Noto_bool
+    {
+        \setmainhangulfont{Noto~Serif~CJK~KR}[BoldFont={*~SemiBold}]
+        \setsanshangulfont{Noto~Sans~CJK~KR}[BoldFont={*~Medium}]
+        \setmonohangulfont{Noto~Sans~Mono~CJK~KR}
+    }
     \bool_gset_true:N \g_CJK_bool
     \newcommand\prenum{제}
 	\renewcommand*{\printpartname}{\partnamefont\prenum}
@@ -245,7 +257,7 @@
 	\renewcommand*{\partnamenum}{\space}
 }
 
-%\ExplSyntaxOff
+\ExplSyntaxOff
 
 % language settings -----------------------------------------------------------
 
@@ -379,7 +391,6 @@
     }
 }
 
-
 \IfLang{fre}
 {
     \RequirePackage{polyglossia}
@@ -473,21 +484,6 @@
     % \newhangulfontfamily\pilgi{Pilgi}[ItalicFont=*]
     % \edef\slshape{\unexpanded\expandafter{\slshape\gungseo}}
     % \edef\itshape{\unexpanded\expandafter{\itshape\pilgi}}
-    \sys_if_engine_xetex:TF
-	{
-        \RequirePackage[hangul]{xetexko}        
-    }{	
-        \sys_if_engine_luatex:T
-		{
-            \RequirePackage[hangul]{luatexko}
-        }
-    }
-    \bool_if:NT \g_Noto_bool
-    {
-        \setmainhangulfont{Noto~Serif~CJK~KR}[BoldFont={*~SemiBold}]
-        \setsanshangulfont{Noto~Sans~CJK~KR}[BoldFont={*~Medium}]
-        \setmonohangulfont{Noto~Sans~Mono~CJK~KR}
-    }
     \AtBeginDocument{
         \renewcommand*{\contentsname}{차례}
         \AdmonitionSetup {
@@ -635,7 +631,7 @@
     }
 }
 
-%\ExplSyntaxOn
+\ExplSyntaxOn
 
 % class utilities to customize styles * * * * * * * * * * * * * * * * * * * * *
 
@@ -4229,7 +4225,6 @@
 \NewBoundedBox{instance}{signal={}, type=RightBar, font=\small}
 \NewBoundedBox{reference}{signal={}, font=\small}
 
-
 %\watermark{x=30,y=30,fontsize=90,color=red,text={...},image=foo,rotate=50}
 % when both text and image are specified, the former is ignored.
 
@@ -5068,29 +5063,6 @@
     \end{reference}  
 }
 
-% \NewDocumentCommand \coderender { s }
-% {
-%     \IfBooleanTF { #1 }
-%     {
-%         \begin{IfVartwoEnlarge}\noindent
-%         \begin{minipage}{.55\linewidth}            
-%             \coderead
-%         \end{minipage}
-%         \hfill
-%         \begin{minipage}{.44\linewidth}
-%             \begin{instance}
-%                 \input{ \tmpvrb }
-%             \end{instance}
-%         \end{minipage}
-%         \end{IfVartwoEnlarge}
-%     }{
-%         \coderead
-%         \begin{instance}
-%             \input{ \tmpvrb }
-%         \end{instance}
-%     }
-% }
-
 \RenewDocumentCommand \verb {v} 
 {
     \texttt{#1}
@@ -5273,8 +5245,8 @@
     \setmainfont{TeX~Gyre~Pagella}
     \setsansfont{TeX~Gyre~Heros}
 }
-\setmonofont{zco} % to type space (␣) 
 \ExplSyntaxOff
+\setmonofont{zco} % to type space (␣) 
 
 % sectional divisions
 \setsecnumdepth{section}
