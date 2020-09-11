@@ -338,12 +338,12 @@
 %%\defbeamertemplate{description~item}{align~left}{\insertdescriptionitem\hfill}
 \setbeamertemplate{description~item}{\insertdescriptionitem\hfill}
 
-\newfontfamily\symbfont{Noto~Sans~Symbols2}
-\NewDocumentCommand \foreign { s o m }
+% Use LuaLaTeX
+\setsansfallbackfont{HCR Batang}
+\NewDocumentCommand \foreign { s m }
 {
 	\group_begin:
-	\IfValueTF { #2 }{ \fontspec{#2} }{ \symbfont }	
-	\IfBooleanTF { #1 }{ \char"#3 }{ #3 }
+	\IfBooleanTF { #1 }{ \char"#2 }{ #2 }
 	\group_end:
 }
 
