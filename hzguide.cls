@@ -14,6 +14,8 @@
 % IV. For those of designer interface level:
 %     Follow clause II. However, it is allowed to use lowercase with compound words.
 
+% \pagegoal, \pagetotal
+
 \ProvidesClass{hzguide}[2018/08/13]
 
 \LoadClassWithOptions{memoir}
@@ -63,7 +65,7 @@
     korean      .code:n = { \LanguageSetup{ korean } },
     language    .code:n = { \LanguageSetup{ #1 } },
     styleset    .tl_set:N = \g_style_set_tl,
-    doctype     .code:n = { \SetDocType{#1} },
+    doctype     .code:n = { \DocumentSetup{#1} },
     Noto        .bool_set:N = \g_Noto_bool,
     smallerfont .bool_set:N = \g_smallerfont_bool,
     minted    	.bool_set:N = \g_minted_bool,
@@ -119,17 +121,17 @@
 }
 
 % if this document's type is ...
-\clist_new:N \g_doc_type
-\NewDocumentCommand \SetDocType { m }
+\clist_new:N \g_doc_property
+\NewDocumentCommand \DocumentSetup { m }
 {
-    \clist_gput_right:Nn \g_doc_type { #1 }
+    \clist_gput_right:Nn \g_doc_property { #1 }
 }
 
 
-\cs_new:Npn \doc_type_check:n #1
+\cs_new:Npn \doc_property_check:n #1
 {
     \bool_gset_false:N \g_tmpa_bool
-    \clist_map_inline:Nn \g_doc_type
+    \clist_map_inline:Nn \g_doc_property
     {
         \str_if_eq:nnT { ##1 }{ #1 }
         {
@@ -138,35 +140,35 @@
     }
 }
 
-\NewDocumentCommand \IfDocType { m +m o }
+\NewDocumentCommand \ifdoc { s m +m o }
 {
-    \doc_type_check:n { #1 }
-    \bool_if:NTF \g_tmpa_bool
+    \doc_property_check:n { #2 }
+    \IfBooleanTF {#1}
     {
-        #2 
-    }{ 
-        \IfValueT { #3 }{ #3 } 
+        \bool_if:NTF \g_tmpa_bool
+        {
+            \IfValueT { #4 }{ #4 } 
+        }{ 
+            #3 
+        }
+    }{
+        \bool_if:NTF \g_tmpa_bool
+        {
+            #3 
+        }{ 
+            \IfValueT { #4 }{ #4 } 
+        }
     }
-}
-
-\NewDocumentCommand \IfNotDocType { m +m o }
-{
-    \doc_type_check:n #1
-    \bool_if:NTF \g_tmpa_bool
-    { 
-        \IfValueT { #3 }{ #3 } 
-    }{ 
-        #2 
-    }
+    
 }
 
 \NewEnviron{IfDoc}[1]
 {
-    \IfDocType{ #1 }{ \BODY }
+    \ifdoc{ #1 }{ \BODY }
 }
 \NewEnviron{IfNotDoc}[1]
 {
-    \IfNotDocType{ #1 }{ \BODY }
+    \ifdoc*{ #1 }{ \BODY }
 }
 
 
@@ -246,9 +248,9 @@
 
     \bool_if:NT \g_Noto_bool
     {
-        \setmainhangulfont{Noto~Serif~CJK~KR}[BoldFont={*~SemiBold}]
+        \setmainhangulfont{Noto~Serif~CJK~KR}[BoldFont={*~Bold}]
         \setsanshangulfont{Noto~Sans~CJK~KR}[BoldFont={*~Medium}]
-        \setmonohangulfont{Noto~Sans~Mono~CJK~KR}
+        % \setmonohangulfont{Noto~Sans~Mono~CJK~KR}
     }
     \bool_gset_true:N \g_CJK_bool
     \newcommand\prenum{제}
@@ -763,12 +765,14 @@
 	}{
 		\begin{IfVartwoEnlarge}		
 			\setSpacing{1}
+            \noindent
 			\tl_if_empty:NF \cover_image_logo_front
 			{
 				\includegraphics[scale=\l_image_scale_tl]{\cover_image_logo_front}
 			}
 			\mbox{}\par\vspace{\cover_top_skip}
 			\begin{minipage}{\linewidth}
+                    \noindent
 					\cover_title_align\cover_font_i
 					\CoverFontSize{1} \cover_title                    
 					\par\medskip
@@ -811,6 +815,7 @@
 		\begin{IfVartwoEnlarge}		
 			\AtPageBottom
 			\setSpacing{1}        
+            \noindent 
 			\tl_if_empty:NTF \cover_image_logo_back
 			{            
                 \tl_if_empty:NF \cover_note
@@ -818,9 +823,10 @@
                     \cover_note \\
                 }
 			}{
-				\illustimage[valign=b, afterskip=1ex]{\cover_image_logo_back}{\cover_note} \\
+				\illustimage[valign=b, textstyle=\raggedleft\footnotesize, afterskip=1ex]
+                {\cover_image_logo_back}{\cover_note} \\
 			}        
-			\noindent	\raisebox{-0.25ex}{\rule{\headwidth}{0.5pt}} \\
+			\raisebox{.25ex}{\rule{\headwidth}{0.5pt}} \\
 			© \space \cover_pub_year \space \cover_manufacturer \\ 
 			\cover_manufacturer_address
 		\end{IfVartwoEnlarge}
@@ -1828,7 +1834,8 @@
 \cs_new:Nn \style_paragraph_interval:
 {
     \abnormalparskip{\hzparskip}
-    \setlength{\parindent}{0em}    
+    \setlength{\parindent}{0em}  
+    \SetTextStyle{\abnormalparskip{\hzparskip}}  
     \setlist{partopsep=0pt, topsep=.5ex, itemsep=0pt}
     \setlist[itemize]{labelindent=0em,labelwidth=1em,labelsep=.5em}
     \setlist[enumerate]{labelindent=0em,labelwidth=1.25em,labelsep=.5em}
@@ -2217,7 +2224,7 @@
 {
     \group_begin:
         \tiny
-        \Ginput@path
+        \tl_to_str:N \Ginput@path
     \group_end:
 }
 
@@ -2282,6 +2289,7 @@
 	middle			.bool_set:N = \l_image_vertical_middle_bool,
     caption       	.tl_set:N 	= \l_image_caption_tl,
 	caption-short  	.tl_set:N 	= \l_image_caption_short_tl,
+	caption-verb	.bool_set:N = \l_image_caption_verbatim_bool,
 	caption-ignore	.bool_set:N = \l_image_caption_ignore_bool,
 	caption-fit		.bool_set:N = \l_image_caption_fit_bool, % fit the caption to the image width
     label         	.tl_set:N 	= \l_image_label_tl,
@@ -2335,7 +2343,7 @@
     \ImageSetup{#3}
     \IfValueT{ #6 }
     { 
-        \tl_set:Nn \l_image_caption_tl { #6 } 
+        \tl_set:Nn \l_image_caption_tl { #6 }         
     }
 	\IfValueT{ #7 }
     { 
@@ -2496,6 +2504,10 @@
 	{
 		\bool_if:NF \l_image_caption_ignore_bool
 		{
+            \bool_if:NT \l_image_caption_verbatim_bool
+            {
+                \tl_set:Nx \l_image_caption_tl { \tl_to_str:N \l_image_caption_tl }
+            }
 			\bool_if:NTF \l_image_legend_bool
 			{
 				\legend{\l_image_caption_tl}
@@ -2533,7 +2545,8 @@
     position        .tl_set:N = \l_illustimage_position_tl,
     voffset         .skip_set:N = \l_illustimage_voffset_skip,
     valign          .tl_set:N = \l_illustimage_valign_tl,
-    caption         .tl_set:N = \l_illustimage_caption,
+    caption         .tl_set:N = \l_illustimage_caption_tl,
+	caption-verb	.bool_set:N = \l_illustimage_caption_verbatim_bool,
 	caption-ignore	.bool_set:N = \l_illustimage_caption_ignore_bool,
 	caption-align	.tl_set:N = \l_illustimage_caption_align_tl,
     label           .tl_set:N = \l_illustimage_label,
@@ -2599,7 +2612,10 @@
 		}
     }
 	\tl_use:N \l_illustimage_hook_tl
-    \IfValueT{#5} { \tl_set:Nn \l_illustimage_caption {#5} }
+    \IfValueT{#5} 
+    { 
+        \tl_set:Nn \l_illustimage_caption_tl {#5} 
+    }    
     % save image & text
     \tl_if_empty:NT \l_illustimage_label
     {
@@ -2714,16 +2730,20 @@
     {
         \legend{\exp_args:No \tl_to_str:N \l_illustimage_label }
     }
-    \tl_if_empty:NF \l_illustimage_caption
-    {
+    \tl_if_empty:NF \l_illustimage_caption_tl    
+    {       
 		\captionstyle{\l_illustimage_caption_align_tl}
 		\bool_if:NF \l_illustimage_caption_ignore_bool
 		{
-			\bool_if:NTF \l_illustimage_legend_bool
-			{				
-				\legend{\l_illustimage_caption}
+            \bool_if:NT \l_illustimage_caption_verbatim_bool
+            {
+                \tl_set:Nx \l_illustimage_caption_tl { \tl_to_str:N \l_illustimage_caption_tl }
+            }                    
+			\bool_if:NTF \l_illustimage_legend_bool	
+            {
+				\legend{\l_illustimage_caption_tl}
 			}{
-				\imgcaption{\l_illustimage_caption}
+				\imgcaption{\l_illustimage_caption_tl}
 				\label{\l_illustimage_label}
 			}
 		}
@@ -2740,18 +2760,15 @@
     \IfBooleanT {#2} { 
         \IllustImageSetup{first=true} 
     }
-    %\IfValueT {#3} { 
-        \IllustImageSetup{#3} 
-    %}
-    \IfValueT {#5} { 
-        \tl_set:Nn \l_illustimage_caption {#5} 
+    \IllustImageSetup{#3} 
+    \IfValueT {#5} 
+    { 
+        \tl_set:Nn \l_illustimage_caption_tl {#5} 
     }
     \IllustratedImage{#4}
 }{
     \endIllustratedImage
 }
-
-
 
 \tl_new:N \l_illust_symbol_options
 \NewDocumentCommand \SymbolSetup { m }
@@ -2804,10 +2821,10 @@
 }
 \NewDocumentEnvironment { IllustEnum } { s t^ o m }
 {
+    \exp_args:No \IllustImageSetup{ \l_illustimage_enum_tl }
     \IfBooleanT {#1} 
 	{
         \IllustImageSetup{first=true}
-        \exp_args:No \IllustImageSetup{ \l_illustimage_enum_tl }
     }
     \IfBooleanT {#2} 
 	{
@@ -2900,14 +2917,20 @@
 
 % \cs_set_eq:NN \lineimg \img
 
-\NewDocumentCommand \listimg { m }
+\NewDocumentCommand \listimg { O{.25\baselineskip} m }
 {
-    \par\img[0pt]{#1}
+    \vspace{#1}\par\includegraphics[scale=\l_image_scale_tl]{#2}
+    \bool_if:NT { \l_image_showfilename_bool}
+    {
+        \group_begin:
+        \allowbreak \tiny \tl_to_str:n { #2 }
+        \group_end:
+    }
 }
 
 % table ------------------------------------
 % \newcolumntype{L}{>{\raggedright\arraybackslash}X}
-% \newcolumntype{C}{>{\centering\arraybackslash}X}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
 % \newcolumntype{R}{>{\raggedleft\arraybackslash}X}
 
 
@@ -3119,7 +3142,6 @@
 
 \NewEnviron{spectable}{
     \placetable{
-        %\begin{tabu}{X[lm]X[1.5lm]}
         \begin{tabularx}{\linewidth}{XX}
         \hline\BODY\hline
         \end{tabularx}
@@ -3128,10 +3150,9 @@
 
 \NewEnviron{spectablex}{
     \placetable{
-        %\begin{tabu}{lX[lm]}
         \begin{tabularx}{\linewidth}{lX}
         \hline\BODY\hline
-        \end{tabu}
+        \end{tabularx}
     }
 }
 
@@ -3147,7 +3168,7 @@
 
 \NewEnviron{imagetableiii}{
     \placetable[stretch=1.3,font=\small,rowcolor=false]{        
-        \begin{tabularx}{\linewidth}{XXX}
+        \begin{tabularx}{\linewidth}{CCC}
         \BODY
         \end{tabularx}
     }
@@ -3161,24 +3182,42 @@
     }
 }
 
-\NewDocumentEnvironment { ImageTable } { s d<> }
+\NewDocumentEnvironment { ImageTable } { s d<> +b }
 {
     \IfValueT{#2} { \tl_set:Nn \l_table_footnote {#2} }
     \IfBooleanTF{#1}
     {
-        \imagetableii
+        \placetable[stretch=1.3,font=\small,rowcolor=false]{
+            \begin{tabularx}{\linewidth}{XX}
+            #3
+            \end{tabularx}
+        }
     }{
-        \imagetableiii
+        \placetable[stretch=1.3,font=\small,rowcolor=false]{
+            \begin{tabularx}{\linewidth}{XXX}
+            #3
+            \end{tabularx}
+        }        
     }
-}
-{
-    \IfBooleanTF{#1}
-    {
-        \endimagetableii
-    }{
-        \endimagetableiii
-    }
-}
+}{}
+% \NewDocumentEnvironment { ImageTable } { s d<> }
+% {
+%     \IfValueT{#2} { \tl_set:Nn \l_table_footnote {#2} }
+%     \IfBooleanTF{#1}
+%     {
+%         \imagetableii
+%     }{
+%         \imagetableiii
+%     }
+% }
+% {
+%     \IfBooleanTF{#1}
+%     {
+%         \endimagetableii
+%     }{
+%         \endimagetableiii
+%     }
+% }
 
 \NewDocumentCommand \TableCommon { O{} }
 {
@@ -3921,11 +3960,11 @@
 }
 
 \CirnumSetup{
-    font=\sffamily\footnotesize\bfseries,
+    font=\small\sffamily\bfseries,
     fgcolor=white,
     bgcolor=black,
-    sep=0.25pt,
-    raise=-.5ex,
+    sep=1pt,
+    raise=-.75ex,
     base=9
 }
 
@@ -3952,7 +3991,7 @@
 
 \NewTColorBox{FrameBox}{ s }
 {
-    colframe=gray, colback=white,
+    colframe=gray, colback=white, after={\par\normalcolor},
     boxrule=0.5pt, arc=0pt, 
     boxsep=0.5ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
 	IfBooleanTF={#1}{
@@ -3963,7 +4002,7 @@
 }
 \NewTColorBox{LeftBarBox}{ s }
 {
-    before~skip=0pt, after~skip=0pt, breakable=false,
+    before~skip=0pt, after~skip=0pt, breakable=false, after={\par\normalcolor},
     colframe=white, colback=white, arc=0ex, boxrule=0pt,
     boxsep=0pt, top=0pt, bottom=0pt, left=1.5em, right=0em,
     borderline~west={1.5pt}{0pt}{gray}, 
@@ -3976,7 +4015,7 @@
 
 \NewTColorBox{RightBarBox}{ s }
 {
-    before~skip=0pt, after~skip=0pt, breakable=false,
+    before~skip=0pt, after~skip=0pt, breakable=false, after={\par\normalcolor},
     colframe=white, colback=white, arc=0ex, boxrule=0pt,
     boxsep=0pt,  top=0pt, bottom=0pt, left=3em, right=1.5em,
     borderline~east={1.5pt}{0pt}{gray}, 
@@ -3989,7 +4028,7 @@
 
 \NewTColorBox{ShadowBox}{ s O{} }
 {
-    before~skip=0pt, after~skip=0pt,
+    before~skip=0pt, after~skip=0pt, after={\par\normalcolor},
     boxrule=0.5pt, colframe=darkgray, colback=white, arc=0.5ex,
     boxsep=0.5ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
     titlerule=0.75pt, toptitle=0.25ex, bottomtitle=0.5ex,
@@ -4004,7 +4043,7 @@
 
 \NewTColorBox{ShadeBox}{ s O{} }
 {
-    before~skip=0pt, after~skip=0pt,
+    before~skip=0pt, after~skip=0pt, after={\par\normalcolor},
     boxrule=0.75pt, colframe=white, colback=backgray, arc=0.5ex,
     boxsep=0.5ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
     titlerule=0.75pt, toptitle=0.5ex, bottomtitle=0.5ex,
@@ -4020,7 +4059,7 @@
 \NewTColorBox{RuleBox}{ s }
 {
     opacityfill=0,
-    before~skip=0pt, after~skip=0pt, breakable=false,
+    before~skip=0pt, after~skip=0pt, breakable=false, after={\par\normalcolor},
     arc=0ex, boxrule=0pt,
     boxsep=0.25ex,  top=0.75ex, bottom=0.75ex, left=0em, right=0em,
     borderline~north={0.5pt}{0pt}{darkgray},
@@ -4035,7 +4074,7 @@
 \NewTColorBox{TabBox}{ s O{} }
 {
     enhanced,
-    before~skip=0pt, after~skip=0pt,
+    before~skip=0pt, after~skip=0pt, after={\par\normalcolor},
     boxrule=0.5pt, colframe=gray, colback=white, arc=0.5ex,
     boxsep=.5ex, top=1.5ex, bottom=0.5ex, left=0.5em, right=0.5em,
     colbacktitle=white, coltitle=black,
@@ -4076,8 +4115,10 @@
 }
 
 \BoundedBoxInitialize {
-    before-skip = 0pt,
-    after-skip = 0pt,
+    % before-skip = 0pt,
+    % after-skip = 0pt,
+    before-skip = .5\baselineskip,
+    after-skip = .5\baselineskip,
     type = shade,
     font-color = black,
     title-font = \bfseries,
@@ -4157,7 +4198,8 @@
                 \tl_set:Nn \l_bbox_signal_tl { ##4 }
 			}
             \bbox_type_set:n { \l_bbox_type_tl }
-            \IfBooleanF{ ##1 }{ 
+            \IfBooleanF{ ##1 }            
+            { 
                 \object_skip_before:n { \l_bbox_before_skip }
             }
             \tl_if_empty:NTF \l_bbox_signal_tl    
@@ -4182,7 +4224,10 @@
                 \color{\l_bbox_font_color_tl}
     }{
                 \end{BBox}
-            \IfBooleanF{##1}{
+            \IfBooleanTF{##1}
+            {
+                \object_skip_after:n { -\l_bbox_before_skip }
+            }{
                 \object_skip_after:n { \l_bbox_after_skip }
             }
         \group_end:
@@ -4516,7 +4561,7 @@
         \url{#2} 
     }
 }
-%\urlstyle{sf}
+% \urlstyle{sf}
 
 \NewDocumentCommand \skiplines { O{1} }
 {
@@ -5239,14 +5284,15 @@
 \ExplSyntaxOn
 \bool_if:NTF \g_Noto_bool
 {
-    \setmainfont{Noto~Serif}[BoldFont={*~SemiBold}]
-    \setsansfont{Noto~Sans}[BoldFont={*~SemiBold}]
+    \setmainfont{Noto~Serif}[BoldFont={*~Bold}]
+    \setsansfont{Noto~Sans}[BoldFont={*~Bold}]
+    % \setmonofont{Noto~Sans~Mono}
 }{
     \setmainfont{TeX~Gyre~Pagella}
     \setsansfont{TeX~Gyre~Heros}
+    %\setmonofont{zco} % to type space (␣) 
 }
 \ExplSyntaxOff
-\setmonofont{zco} % to type space (␣) 
 
 % sectional divisions
 \setsecnumdepth{section}
