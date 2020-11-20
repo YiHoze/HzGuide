@@ -21,7 +21,7 @@
 \LoadClassWithOptions{memoir}
 
 \RequirePackage{xparse,l3keys2e}
-\RequirePackage{environ}
+% \RequirePackage{environ}
 \RequirePackage{fontspec}
 \RequirePackage{ragged2e}
 \RequirePackage{xspace}
@@ -35,9 +35,9 @@
 \RequirePackage{tcolorbox}
 \RequirePackage{tabularx, longtable, multirow}
 \RequirePackage[obeyspaces, spaces]{url} 
-    %\path{file path}
-    % when using \path and, if necessary, redefine \flushleft as below to avoid spaces above and below it.
-    %\def\flushleft{\setlength\topsep{0pt}\trivlist \raggedright\item\relax}
+%\path{file path}
+% when using \path, if necessary, redefine \flushleft as below to avoid spaces above and below it.
+%\def\flushleft{\setlength\topsep{0pt}\trivlist \raggedright\item\relax}
 \RequirePackage{hyperref}
 \RequirePackage{bookmark}
 \RequirePackage{calc} % to allow arithmetic expressions for \setlength 
@@ -127,7 +127,6 @@
     \clist_gput_right:Nn \g_doc_property { #1 }
 }
 
-
 \cs_new:Npn \doc_property_check:n #1
 {
     \bool_gset_false:N \g_tmpa_bool
@@ -143,7 +142,7 @@
 \NewDocumentCommand \ifdoc { s m +m o }
 {
     \doc_property_check:n { #2 }
-    \IfBooleanTF {#1}
+    \IfBooleanTF { #1 }
     {
         \bool_if:NTF \g_tmpa_bool
         {
@@ -162,15 +161,22 @@
     
 }
 
-\NewEnviron{IfDoc}[1]
+\NewDocumentEnvironment { IfDoc }{ s m +b }
 {
-    \ifdoc{ #1 }{ \BODY }
-}
-\NewEnviron{IfNotDoc}[1]
-{
-    \ifdoc*{ #1 }{ \BODY }
-}
-
+    \doc_property_check:n { #2 }
+    \IfBooleanTF { #1 }
+    {
+        \bool_if:NF \g_tmpa_bool
+        {
+            #3
+        }
+    }{
+        \bool_if:NT \g_tmpa_bool
+        {
+            #3
+        }
+    }
+}{}
 
 \NewDocumentCommand \ClassSetup { m }
 {
@@ -917,7 +923,10 @@
     }
 }
 
-\NewEnviron{Pending}{\pending{\BODY}}
+\NewDocumentEnvironment { Pending }{ +b }
+{
+    \pending{ #1 }
+}{}
 
 \NewDocumentCommand \HidePending {}
 {
@@ -2751,8 +2760,7 @@
 }
 
 % as environment
-\NewEnviron{IllustratedImage}[1]{ \illustimage{ #1 }{ \BODY } }
-\NewDocumentEnvironment {IllustImage} { s t^ O{} m d() }
+\NewDocumentEnvironment {IllustImage} { s t^ O{} m d() +b }
 {
     \IfBooleanT {#1} { 
         \exp_args:No \IllustImageSetup{ \l_illustimage_star_tl }
@@ -2765,10 +2773,8 @@
     { 
         \tl_set:Nn \l_illustimage_caption_tl {#5} 
     }
-    \IllustratedImage{#4}
-}{
-    \endIllustratedImage
-}
+    \illustimage{#4}{#6}
+}{}
 
 \tl_new:N \l_illust_symbol_options
 \NewDocumentCommand \SymbolSetup { m }
@@ -2788,38 +2794,18 @@
     \group_end:
 }
 
-% as environment for itemize
-\NewEnviron{IllustratedItemize}[1]{
-    \illustimage{#1}{
-        \begin{itemize}
-        \BODY
-        \end{itemize}
-    }
-}
-\NewDocumentEnvironment { IllustItem } { o m }
+\NewDocumentEnvironment { IllustItem } { o m +b }
 {
     \IfValueT{#1} { \IllustImageSetup{#1} }
-    \IllustratedItemize{#2}
-}{
-    \endIllustratedItemize
-}
+    \illustimage{#2}
+    {
+        \begin{itemize}
+        #2
+        \end{itemize}
+    }
+}{}
 
-% as environment for enumerate
-\NewEnviron{IllustratedEnumerateStart}[1]{
-    \illustimage{#1}{
-        \begin{enumerate}[series=IlluEnum, leftmargin=1.5em]
-        \BODY
-        \end{enumerate}
-    }
-}
-\NewEnviron{IllustratedEnumerateContinue}[1]{
-    \illustimage{#1}{
-        \begin{enumerate}[series=IlluEnum, resume=IlluEnum, leftmargin=1.5em]
-        \BODY
-        \end{enumerate}
-    }
-}
-\NewDocumentEnvironment { IllustEnum } { s t^ o m }
+\NewDocumentEnvironment { IllustEnum } { s t^ o m +b }
 {
     \exp_args:No \IllustImageSetup{ \l_illustimage_enum_tl }
     \IfBooleanT {#1} 
@@ -2836,18 +2822,19 @@
     }
     \IfBooleanTF{#1}
     {
-        \IllustratedEnumerateStart{#4}
+        \illustimage{#4}{
+            \begin{enumerate}[series=IlluEnum, leftmargin=1.5em]
+                #5
+            \end{enumerate}
+        }        
     }{
-        \IllustratedEnumerateContinue{#4}
+        \illustimage{#4}{
+            \begin{enumerate}[series=IlluEnum, resume=IlluEnum, leftmargin=1.5em]
+                #5
+            \end{enumerate}
+        }         
     }
-}{
-    \IfBooleanTF{#1}
-    {
-        \endIllustratedEnumerateStart
-    }{
-        \endIllustratedEnumerateContinue
-    }
-}
+}{}
 
 \keys_define:nn { marginimage }
 {
@@ -2919,7 +2906,8 @@
 
 \NewDocumentCommand \listimg { O{.25\baselineskip} m }
 {
-    \vspace{#1}\par\includegraphics[scale=\l_image_scale_tl]{#2}
+    \par\vspace{#1}
+    \includegraphics[scale=\l_image_scale_tl]{#2}
     \bool_if:NT { \l_image_showfilename_bool}
     {
         \group_begin:
@@ -3112,8 +3100,7 @@
     }
 }
 
-\NewEnviron{PlaceTable}[1][]{ \placetable[#1]{\BODY} }
-\NewDocumentEnvironment { Table } { s t| o d() d<> }
+\NewDocumentEnvironment { Table } { s t| o d() d<> +b }
 {
 	\IfBooleanT{ #1 }
 	{
@@ -3135,52 +3122,30 @@
 	{ 
 		\tl_set:Nn \l_table_footnote {#5} 
 	}
-    \PlaceTable
-}{
-    \endPlaceTable
-}
+    \placetable{ #6 }
+}{}
 
-\NewEnviron{spectable}{
-    \placetable{
-        \begin{tabularx}{\linewidth}{XX}
-        \hline\BODY\hline
-        \end{tabularx}
-    }
-}
-
-\NewEnviron{spectablex}{
-    \placetable{
-        \begin{tabularx}{\linewidth}{lX}
-        \hline\BODY\hline
-        \end{tabularx}
-    }
-}
-
-\NewDocumentEnvironment { SpecTable } { s o d() d<> }
+\NewDocumentEnvironment { SpecTable } { s o d() d<> +b }
 {
     \IfValueT{#2} { \TableSetup{#2} }
     \IfValueT{#3} { \tl_set:Nn \l_table_caption_tl {#3} }
     \IfValueT{#4} { \tl_set:Nn \l_table_footnote {#4} }
-    \IfBooleanTF{#1}{\spectablex}{\spectable}
-}{
-    \IfBooleanTF{#1}{\endspectablex}{\endspectable}
-}
-
-\NewEnviron{imagetableiii}{
-    \placetable[stretch=1.3,font=\small,rowcolor=false]{        
-        \begin{tabularx}{\linewidth}{CCC}
-        \BODY
-        \end{tabularx}
+    \IfBooleanTF{#1}
+    {
+        \placetable{
+            \begin{tabularx}{\linewidth}{lX}
+            \hline #5 \hline
+            \end{tabularx}
+        }
+    }{
+        \placetable{
+            \begin{tabularx}{\linewidth}{XX}
+            \hline #5 \hline
+            \end{tabularx}
+        }
     }
-}
-
-\NewEnviron{imagetableii}{
-    \placetable[stretch=1.3,font=\small,rowcolor=false]{
-        \begin{tabularx}{\linewidth}{XX}
-        \BODY
-        \end{tabularx}
-    }
-}
+}{}
+    
 
 \NewDocumentEnvironment { ImageTable } { s d<> +b }
 {
@@ -3188,36 +3153,18 @@
     \IfBooleanTF{#1}
     {
         \placetable[stretch=1.3,font=\small,rowcolor=false]{
-            \begin{tabularx}{\linewidth}{XX}
+            \begin{tabularx}{\linewidth}{CC}
             #3
             \end{tabularx}
         }
     }{
         \placetable[stretch=1.3,font=\small,rowcolor=false]{
-            \begin{tabularx}{\linewidth}{XXX}
+            \begin{tabularx}{\linewidth}{CCC}
             #3
             \end{tabularx}
         }        
     }
 }{}
-% \NewDocumentEnvironment { ImageTable } { s d<> }
-% {
-%     \IfValueT{#2} { \tl_set:Nn \l_table_footnote {#2} }
-%     \IfBooleanTF{#1}
-%     {
-%         \imagetableii
-%     }{
-%         \imagetableiii
-%     }
-% }
-% {
-%     \IfBooleanTF{#1}
-%     {
-%         \endimagetableii
-%     }{
-%         \endimagetableiii
-%     }
-% }
 
 \NewDocumentCommand \TableCommon { O{} }
 {
@@ -3775,7 +3722,8 @@
 }{
     \end{list}
 }
-\NewDocumentCommand \alignterms { o m }
+
+\NewDocumentEnvironment { Terms }{ o +b }
 {
     \hbox_set:Nn \l_tmpa_box
     {
@@ -3784,10 +3732,9 @@
         \end{minipage}
     }
     \begin{terms}[base=\l_tmpa_tl, #1]
-    #2
+        #2
     \end{terms}
-}
-\NewEnviron{Terms}[1][]{ \alignterms[#1]{\BODY} }
+}{}
 
 % option list
 \int_new:N \l_opt_cnt_int
@@ -4226,7 +4173,7 @@
                 \end{BBox}
             \IfBooleanTF{##1}
             {
-                \object_skip_after:n { -\l_bbox_before_skip }
+                \object_skip_after:n { -.5\l_bbox_before_skip }
             }{
                 \object_skip_after:n { \l_bbox_after_skip }
             }
