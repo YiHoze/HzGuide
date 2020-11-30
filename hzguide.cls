@@ -120,6 +120,15 @@
     }
 }
 
+\NewDocumentEnvironment { IfLanguage }{ m +b }
+{
+    \str_if_eq:VnT \HzLang {#1}
+    { 
+        #2 
+    }
+}{}
+
+
 % if this document's type is ...
 \clist_new:N \g_doc_property
 \NewDocumentCommand \DocumentSetup { m }
@@ -829,7 +838,7 @@
                     \cover_note \\
                 }
 			}{
-				\illustimage[valign=b, textstyle=\raggedleft\footnotesize, afterskip=1ex]
+				\illustimage[frame=false, valign=b, textstyle=\raggedleft\footnotesize, afterskip=1ex]
                 {\cover_image_logo_back}{\cover_note} \\
 			}        
 			\raisebox{.25ex}{\rule{\headwidth}{0.5pt}} \\
@@ -1026,87 +1035,87 @@
 }
 
 % alphanumeric segment display
-\keys_define:nn { segment }
-{
-    scale     .tl_set:N = \l_segment_scale,
-    raise     .tl_set:N = \l_segment_raise,
-    space     .tl_set:N = \l_segment_space,
-    wordspace .tl_set:N = \l_segment_wordspace,
-    breakable .bool_set:N = \l_segment_break_bool
-}
+% \keys_define:nn { segment }
+% {
+%     scale     .tl_set:N = \l_segment_scale,
+%     raise     .tl_set:N = \l_segment_raise,
+%     space     .tl_set:N = \l_segment_space,
+%     wordspace .tl_set:N = \l_segment_wordspace,
+%     breakable .bool_set:N = \l_segment_break_bool
+% }
 
-\NewDocumentCommand \SegmentSetup { m }
-{
-    \keys_set:nn { segment }{ #1 }
-}
+% \NewDocumentCommand \SegmentSetup { m }
+% {
+%     \keys_set:nn { segment }{ #1 }
+% }
 
-\SegmentSetup{
-    scale=1,
-    raise=-0.5pt,
-    space=0.1pt,
-    wordspace=0.5em,
-    breakable=true
-}
+% \SegmentSetup{
+%     scale=1,
+%     raise=-0.5pt,
+%     space=0.1pt,
+%     wordspace=0.5em,
+%     breakable=true
+% }
 
-\cs_new:Npn \segment_include:n #1
-{
-    \hspace{\l_segment_space}
-    \raisebox{\l_segment_raise}{ \includegraphics[scale=\l_segment_scale]{#1} }
-    \hspace{\l_segment_space}
-}
+% \cs_new:Npn \segment_include:n #1
+% {
+%     \hspace{\l_segment_space}
+%     \raisebox{\l_segment_raise}{ \includegraphics[scale=\l_segment_scale]{#1} }
+%     \hspace{\l_segment_space}
+% }
 
-\cs_new:Npn \segment_parse:n #1
-{
-    \seq_set_split:Nnn \l_tempa_seq { ~ } { #1 }
-    \seq_map_inline:Nn \l_tempa_seq
-    {
-        \mbox{
-            \seq_set_split:Nnn \l_tempb_seq {}{ ##1 }
-            \seq_map_inline:Nn \l_tempb_seq
-            {
-                \str_case:nnF { ####1 }
-                {
-                    { m }{ \segment_include:n {M_} }
-                    { o }{ \segment_include:n {O_} }
-                    { r }{ \segment_include:n {R_} }
-                    { - }{ \segment_include:n {minus} }
-                    { _ }{ \segment_include:n {space} }
-                    { . }{ \segment_include:n {dot} }
-                    { ? }{ \segment_include:n {QuestionMark} }
-                }{ 
-                    \segment_include:n {####1} 
-                }
-            }
-        }
-        \hspace{\l_segment_wordspace} %\c_space_token
-    }
-    \hspace{-\l_segment_wordspace}
-}
+% \cs_new:Npn \segment_parse:n #1
+% {
+%     \seq_set_split:Nnn \l_tempa_seq { ~ } { #1 }
+%     \seq_map_inline:Nn \l_tempa_seq
+%     {
+%         \mbox{
+%             \seq_set_split:Nnn \l_tempb_seq {}{ ##1 }
+%             \seq_map_inline:Nn \l_tempb_seq
+%             {
+%                 \str_case:nnF { ####1 }
+%                 {
+%                     { m }{ \segment_include:n {M_} }
+%                     { o }{ \segment_include:n {O_} }
+%                     { r }{ \segment_include:n {R_} }
+%                     { - }{ \segment_include:n {minus} }
+%                     { _ }{ \segment_include:n {space} }
+%                     { . }{ \segment_include:n {dot} }
+%                     { ? }{ \segment_include:n {QuestionMark} }
+%                 }{ 
+%                     \segment_include:n {####1} 
+%                 }
+%             }
+%         }
+%         \hspace{\l_segment_wordspace} %\c_space_token
+%     }
+%     \hspace{-\l_segment_wordspace}
+% }
 
-\NewDocumentCommand \segment { s m }
-{
-    \bool_if:NTF \l_segment_break_bool
-    {
-        \IfBooleanTF {#1}
-        { 
-            \mbox{\segment_parse:n {#2}} 
-        }{ 
-            \segment_parse:n {#2} 
-        }
-    }{
-        \IfBooleanTF {#1}
-        { 
-            \segment_parse:n {#2} 
-        }{ 
-            \mbox{\segment_parse:n {#2}} 
-        }
-    }
-}
+% \NewDocumentCommand \segment { s m }
+% {
+%     \bool_if:NTF \l_segment_break_bool
+%     {
+%         \IfBooleanTF {#1}
+%         { 
+%             \mbox{\segment_parse:n {#2}} 
+%         }{ 
+%             \segment_parse:n {#2} 
+%         }
+%     }{
+%         \IfBooleanTF {#1}
+%         { 
+%             \segment_parse:n {#2} 
+%         }{ 
+%             \mbox{\segment_parse:n {#2}} 
+%         }
+%     }
+% }
 
-\NewDocumentCommand \segitem { m }
-{
-    \item[\segment{#1}]
-}
+% \NewDocumentCommand \segitem { m }
+% {
+%     \item[\segment{#1}]
+% }
 
 % layout * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -2781,7 +2790,6 @@
 {
     \tl_set:Nn \l_illust_symbol_options {#1}
 }
-
 % \SymbolSetup{
 %     frame=false, voffset=0.75ex, valign=m
 % }
@@ -2800,7 +2808,7 @@
     \illustimage{#2}
     {
         \begin{itemize}
-        #2
+        #3
         \end{itemize}
     }
 }{}
@@ -2911,7 +2919,8 @@
     \bool_if:NT { \l_image_showfilename_bool}
     {
         \group_begin:
-        \allowbreak \tiny \tl_to_str:n { #2 }
+        \allowbreak %\small \tl_to_str:n { #2 }
+        \legend{\tl_to_str:n { #2 }}
         \group_end:
     }
 }
@@ -3600,7 +3609,8 @@
             \cs_set_eq:NN \makelabel \terms_label_default:n
         }
         { newline }{
-            \dim_set_towidth:Nn \labelwidth { \l_terms_marker }
+            % \dim_set_towidth:Nn \labelwidth { \l_terms_marker }
+            \dim_set_eq:NN \labelwidth \l_terms_label_width_dim
             \skip_set_eq:NN \partopsep \hzparskip
             \cs_set_eq:NN \makelabel \terms_label_newline:n
         }
@@ -3619,11 +3629,11 @@
     {
         \addtolength\leftmargin{ \l_terms_offset_skip } 
     }	
-	\dim_compare:nT { \l_terms_left_margin_dim > 0pt }
+	\dim_compare:nT { \l_terms_left_margin_dim != 0pt }
 	{
 		\dim_set:Nn \leftmargin \l_terms_left_margin_dim
 	}
-	\dim_compare:nT { \l_terms_item_indent_dim > 0pt }
+	\dim_compare:nT { \l_terms_item_indent_dim != 0pt }
 	{
 		\dim_set:Nn \itemindent \l_terms_item_indent_dim
 	}
@@ -3664,8 +3674,6 @@
             \l_terms_style_tl
         }
     }{
-        % \cs_set_eq:NN \uitem \item
-        % \cs_set_eq:NN \mitem \item
         \end{list}
         \l_terms_after_list_tl
     }
@@ -4171,12 +4179,12 @@
                 \color{\l_bbox_font_color_tl}
     }{
                 \end{BBox}
-            \IfBooleanTF{##1}
-            {
-                \object_skip_after:n { -.5\l_bbox_before_skip }
-            }{
-                \object_skip_after:n { \l_bbox_after_skip }
-            }
+            % \IfBooleanTF{##1}
+            % {
+            %     \object_skip_after:n { -.5\l_bbox_before_skip }
+            % }{
+            %     \object_skip_after:n { \l_bbox_after_skip }
+            % }
         \group_end:
     }
 }
@@ -5035,7 +5043,7 @@
     \endverbatimoutput
     \group_end: 
     
-    \IfBooleanF { #1 } 
+    \IfBooleanT { #1 } 
     {
         \coderead
     }
@@ -5046,10 +5054,10 @@
     \begin{reference}
         \bool_if:NTF \g_minted_bool
         {
-            \mbox{}\vspace{-.5\baselineskip}
+            % \mbox{}\vspace{-.5\baselineskip}
             \inputminted{ latex }{ \tmpvrb }
         }{            
-            \mbox{}\vspace{-\baselineskip}
+            % \mbox{}\vspace{-\baselineskip}
             \verbatiminput{ \tmpvrb }
         }
     \end{reference}  
@@ -5062,7 +5070,7 @@
 
 \NewDocumentCommand \vitem { v }
 {
-    \item[#1]
+    \item[{#1}]
 }
 \ExplSyntaxOff
 
