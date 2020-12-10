@@ -652,15 +652,15 @@
 
 % class utilities to customize styles * * * * * * * * * * * * * * * * * * * * *
 
-\NewDocumentCommand \IfDefined { m m O{} }
-{
-    \cs_if_exist:NTF #1 { #2 } { #3 }
-}
+% \NewDocumentCommand \IfDefined { m m O{} }
+% {
+%     \cs_if_exist:NTF #1 { #2 } { #3 }
+% }
 
-\NewDocumentCommand \IfUndefinedTF { m m O{} }
-{
-    \cs_if_exist:NFT #1 { #2 } { #3 }
-}
+% \NewDocumentCommand \IfUndefinedTF { m m O{} }
+% {
+%     \cs_if_exist:NFT #1 { #2 } { #3 }
+% }
 
 \box_new:N \l_tmpc_box
 \cs_new:Npn \dim_set_towidth:Nn #1 #2
@@ -2545,7 +2545,7 @@
 
 %\illustimage*^[ options ]{ image filename }( caption ){ description } -------------------------------
 %\illustimage*: user-specified action
-%\illustimage^: another user-specified action
+%\illustimage^: the option of "first" is enabled.
 
 \dim_new:N \l_illustimage_image_width_dim
 \dim_new:N \l_illustimage_text_width_dim
@@ -2700,7 +2700,7 @@
                 \bool_if:NT \l_illustimage_flush_bool { \hfill }
             }
 			\l_illustimage_image_align_tl
-            \box_use:N \l_image_box      
+            \mbox{} \box_use:N \l_image_box      
             \illustimage_caption:      
         \end{minipage}
         \hfill 
@@ -2735,7 +2735,7 @@
                 \bool_if:NT \l_illustimage_flush_bool { \hfill }
             }
 			\l_illustimage_image_align_tl
-            \box_use:N \l_image_box
+            \mbox{} \box_use:N \l_image_box
             \illustimage_caption:
         \end{minipage}
     \end{minipage}
@@ -2812,6 +2812,10 @@
         \end{itemize}
     }
 }{}
+
+%\begin{IllustEnum}[options]{image_file}
+%\begin{IllustEnum}*    : restart the order number
+%\begin{IllustEnum}^    : apply ad-hoc options, specified to the option of "star" of \illustimage*)
 
 \NewDocumentEnvironment { IllustEnum } { s t^ o m +b }
 {
@@ -3161,13 +3165,13 @@
     \IfValueT{#2} { \tl_set:Nn \l_table_footnote {#2} }
     \IfBooleanTF{#1}
     {
-        \placetable[stretch=1.3,font=\small,rowcolor=false]{
+        \placetable[stretch=1,font=\small,rowcolor=false]{
             \begin{tabularx}{\linewidth}{CC}
             #3
             \end{tabularx}
         }
     }{
-        \placetable[stretch=1.3,font=\small,rowcolor=false]{
+        \placetable[stretch=1,font=\small,rowcolor=false]{
             \begin{tabularx}{\linewidth}{CCC}
             #3
             \end{tabularx}
@@ -3378,32 +3382,28 @@
     star = { font=\itshape }
 }
 
-\NewTerm{\ui} % user interface
+% user interface
+\NewTerm{\ui} 
 {
     font = \sffamily\bfseries,
     color = darkgray,
     index = false,
     star = { index=true }
 }
-\NewTerm{\mi} % machine interface
+
+% machine interface
+\NewTerm{\mi} 
 {
     font = \sffamily\mdseries,
     index = false,
     star = { index=true }
 }
 
-\NewDocumentCommand \menu { s o o m m }
+\NewDocumentCommand \menu { o o m m }
 {
-    \IfBooleanTF{ #1 }
-    {
-        \IfValueT{ #2 }{ \ui*{#2} ~ > ~ }
-        \IfValueT{ #3 }{ \ui*{#3} ~ > ~ }
-        \ui*{#4} ~ > ~ \ui*{#5}
-    }{
-        \IfValueT{ #2 }{ \ui{#2} ~ > ~ }
-        \IfValueT{ #3 }{ \ui{#3} ~ > ~ }
-        \ui{#4} ~ > ~ \ui{#5}
-    }
+    \IfValueT{ #1 }{ \ui{#1} ~ > ~ }
+    \IfValueT{ #2 }{ \ui{#2} ~ > ~ }
+    \ui{#3} ~ > ~ \ui{#4}
 }
 
 % lists  -------------------------------------------------------
@@ -3938,8 +3938,6 @@
 }
 
 % environments using one of bounded text boxes for admonition and reference
-% BoundedBox*: without linespacing before and after
-% BoundedBox|: (deprecated) the box becomes breakable when it is globally set to be unbreakable, or the other way.
 
 \tcbuselibrary{breakable, skins, xparse}
 \tcbset{enhanced}
@@ -4035,7 +4033,7 @@
     colbacktitle=white, coltitle=black,
     attach~boxed~title~to~top~left={xshift=.5cm, yshift=-1.75mm},
     boxed~title~style={size=minimal, enhanced, boxrule=0.25pt, colframe=white},
-    fonttitle=\l_bbox_title_font_tl, title=#2, 
+    fonttitle=\l_bbox_title_font_tl, title=\quad#2\quad, 
 	IfBooleanTF={#1}{
 		breakable=\l_bbox_breakable_adhoc_tl
 	}{
@@ -4136,13 +4134,17 @@
 % 	\cs_set_eq:NN \endBBox \endFooBox
 % }
 
+% \begin{BOUNDEDBOX}[options](title)
+% \begin{BOUNDEDBOX}*: without linespacing above and below
+% \begin{BOUNDEDBOX}^: the box becomes breakable when it is globally set to be unbreakable, or the other way. 
+
 \NewDocumentCommand \NewBoundedBox { s m m }
 {
     \IfBooleanTF{ #1 }{
         \RenewDocumentEnvironment
     }{
-        \NewDocumentEnvironment % *=nobottomsep|=nobreakable[options](title)
-    }{ #2 }{ s t| O{} d() }
+        \NewDocumentEnvironment 
+    }{ #2 }{ s t^ O{} d() }
     {
         \exp_args:Nno \keys_set:nn { BoundedBox }{ \g_bounded_box_options_tl }
         \keys_set:nn { BoundedBox }{ #3 }
@@ -4179,10 +4181,8 @@
                 \color{\l_bbox_font_color_tl}
     }{
                 \end{BBox}
-            % \IfBooleanTF{##1}
+            % \IfBooleanT{##1}
             % {
-            %     \object_skip_after:n { -.5\l_bbox_before_skip }
-            % }{
             %     \object_skip_after:n { \l_bbox_after_skip }
             % }
         \group_end:
