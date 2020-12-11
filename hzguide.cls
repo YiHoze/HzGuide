@@ -59,6 +59,27 @@
 % class options * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 \ExplSyntaxOn
+
+\NewDocumentCommand \IfXetex { m o }
+{
+    \sys_if_engine_xetex:TF
+    {
+        #1
+    }{
+        \IfValueT{ #2 }{ #2 }
+    }   
+}
+
+\NewDocumentCommand \IfLuatex { m o }
+{
+    \sys_if_engine_luatex:TF
+    {
+        #1
+    }{
+        \IfValueT{ #2 }{ #2 }
+    }   
+}
+
 \keys_define:nn { HzGuide }
 {
     english     .code:n = { \LanguageSetup{ english } },
@@ -252,14 +273,12 @@
     \newcommand\prenum{第}
 }
 
-\IfLang{kor}{
-    
-    \sys_if_engine_luatex:TF
-    {
+\IfLang{kor}{    
+    \IfLuatex{
         \RequirePackage[hangul]{luatexko}
-    }{
+    }[
         \RequirePackage[hangul]{xetexko}
-    }
+    ]
 
     \bool_if:NT \g_Noto_bool
     {
