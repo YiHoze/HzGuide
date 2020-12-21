@@ -2138,8 +2138,8 @@
 
 \keys_define:nn { HzObject }
 {
-    beforeskip  .skip_gset:N = \g_object_before_skip,
-    afterskip  .skip_gset:N = \g_object_after_skip,
+    beforeskip  .skip_set:N = \g_object_before_skip,
+    afterskip   .skip_set:N = \g_object_after_skip,
     framecolor  .tl_set:N = \g_object_frame_color
 }
 
@@ -2151,23 +2151,24 @@
 \cs_new:Npn \object_skip_before:n #1
 {
     \dim_compare:nTF { #1 != 0pt }
-    { 
-        \skip_set:Nn \l_tmpa_skip {#1} 
-    }{ 
-        \skip_set:Nn \l_tmpa_skip {\g_object_before_skip} 
-    }
-    \vspace{\l_tmpa_skip}\noindent
+    {
+        \skip_set:Nn \l_tmpa_skip { #1 }
+    }{
+        \skip_set:Nn \l_tmpa_skip { \g_object_before_skip }
+    }    
+    \vspace{ \l_tmpa_skip }    
+    \noindent
 }
 
 \cs_new:Npn \object_skip_after:n #1
 {
     \dim_compare:nTF { #1 != 0pt }
-    { 
-        \skip_set:Nn \l_tmpa_skip {#1} 
-    }{ 
-        \skip_set:Nn \l_tmpa_skip {\g_object_after_skip} 
+    {
+        \skip_set:Nn \l_tmpa_skip { #1 }
+    }{
+        \skip_set:Nn \l_tmpa_skip { \g_object_after_skip }
     }
-    \vspace{\l_tmpa_skip}
+    \vspace{ \l_tmpa_skip }    
 }
 
 \cs_new:Npn \object_locate:N #1
@@ -2928,7 +2929,7 @@
     \bool_if:NT { \l_lineimg_showfilename_bool}
     {
         \group_begin:
-        \allowbreak \tiny \tl_to_str:n { #2 }
+        \allowbreak \color{red} \scriptsize \tl_to_str:n { #2 }
         \group_end:
     }
 }
@@ -2939,11 +2940,11 @@
 {
     \par\vspace{#1}
     \includegraphics[scale=\l_image_scale_tl]{#2}
-    \bool_if:NT { \l_image_showfilename_bool}
+    \bool_if:NT { \l_image_showfilename_bool }
     {
         \group_begin:
-        \allowbreak %\small \tl_to_str:n { #2 }
-        \legend{\tl_to_str:n { #2 }}
+        \tl_set:Nx \l_tmpa_tl { #2 }
+        \allowbreak \color{red} \scriptsize \tl_to_str:N \l_tmpa_tl
         \group_end:
     }
 }
@@ -3223,6 +3224,7 @@
     \IfBooleanT{#1} { 
         \LineImageSetup{showfilename=true} 
     }
+    \CaptionSetup{font=\color{red}\sffamily\footnotesize}
 }
 
 \NewDocumentCommand \HideImageFilename { }
@@ -4065,17 +4067,18 @@
 
 \keys_define:nn { BoundedBox }
 {
-    before-skip 		.skip_set:N = \l_bbox_before_skip,
-    after-skip  		.skip_set:N = \l_bbox_after_skip,
+    beforeskip 		    .skip_set:N = \l_bbox_before_skip,
+    raise 		        .skip_set:N = \l_bbox_raise_skip,
+    % afterskip  		    .skip_set:N = \l_bbox_after_skip, 
     type        		.tl_set:N = \l_bbox_type_tl,
     symbol      		.tl_set:N = \l_bbox_symbol_tl,
     signal      		.tl_set:N = \l_bbox_signal_tl,
-    before-signal		.tl_set:N = \l_bbox_before_signal_tl,
-    after-signal		.tl_set:N = \l_bbox_after_signal_tl,
+    beforesignal		.tl_set:N = \l_bbox_before_signal_tl,
+    aftersignal		    .tl_set:N = \l_bbox_after_signal_tl,
     style       		.tl_set:N = \l_bbox_style_extra_tl,
-    title-font           .tl_set:N = \l_bbox_title_font_tl,
+    titlefont           .tl_set:N = \l_bbox_title_font_tl,
     font        		.tl_set:N = \l_bbox_font_tl,
-    font-color  		.tl_set:N = \l_bbox_font_color_tl,
+    fontcolor  		    .tl_set:N = \l_bbox_font_color_tl,
     wrapping    		.bool_set:N = \l_bbox_wrapping_bool,
 	breakable-default	.tl_set:N = \l_bbox_breakable_default_tl,
 	breakable-adhoc		.tl_set:N = \l_bbox_breakable_adhoc_tl
@@ -4087,13 +4090,11 @@
 }
 
 \BoundedBoxInitialize {
-    % before-skip = 0pt,
-    % after-skip = 0pt,
-    before-skip = .5\baselineskip,
-    after-skip = .5\baselineskip,
+    beforeskip = .5\baselineskip,
+    raise = -.5\baselineskip,
     type = shade,
-    font-color = black,
-    title-font = \bfseries,
+    fontcolor = black,
+    titlefont = \bfseries,
 	breakable-default = true,
 	breakable-adhoc = false
 }
@@ -4174,8 +4175,10 @@
                 \tl_set:Nn \l_bbox_signal_tl { ##4 }
 			}
             \bbox_type_set:n { \l_bbox_type_tl }
-            \IfBooleanF{ ##1 }            
-            { 
+            \IfBooleanTF { ##1 }
+            {
+                \object_skip_before:n { \l_bbox_raise_skip }
+            }{
                 \object_skip_before:n { \l_bbox_before_skip }
             }
             \tl_if_empty:NTF \l_bbox_signal_tl    
@@ -4199,11 +4202,8 @@
                 \l_bbox_font_tl
                 \color{\l_bbox_font_color_tl}
     }{
-                \end{BBox}
-            % \IfBooleanT{##1}
-            % {
-            %     \object_skip_after:n { \l_bbox_after_skip }
-            % }
+                \end{BBox}            
+            % \object_skip_after:n { \l_bbox_after_skip }
         \group_end:
     }
 }
@@ -4456,6 +4456,19 @@
 }
 
 % miscellaneous utilities * * * * * * * * * * * * * * * * * * * * * * * * *
+
+% \LineSpacing: reduce
+% \LineSpacing*: increase
+\NewDocumentCommand \LineSpacing { s O{\baselineskip} }
+{
+    \IfBooleanTF { #1 }
+    {
+        \vspace{#2} 
+    }{
+        \skip_set:Nn \l_tmpa_skip {#2 * -1}
+        \vspace{\l_tmpa_skip}         
+    }
+}
 
 \keys_define:nn { finalizer }
 {	
@@ -5259,7 +5272,7 @@
 \bool_if:NTF \g_Noto_bool
 {
     \setmainfont{Noto~Serif}[BoldFont={*~Bold}]
-    \setsansfont{Noto~Sans}[BoldFont={*~Bold}]
+    \setsansfont{Noto~Sans}[BoldFont={*~SemiBold}]
     % \setmonofont{Noto~Sans~Mono}
 }{
     \setmainfont{TeX~Gyre~Pagella}
