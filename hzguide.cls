@@ -86,12 +86,12 @@
     korean      .code:n = { \LanguageSetup{ korean } },
     language    .code:n = { \LanguageSetup{ #1 } },
     styleset    .tl_set:N = \g_style_set_tl,
-    doctype     .code:n = { \DocumentSetup{#1} },
     Noto        .bool_set:N = \g_Noto_bool,
     smallerfont .bool_set:N = \g_smallerfont_bool,
     minted    	.bool_set:N = \g_minted_bool,
     pairquote   .bool_set:N = \g_pairquote_bool,
     uprightmath .bool_set:N = \g_upright_math_bool,
+    template    .bool_set:N = \g_template_bool,
 }
 
 \tl_new:N \HzLang
@@ -151,62 +151,131 @@
 
 
 % if this document's type is ...
-\clist_new:N \g_doc_property
+\clist_new:N \g_doc_property_clist
 \NewDocumentCommand \DocumentSetup { m }
 {
-    \clist_gput_right:Nn \g_doc_property { #1 }
+    \clist_gput_right:Nn \g_doc_property_clist { #1 }
 }
 
-\cs_new:Npn \doc_property_check:n #1
+\prg_set_conditional:Npnn \doc_if_in:n #1 { TF }
 {
-    \bool_gset_false:N \g_tmpa_bool
-    \clist_map_inline:Nn \g_doc_property
+    \clist_if_in:NnTF \g_doc_property_clist { #1 }
     {
-        \str_if_eq:nnT { ##1 }{ #1 }
+        \prg_return_true:
+    }{
+        \prg_return_false:
+    }
+}
+
+\prg_set_conditional:Npnn \doc_if_or_in:nn #1 #2 { TF }
+{
+    \clist_if_in:NnTF \g_doc_property_clist { #1 }
+    {
+        \prg_return_true:
+    }{
+        \clist_if_in:NnTF \g_doc_property_clist { #2 }
         {
-            \bool_gset_true:N \g_tmpa_bool 
+            \prg_return_true:
+        }{
+            \prg_return_false:
         }
     }
 }
 
-\NewDocumentCommand \ifdoc { s m +m o }
+\prg_set_conditional:Npnn \doc_if_and_in:nn #1 #2 { TF }
 {
-    \doc_property_check:n { #2 }
-    \IfBooleanTF { #1 }
+    \clist_if_in:NnTF \g_doc_property_clist { #1 }
     {
-        \bool_if:NTF \g_tmpa_bool
+        \clist_if_in:NnTF \g_doc_property_clist { #2 }
         {
-            \IfValueT { #4 }{ #4 } 
-        }{ 
-            #3 
+            \prg_return_true:
+        }{
+            \prg_return_false:
         }
     }{
-        \bool_if:NTF \g_tmpa_bool
-        {
-            #3 
-        }{ 
-            \IfValueT { #4 }{ #4 } 
-        }
+        \prg_return_true:
     }
-    
 }
 
-\NewDocumentEnvironment { IfDoc }{ s m +b }
+% \begin{IfDoc}{foo}         : if "foo" is in the doc list
+% \begin{IfDoc}^{foo}        : if "foo" is NOT in the doc list
+% \begin{IfDoc}{foo}[goo]    : if "foo" or "goo" is in the doc list
+% \begin{IfDoc}*{foo}[goo]   : if "foo" and "goo" are in the doc list
+\NewDocumentEnvironment { IfDoc }{ s t^ m o +b }
 {
-    \doc_property_check:n { #2 }
-    \IfBooleanTF { #1 }
+    \IfBooleanTF { #2 }
     {
-        \bool_if:NF \g_tmpa_bool
-        {
-            #3
+        \doc_if_in:nTF { #3 }
+        {}{
+            #5
         }
     }{
-        \bool_if:NT \g_tmpa_bool
+        \IfValueTF { #4 }
         {
-            #3
+            \IfBooleanTF { #1 }
+            {
+                \doc_if_and_in:nnTF { #3 }{ #4 }
+                {
+                    #5
+                }{}
+            }{
+                \doc_if_or_in:nnTF { #3 }{ #4 }
+                {
+                    #5
+                }{}
+            }
+        }{        
+            \doc_if_in:nTF { #3 }
+            {
+                #5
+            }{}
         }
     }
 }{}
+
+% \ifdoc{foo}{TRUE}[FALSE]         : if "foo" is in the doc list
+% \ifdoc^{foo}{TRUE}[FALSE]        : if "foo" is NOT in the doc list
+% \ifdoc{foo}[goo]{TRUE}[FALSE]    : if "foo" or "goo" is in the doc list
+% \ifdoc*{foo}[goo]{TRUE}[FALSE]   : if "foo" and "goo" are in the doc list
+\NewDocumentCommand \ifdoc { s t^ m o m o }
+{
+    \IfBooleanTF { #2 }
+    {
+        \doc_if_in:nTF { #3 }
+        {
+            \IfValueT { #6 }{ #6 }
+        }{
+            #5
+        }
+    }{
+        \IfValueTF { #4 }
+        {
+            \IfBooleanTF { #1 }
+            {
+                \doc_if_and_in:nnTF { #3 }{ #4 }
+                {
+                    #5
+                }{
+                    \IfValueT { #6 }{ #6 }
+                }
+            }{
+                \doc_if_or_in:nnTF { #3 }{ #4 }
+                {
+                    #5
+                }{
+                    \IfValueT { #6 }{ #6 }
+                }
+            }
+        }{        
+            \doc_if_in:nTF { #3 }
+            {
+                #5
+            }{
+                \IfValueT { #6 }{ #6 }
+            }
+        }
+    }
+}
 
 \NewDocumentCommand \ClassSetup { m }
 {
@@ -256,6 +325,11 @@
 {
     \RequirePackage{unicode-math}
     \setmathfont[math-style=upright]{TeX~Gyre~Pagella}
+}
+
+\bool_if:NT \g_template_bool
+{
+    \input{hztemplate.tex}
 }
 
 \cs_set_eq:NN \Sup \textsuperscript
@@ -751,7 +825,7 @@
 
 \NewDocumentCommand \CoverSetup { m }
 {
-    \keys_set:nn { cover } { #1 }  
+    \keys_set:nn { cover } { #1 }      
 }
 
 \tl_set:Nn \cover_pub_year { \int_to_arabic:n {\c_sys_year_int} }
@@ -4805,245 +4879,26 @@
     }
 }
 
-% templates for document elements  * * * * * * * * * * * * * * * * * * * * *
-
-\seq_new:N \g_template_text_seq
-\cs_new:Npn \template_add_text:n #1
-{
-    \seq_gput_right:Nn \g_template_text_seq {#1}
-}
-
-\group_begin:
-    \char_set_catcode_space:n {`\ }
-    \template_add_text:n {Lorem ipsum dolor sit amet, consectetuer adipiscing elit. }
-    \template_add_text:n {Etiam lobortis facilisis sem. Nullam nec mi et neque pharetra sollicitudin. Praesent imperdiet mi nec ante. }
-    \template_add_text:n {Donec ullamcorper, felis non sodales commodo, lectus velit ultrices augue, a dignissim nibh lectus placerat pede. Vivamus nunc nunc, molestie ut, ultricies vel, semper in, velit. Ut porttitor. Praesent in sapien. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Duis fringilla tristique neque. }
-    \template_add_text:n {Sed interdum libero ut metus. Pellentesque placerat. Nam rutrum augue a leo. Morbi sed elit sit amet ante lobortis sollicitudin. Praesent blandit blandit mauris. Praesent lectus tellus, aliquet aliquam, luctus a, egestas a, turpis. Mauris lacinia lorem sit amet ipsum. Nunc quis urna dictum turpis accumsan semper.}
-\group_end:
-
-\cs_new:Npn \template_print_text:n #1
-{
-    \seq_item:Nn \g_template_text_seq {#1}
-}
-
-\NewDocumentCommand \tpltext { O{1} }
-{
-    \int_step_function:nnnN {1}{1}{#1} \template_print_text:n
-}
-
-\NewDocumentCommand \tplpara { s }
-{
-    \IfBooleanTF {#1}
-        { \tpltext[3] }
-        { \tpltext[2]  }
-    \par
-}
-
-% \tpllist*[terms][enumerate]
-\NewDocumentCommand \tpllist { s o o }
-{
-    \tplpara
-    \IfValueTF {#2}
-    {
-        \str_set:Nn \l_tmpa_str { #2 }
-    }
-    {
-        \IfBooleanTF{#1}
-            { \str_set:Nn \l_tmpa_str { enumerate } }
-            { \str_set:Nn \l_tmpa_str { itemize } }
-    }
-    \IfValueTF {#3}
-        { \template_list:nn {\l_tmpa_str}{#3} }
-        { \template_list:nn {\l_tmpa_str}{} }
-}
-
-\cs_new:Npn \template_list:nn #1 #2
-{
-    \begin{#1}
-    \int_zero:N \l_tmpa_int
-    \int_do_while:nNnn {\l_tmpa_int} < {4}
-    {
-        \int_incr:N \l_tmpa_int
-        \str_if_eq:nnTF {terms} {#1}
-            { \template_item_label: {#2} }
-            { \template_item: {#2} }
-    }
-    \end{#1}
-}
-
-\cs_new:Npn \template_item_label: #1
-{
-    \tl_set:Nn \l_tmpa_tl {Term~\int_to_Alph:n {\l_tmpa_int}}
-    \item[\l_tmpa_tl] \tpltext
-    \tl_if_empty:nF {#1} { \template_list:nn {#1}{} }
-}
-
-\cs_new:Npn \template_item: #1
-{
-    \item \tpltext
-    \tl_if_empty:nF {#1} { \template_list:nn {#1}{} }
-}
-
-\NewDocumentCommand \tplimage {}
-{
-    \par\image{uncertain}
-}
-
-\NewDocumentCommand \tplimg {}
-{
-    \img{uncertain}
-}
-
-\NewDocumentCommand \tplimagetable {}
-{
-    \tplpara
-    \par
-    \begin{ImageTable}
-        \tplimg & \tplimg & \tplimg \\
-        First~item & Second~item & Third~item \\
-        \tplimg & \tplimg & \tplimg \\
-        Fourth~item & Fifth~item & Sixth~item \\
-    \end{ImageTable}
-}
-
-\NewDocumentCommand \tplprocedure { O{3} }
-{
-    \int_set:Nn \l_tmpa_int {1}
-    \int_set:Nn \l_tmpb_int {#1}
-    \tplpara
-    \par
-    \begin{IllustEnum}*{uncertain}
-        \item \tplpara
-    \end{IllustEnum}
-    \int_do_while:nNnn {\l_tmpa_int} < {\l_tmpb_int}
-        {
-            \int_incr:N \l_tmpa_int
-            \par
-            \begin{IllustEnum}{uncertain}
-                \item \tplpara
-            \end{IllustEnum}
-        }
-}
-
-\NewDocumentCommand \tplactions { O{5} }
-{
-    \int_zero:N \l_tmpa_int 
-    \int_set:Nn \l_tmpb_int {#1}
-    \int_do_while:nNnn {\l_tmpa_int} < {\l_tmpb_int}
-    {
-        \int_incr:N \l_tmpa_int
-        \str_set:Nx \l_tmpa_str { \int_to_Alph:n \l_tmpa_int }
-        \section{action~\l_tmpa_str}
-        \tpllist*
-
-    }
-}
-
-\NewDocumentCommand \tplspectable {}
-{
-    \par
-    \begin{SpecTable}
-    First~spec & Value \\
-    Second~spec & Value \\
-    Third~spec & Value \\
-    Fourth~spec & Value \\
-    Fifth~spec & Value \\
-    \end{SpecTable}
-}
-
-\NewDocumentCommand \tplspectables { O{3} }
-{
-    \int_step_inline:nnnn {1}{1}{#1}{ \tplspectable }
-}
-
-\NewDocumentCommand \tpltable {}
-{
-    \par
-    \begin{PlaceTable}
-        %\begin{tabu}{X[lp]X[lp]X[lp]}
-        \begin{tabularx}{\linewidth}{XXX}
-            \hline
-            \textbf{A} & \textbf{B} & \textbf{C} \\\hline
-            1 & 1 & 1\\
-            2 & 2 & 2\\
-            3 & 3 & 3\\
-            4 & 4 & 4\\
-            5 & 5 & 5\\
-            \hline
-        \end{tabularx}
-    \end{PlaceTable}
-}
-
-\NewDocumentCommand \tplproblem {}
-{
-    \problem{Problem} \tplpara
-}
-
-\NewDocumentCommand \tplproblems { O{2} }
-{
-    %\listofproblems*
-    \int_zero:N \l_tmpa_int 
-    \int_set:Nn \l_tmpb_int {#1}
-    \int_do_while:nNnn {\l_tmpa_int} < {\l_tmpb_int}
-    {
-        \int_incr:N \l_tmpa_int
-        \str_set:Nx \l_tmpa_str { \int_to_Alph:n \l_tmpa_int }
-        \problemsection{Problem~\l_tmpa_str}
-        {
-            \group_begin:
-                \int_set:Nn \l_tmpa_int {0}
-                \int_set:Nn \l_tmpb_int {#1}
-                \int_do_while:nNnn {\l_tmpa_int} < {\l_tmpb_int}
-                {
-                    \int_incr:N \l_tmpa_int
-                    \str_set:Nx \l_tmpa_str { \int_to_alph:n \l_tmpa_int }
-                    \problem{Problem~\l_tmpa_str}
-                    \tplpara*
-                    \tpllist*
-                }
-            \group_end:
-        }
-    }
-}
-
-% chpater contents
-\DeclareExpandableDocumentCommand \chaptoc {}
-{
-    \ifanappendix
-        toc \int_to_alph:n {\c@chapter}
-    \else
-        toc \int_to_roman:n {\c@chapter}
-    \fi
-}
 
 \NewDocumentCommand \EnableChapterContents {}
 {
-    \usepackage{morewrites}
-
-    \RenewDocumentCommand \memendofchapterhook {}
-    {
-            \@input{\jobname.\chaptoc}%
-            \if@filesw
-                    \expandafter\newwrite\csname tf@\chaptoc\endcsname
-                    \immediate\openout \csname tf@\chaptoc\endcsname \jobname.\chaptoc\relax
-        \fi
-        \bigskip
-    }
-
-    \cs_set_eq:NN \orgaddcontentsline \addcontentsline
-    \RenewDocumentCommand \addcontentsline { m m m }
-    {
-        \orgaddcontentsline{##1}{##2}{##3}
-        \str_if_eq:nnT {##1}{toc}
-        {
-            \str_if_eq:nnF {##2}{chapter}
-            {
-                \addtocontents{\chaptoc}{\protect\contentsline{##2}{##3}{\thepage}{\@currentHref}}
-            }
-        }
+    \newcounter{tocmarker} 
+    \renewcommand\mempreaddchaptertotochook{ \cftinserthook{toc}{end-\thetocmarker} }
+    \renewcommand\mempostaddchaptertotochook{ \stepcounter{tocmarker} \cftinserthook{toc}{start-\thetocmarker} }
+    \let\normalchangetocdepth\changetocdepth
+    \renewcommand\memendofchapterhook{
+        \begingroup
+        \setcounter{@memmarkcntra}{\value{tocdepth}}
+        \let\changetocdepth\@gobble
+        \normalchangetocdepth{-10}
+        \cftinsertcode{start-\thetocmarker}{\normalchangetocdepth{2}}
+        \cftinsertcode{end-\thetocmarker}{\normalchangetocdepth{-10}}
+        \let\printtoctitle\@gobble
+        \tableofcontents*\bigskip
+        \endgroup
+        \setcounter{tocdepth}{\value{@memmarkcntra}}
     }
 }
-
 
 % verbatim & literal -----------------------------------------------------------
 
@@ -5305,8 +5160,6 @@
 % colors
 \definecolor{backgray}{gray}{0.9}
 
-\LoadStyleset
-
 % cross-reference
 \renewcommand{\chapterrefname}{\chaptername~}
 \renewcommand{\tablerefname}{\tablename}
@@ -5317,5 +5170,6 @@
     \patchcmd{\FV@ListVSpace}{\@topsepadd\topsep}{\vspace{.25\baselineskip}}{}{}
 }{}
 
+\LoadStyleset
 
 \endinput
