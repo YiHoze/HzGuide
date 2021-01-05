@@ -87,7 +87,6 @@
     language    .code:n = { \LanguageSetup{ #1 } },
     styleset    .tl_set:N = \g_style_set_tl,
     Noto        .bool_set:N = \g_Noto_bool,
-    smallerfont .bool_set:N = \g_smallerfont_bool,
     minted    	.bool_set:N = \g_minted_bool,
     pairquote   .bool_set:N = \g_pairquote_bool,
     uprightmath .bool_set:N = \g_upright_math_bool,
@@ -283,32 +282,13 @@
 }
 
 % default class options
-\ClassSetup
-{
-    %minted = false,    
+\ClassSetup{
     language = korean,
-    %pairquote = false,
 }
 
 \ProcessKeysOptions{ HzGuide }
 \tcbuselibrary{listings}
 \hypersetup{pdfencoding=auto, bookmarksnumbered=true, linktoc=all, pdfauthor={hzguide.cls}} 
-
-
-\bool_if:NT \g_smallerfont_bool %\documentclass[9pt, smallerfont]
-{
-    \cs_set_eq:NN \HUGE \Huge %17pt
-    \cs_set_eq:NN \Huge \huge %14pt
-    \cs_set_eq:NN \huge \LARGE %12pt
-    \cs_set_eq:NN \LARGE \Large %11pt
-    \cs_set_eq:NN \Large \large %10pt
-    \cs_set_eq:NN \large \normalsize %9pt
-    \cs_set_eq:NN \normalsize \small %8pt
-    \cs_set_eq:NN \small \footnotesize %7pt
-    \cs_set_eq:NN \footnotesize \scriptsize %6pt
-    \cs_set_eq:NN \scriptsize \tiny  %5pt
-    \cs_set_eq:NN \tiny \miniscule %4pt
-}
 
 \bool_if:NT \g_minted_bool
 {
@@ -895,11 +875,11 @@
 			}
 			\vfill
 			\begin{flushright}
-					\cover_font_ii
-					\CoverFontSize{3} \cover_doc_type
-					\par
+                \cover_font_ii
+                \CoverFontSize{3} \cover_doc_type
+                \smallskip \par
 				\CoverFontSize{4} \cover_pub_year \hspace{0.5em}|\hspace{0.5em} \cover_revision
-				\end{flushright}        
+            \end{flushright}        
 		\end{IfVartwoEnlarge}
 	}
     \cover_after_front
@@ -921,9 +901,8 @@
 		\mbox{}
 	}{
 		\begin{IfVartwoEnlarge}		
-			\AtPageBottom
 			\setSpacing{1}        
-            \noindent 
+			\AtPageBottom \noindent \cover_font_ii
 			\tl_if_empty:NTF \cover_image_logo_back
 			{            
                 \tl_if_empty:NF \cover_note
@@ -935,7 +914,8 @@
                 {\cover_image_logo_back}{\cover_note} \\
 			}        
 			\raisebox{.25ex}{\rule{\headwidth}{0.5pt}} \\
-			© \space \cover_pub_year \space \cover_manufacturer \\ 
+			© \space \cover_pub_year \space \cover_manufacturer 
+            \smallskip \par \noindent
 			\cover_manufacturer_address
 		\end{IfVartwoEnlarge}
 	}
@@ -1939,7 +1919,7 @@
     \setlist{partopsep=0pt, topsep=.25\baselineskip, itemsep=.25ex}
     \setlist[itemize]{labelindent=.5em,labelwidth=1em,labelsep=.5em}
     \setlist[enumerate]{labelindent=.5em,labelwidth=1.25em,labelsep=.5em}
-    \TermsInitialize{top-sep=0.5\baselineskip,item-sep=.5ex}
+    \TermsInitialize{topsep=0.5\baselineskip,itemsep=.5ex}
 }
 
 \cs_new:Nn \style_paragraph_interval:
@@ -1950,7 +1930,7 @@
     \setlist{partopsep=0pt, topsep=.5ex, itemsep=0pt}
     \setlist[itemize]{labelindent=0em,labelwidth=1em,labelsep=.5em}
     \setlist[enumerate]{labelindent=0em,labelwidth=1.25em,labelsep=.5em}
-    \TermsInitialize{top-sep=0.5ex,item-sep=.25ex}
+    \TermsInitialize{topsep=0.5ex,itemsep=.25ex}
 }
 
 \bool_new:N \g_section_multiline_bool
@@ -3368,8 +3348,8 @@
 
 % index  ----------------------------------------------------------------------
 
-\newcommand\indexfont{\small}
-\addtodef{\printindex}{\indexfont}{}
+\newcommand\indexfontsize{\small}
+\addtodef{\printindex}{\indexfontsize}{}
 \setlength\indexcolsep{2em}
 
 \NewDocumentCommand \BookmarkIndexHead {}
@@ -3501,6 +3481,30 @@
     \ui{#3} ~ > ~ \ui{#4}
 }
 
+\RenewDocumentCommand \cmd { s m }
+{
+	\tl_if_head_eq_catcode:nNTF { #2 } \c_catcode_active_tl
+	{
+		\cmdprint{#2}	
+		\IfBooleanT {#1}
+		{	
+			\cmdindex{#2}
+		}
+	}{
+		\IfBooleanT {#1}
+		{	
+			\texttt{#2}
+			\index{\texttt{#2}}
+		}
+	}
+}
+\NewDocumentCommand \cmdindex { m }
+{
+    \str_set:Nx \l_tmpa_str { \cs_to_str:N #1 }
+    \str_put_right:Nn \l_tmpa_str {@ \cmdprint{#1}}
+    \index{\str_use:N \l_tmpa_str}
+}
+
 % lists  -------------------------------------------------------
 \keys_define:nn { hzlist }
 {
@@ -3572,27 +3576,28 @@
 
 \keys_define:nn { terms }
 {
-    label-type  .tl_set:N = \l_terms_label_type_tl,
+    labeltype  .tl_set:N = \l_terms_label_type_tl,
     offset      .skip_set:N = \l_terms_offset_skip,
     marker      .code:n = { \terms_define_marker:n {#1} },
-    marker-sep  .skip_set:N = \l_terms_marker_sep_skip,
+    markersep  .skip_set:N = \l_terms_marker_sep_skip,
     enumerate   .bool_set:N = \l_terms_enumerate_bool,
-    enum-marker .tl_set:N = \l_terms_enummarker_tl,
+    enummarker .tl_set:N = \l_terms_enummarker_tl,
     base        .tl_set:N = \l_terms_base_tl,
     font        .tl_set:N = \l_terms_font_tl,
     color       .tl_set:N = \l_terms_color_tl,
     delimiter   .tl_set:N = \l_terms_delimiter_tl,
-    label-width .dim_set:N = \l_terms_label_width_dim,
-    label-sep   .skip_set:N = \l_terms_label_sep_skip,
-	item-indent .dim_set:N = \l_terms_item_indent_dim,
-	left-margin .dim_set:N = \l_terms_left_margin_dim,
+    labelwidth .dim_set:N = \l_terms_label_width_dim,
+    labelsep   .skip_set:N = \l_terms_label_sep_skip,
+	itemindent .dim_set:N = \l_terms_item_indent_dim,
+	leftmargin .dim_set:N = \l_terms_left_margin_dim,
     index       .bool_set:N = \l_terms_index_bool,
+    indexfont   .tl_set:N = \l_terms_index_font_tl,
 	anchor		.bool_set:N = \l_terms_anchor_bool, % for glossary
-    top-sep     .skip_set:N = \l_terms_top_sep_skip,
-    item-sep    .skip_set:N  = \l_terms_item_sep_skip,
+    topsep     .skip_set:N = \l_terms_top_sep_skip,
+    itemsep    .skip_set:N  = \l_terms_item_sep_skip,
     style       .tl_set:N = \l_terms_style_tl,
-    before-list .tl_set:N = \l_terms_before_list_tl,
-    after-list  .tl_set:N = \l_terms_after_list_tl,
+    beforelist .tl_set:N = \l_terms_before_list_tl,
+    afterlist  .tl_set:N = \l_terms_after_list_tl,
     star        .tl_set:N = \l_terms_star_tl,
     vbar        .tl_set:N = \l_terms_vbar_tl
 }
@@ -3601,21 +3606,21 @@
     \keys_set:nn { terms }{ #1 }    
 }
 \TermsInitialize{
-    label-type = default,
+    labeltype = default,
     offset = 0em,
     marker = {{},\textbullet},
-    marker-sep = 0.5em,
+    markersep = 0.5em,
     base = MM,
     font = \bfseries,
     color = black,
     delimiter = :\hfill,	
-    label-sep = 0.5em,
-	left-margin = 0pt,
-    star = { item-sep=0ex },
+    labelsep = 0.5em,
+	leftmargin = 0pt,
+    star = { itemsep=0ex },
     vbar = { delimiter=\hfill },
-    enum-marker = { \int_use:N \l_terms_int)\hskip\l_terms_marker_sep_skip }
+    enummarker = { \int_use:N \l_terms_int)\hskip\l_terms_marker_sep_skip }
 }
-
+\NewDocumentCommand \termsindexfont { m }{ #1 }
 \NewDocumentCommand \TermsSetup { o m }
 {
 	\IfValueTF { #1 }
@@ -3637,7 +3642,7 @@
 \cs_new:Npn \terms_label_default:n #1
 {
     \int_gincr:N \l_terms_int
-    \bool_if:NT \l_terms_index_bool { \index{#1} }
+    \bool_if:NT \l_terms_index_bool { \index{\termsindexfont{#1}} }
     \group_begin:
         \color{\l_terms_color_tl}
         \l_terms_marker
@@ -3646,10 +3651,10 @@
     \group_end:
     \l_terms_delimiter_tl
 }
-\cs_new:Npn \terms_label_newline:n #1
+\cs_new:Npn \terms_label_singleline:n #1
 {
     \int_gincr:N \l_terms_int
-    \bool_if:NT \l_terms_index_bool { \index{#1} }
+    \bool_if:NT \l_terms_index_bool { \index{\termsindexfont{#1}} }
     \parbox[b]{\labelwidth}{
         \makebox[0pt][l]{
             \color{\l_terms_color_tl}
@@ -3664,7 +3669,7 @@
 \cs_new:Npn \terms_label_multiline:n #1
 {
     \int_gincr:N \l_terms_int
-    \bool_if:NT \l_terms_index_bool { \index{#1} }
+    \bool_if:NT \l_terms_index_bool { \index{\termsindexfont{#1}} }
     \hbox_set:Nn \l_tmpa_box 
     {
         \parbox[t]{\labelwidth}{
@@ -3681,15 +3686,27 @@
 \cs_new:Npn \terms_label_verbatim:n #1
 {
     \int_gincr:N \l_terms_int
-    \str_set:Nn \l_tmpa_str { #1 }
-    \bool_if:NT \l_terms_index_bool { \index{\l_tmpa_str} }
     \group_begin:
         \color{\l_terms_color_tl}
         \l_terms_marker
         \l_terms_font_tl 
-		\terms_label_anchor:n { \l_tmpa_str }
+        \cmd*{#1}
     \group_end:
     \l_terms_delimiter_tl
+}
+\cs_new:Npn \terms_label_verbatim_single:n #1
+{
+    \int_gincr:N \l_terms_int
+    \parbox[b]{\labelwidth}{
+        \makebox[0pt][l]{
+            \color{\l_terms_color_tl}
+            \l_terms_marker
+            \l_terms_font_tl 
+			\cmd*{#1}
+            \l_terms_delimiter_tl
+        }
+        \newline
+    }
 }
 \cs_new:Npn \terms_label_type_set:n #1
 {
@@ -3703,11 +3720,10 @@
             \dim_set_towidth:Nn \labelwidth { \l_terms_marker\l_terms_font_tl\l_terms_base_tl\l_terms_delimiter_tl }
             \cs_set_eq:NN \makelabel \terms_label_default:n
         }
-        { newline }{
-            % \dim_set_towidth:Nn \labelwidth { \l_terms_marker }
+        { singleline }{
             \dim_set_eq:NN \labelwidth \l_terms_label_width_dim
             \skip_set_eq:NN \partopsep \hzparskip
-            \cs_set_eq:NN \makelabel \terms_label_newline:n
+            \cs_set_eq:NN \makelabel \terms_label_singleline:n
         }
         { multiline }{
             \dim_set_eq:NN \labelwidth \l_terms_label_width_dim
@@ -3716,6 +3732,10 @@
         { verbatim }{
             \dim_set_eq:NN \labelwidth \l_terms_label_width_dim
             \cs_set_eq:NN \makelabel \terms_label_verbatim:n
+        }
+        { verbatimsingle }{
+            \dim_set_eq:NN \labelwidth \l_terms_label_width_dim
+            \cs_set_eq:NN \makelabel \terms_label_verbatim_single:n
         }
     }
     \skip_set_eq:NN \labelsep \l_terms_label_sep_skip
@@ -3765,6 +3785,7 @@
             {
                 \tl_set:Nn \l_terms_base_tl { ##4 }
             }
+            \cs_set_eq:NN \termsindexfont \l_terms_index_font_tl
             \terms_label_type_set:n { \l_terms_label_type_tl }
             \l_terms_style_tl
         }
@@ -3780,26 +3801,30 @@
     \NewTerms*{ #1 }{ #2 }
 }
 
-
-\NewTerms{terms}
+\NewTerms{cmds}
 {
-    %index = false
+    labeltype=verbatimsingle,
+	style=\raggedright,
+    delimiter={},
+    labelwidth=2.75em,
+    leftmargin=3.35em,
+    itemsep=1.5ex,    
 }
+\NewTerms{terms}{}
 \NewTerms{UI}
 {
     font = \sffamily\bfseries,
     color = darkgray,
-    %index = false  
 }
 \NewTerms{Symbols}
 {
-    label-type = multiline,
-    label-width = 3em,
+    labeltype = multiline,
+    labelwidth = 3em,
     index = false,
-    %before-list = \RuleBox,
-    %after-list = \endRuleBox,
+    %beforelist = \RuleBox,
+    %afterlist = \endRuleBox,
     delimiter = \hfill,
-    item-sep = 1ex, 
+    itemsep = 1ex, 
 }
 \NewDocumentCommand \imgitem { r[] }
 {
@@ -4143,7 +4168,7 @@
 {
     beforeskip 		    .skip_set:N = \l_bbox_before_skip,
     raise 		        .skip_set:N = \l_bbox_raise_skip,
-    % afterskip  		    .skip_set:N = \l_bbox_after_skip, 
+    afterskip  		    .skip_set:N = \l_bbox_after_skip, 
     type        		.tl_set:N = \l_bbox_type_tl,
     symbol      		.tl_set:N = \l_bbox_symbol_tl,
     signal      		.tl_set:N = \l_bbox_signal_tl,
@@ -4165,6 +4190,7 @@
 
 \BoundedBoxInitialize {
     beforeskip = .5\baselineskip,
+    afterskip = .5\baselineskip,
     raise = -.5\baselineskip,
     type = shade,
     fontcolor = black,
@@ -4277,7 +4303,7 @@
                 \color{\l_bbox_font_color_tl}
     }{
                 \end{BBox}            
-            % \object_skip_after:n { \l_bbox_after_skip }
+            \object_skip_after:n { \l_bbox_after_skip }
         \group_end:
     }
 }
@@ -4617,9 +4643,9 @@
 {
     \IfBooleanTF {#1}
     { 
-        \href{http://#2}{\nolinkurl{#2}}
+        \href{https://#2}{\nolinkurl{#2}}
     }{ 
-        \url{#2} 
+        \href{http://#2}{\nolinkurl{#2}}
     }
 }
 % \urlstyle{sf}
@@ -4932,32 +4958,48 @@
     
     \IfBooleanT { #1 } 
     {
-        \coderead
+        \Code
     }
 }
 
-\NewDocumentCommand \coderead {}
+\NewDocumentCommand \Code {}
 {
-    \begin{reference}
+    % \hbox_set:Nn \l_tmpa_box
+    % {        
+    %     \begin{instance}
+    %     \vspace{-\baselineskip}\mbox{}
+    %     \bool_if:NTF \g_minted_bool
+    %     {                
+    %         \inputminted{ latex }{ \tmpvrb }
+    %     }{            
+    %         \verbatiminput{ \tmpvrb }
+    %     }
+    %     \end{instance}  
+    % }
+    % \dim_set:Nn \l_tmpa_dim { \box_ht:N \l_tmpa_box + \box_dp:N \l_tmpa_box }
+    % \dim_add:Nn \l_tmpa_dim { 1.5\baselineskip }
+    % \dim_set:Nn \l_tmpb_dim { \pagegoal - \pagetotal }
+	% \dim_compare:nT { \l_tmpa_dim > \l_tmpb_dim }
+	% {		
+	% 	\newpage
+    %     \mbox{} \par \vspace{ -1.5\baselineskip }
+	% }
+    % \box_use:N \l_tmpa_box 
+    % \mbox{} \newline
+    \begin{instance}
+        \vspace{-\baselineskip}\mbox{}
         \bool_if:NTF \g_minted_bool
-        {
-            % \mbox{}\vspace{-.5\baselineskip}
+        {                
             \inputminted{ latex }{ \tmpvrb }
         }{            
-            % \mbox{}\vspace{-\baselineskip}
             \verbatiminput{ \tmpvrb }
         }
-    \end{reference}  
+    \end{instance} 
 }
 
 \RenewDocumentCommand \verb {v} 
 {
     \texttt{#1}
-}
-
-\NewDocumentCommand \vitem { v }
-{
-    \item[{#1}]
 }
 \ExplSyntaxOff
 
@@ -5124,16 +5166,16 @@
 
 % font
 \ExplSyntaxOn
-\bool_if:NTF \g_Noto_bool
+\bool_if:NT \g_Noto_bool
 {
     \setmainfont{Noto~Serif}[BoldFont={*~Bold}]
     \setsansfont{Noto~Sans}[BoldFont={*~SemiBold}]
     % \setmonofont{Noto~Sans~Mono}
-}{
-    \setmainfont{TeX~Gyre~Pagella}
-    \setsansfont{TeX~Gyre~Heros}
-    %\setmonofont{zco} % to type space (␣) 
 }
+    % \setmainfont{TeX~Gyre~Pagella}
+    % \setsansfont{TeX~Gyre~Heros}
+    %\setmonofont{zco} % to type space (␣) 
+
 \ExplSyntaxOff
 
 % sectional divisions
