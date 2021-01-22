@@ -373,7 +373,7 @@
             warning=WARNUNG,
             caution=VORSICHT,
             notice=HINWEIS, %BEACHTEN
-            note=ANMERKUNG,
+            note=ANMERKUNG
         }
     }
 }
@@ -1474,7 +1474,7 @@
 \NewDocumentCommand \SectionRule { m }
 {
     \secstyle #1
-    \nopagebreak\vskip-.85\onelineskip
+    \nopagebreak\vskip-\onelineskip
     \hspace*{-\vartwosecindent}
     \IfVartwo
     {
@@ -1665,15 +1665,14 @@
 \cs_new:Nn \style_paragraph_indent:
 {
     \abnormalparskip{0pt}
-    \setlength{\parindent}{\hzparindent}
-    \SetTextStyle{\noindent\setlength\parindent{\hzparindent}}
-    \setlist{partopsep=0pt, topsep=.25\baselineskip, itemsep=.25ex}
+    \SetTextStyle{\setlength\parindent{\hzparindent}}
+    \setlist{partopsep=0pt, topsep=.25\onelineskip, itemsep=.25ex}
     \setlist[itemize]{labelindent=.5em,labelwidth=1em,labelsep=.5em}
     \setlist[enumerate]{labelindent=.5em,labelwidth=1.25em,labelsep=.5em}
-    \TermsInitialize{topsep=0.5\baselineskip,itemsep=.25ex}
+    \TermsInitialize{topsep=0.5\onelineskip,itemsep=.25ex}
     \ObjectSetup{
-        beforeskip=.75\baselineskip, 
-        afterskip=.75\baselineskip
+        beforeskip=.75\onelineskip, 
+        afterskip=.75\onelineskip
     }    
 }
 
@@ -1687,8 +1686,8 @@
     \setlist[enumerate]{labelindent=0em,labelwidth=1.25em,labelsep=.5em}
     \TermsInitialize{topsep=0.5ex,itemsep=.25ex}
     \ObjectSetup{
-        beforeskip=.5\baselineskip, 
-        afterskip=.5\baselineskip
+        beforeskip=.5\onelineskip, 
+        afterskip=.5\onelineskip
     }
 }
 
@@ -1782,7 +1781,7 @@
     sectionsize=\Large,
     subsectionsize=\large,
     subsubsectionsize=\normalsize,
-    parskip=.25\baselineskip,
+    parskip=.25\onelineskip,
     parindent=1em
 }
 
@@ -1852,9 +1851,9 @@
 }
 
 \makechapterstyle{tight}{
-    \setlength{\beforechapskip}{3\baselineskip}
-    \setlength{\midchapskip}{.5\baselineskip}
-    \setlength{\afterchapskip}{2\baselineskip}        
+    \setlength{\beforechapskip}{3\onelineskip}
+    \setlength{\midchapskip}{.5\onelineskip}
+    \setlength{\afterchapskip}{2\onelineskip}        
 }
 
 % heading utilities -----------------------------------------------
@@ -1936,11 +1935,19 @@
     top=0pt, bottom=0pt, left=0pt, right=0pt
 }
 
+\NewDocumentCommand \SetObjectAlign { m }
+{
+    \CaptionSetup{ align-short=#1, align=#1 }
+    \ImageSetup{ align=#1 }
+    \TableSetup{ align=#1 }
+}
+
 \keys_define:nn { HzObject }
 {
     beforeskip  .skip_set:N = \g_object_before_skip,
     afterskip   .skip_set:N = \g_object_after_skip,
-    framecolor  .tl_set:N = \g_object_frame_color
+    framecolor  .tl_set:N = \g_object_frame_color,
+    align       .code:n = { \SetObjectAlign{ #1 } }
 }
 
 \dim_new:N \hznulldim
@@ -1948,7 +1955,7 @@
 
 \NewDocumentCommand \ObjectSetup { m }
 {
-    \keys_set:nn { HzObject } { #1 }
+    \keys_set:nn { HzObject }{ #1 }
 }
 
 \cs_new:Npn \object_skip_before:n #1
@@ -1971,7 +1978,7 @@
     }{
         \skip_set:Nn \l_tmpa_skip { \g_object_after_skip }
     }
-    \vspace{ \l_tmpa_skip }    
+    \vspace{ \l_tmpa_skip }
 }
 
 \cs_new:Npn \object_locate:N #1
@@ -1988,13 +1995,6 @@
 	{
 		\dim_set_eq:NN #1 \linewidth
 	}
-}
-
-\NewDocumentCommand \SetObjectAlign { m }
-{
-    \CaptionSetup{ align-short=#1, align=#1 }
-    \ImageSetup{ align=#1 }
-    \TableSetup{ align=#1 }
 }
 
 \ObjectSetup{ framecolor=gray }
@@ -2064,15 +2064,15 @@
     beforeskip    	.skip_set:N = \l_image_before_skip,
     afterskip     	.skip_set:N = \l_image_after_skip,
     gap     	    .skip_set:N = \l_image_gap_skip,
+    align         	.tl_set:N 	= \l_image_align,
     float         	.bool_set:N = \l_image_float_bool,
 	float-placement	.tl_set:N	= \l_image_float_placement_tl,
     frame         	.bool_set:N = \l_image_frame_bool,
     fitline       	.bool_set:N = \l_image_fitline_bool, % fit images to the specified width; not valid when an extra image is given.
     fitwidth      	.tl_set:N 	= \l_image_fitwidth_tl,
-    scale         	.tl_set:N 	= \l_image_scale_tl,
     flush         	.bool_set:N = \l_image_flush_bool, % flush images into the left margin
+    scale         	.tl_set:N 	= \l_image_scale_tl,
     landscape     	.bool_set:N = \l_image_landscape_bool,
-    align         	.tl_set:N 	= \l_image_align,
 	middle			.bool_set:N = \l_image_vertical_middle_bool,
     caption       	.tl_set:N 	= \l_image_caption_tl,
 	caption-short  	.tl_set:N 	= \l_image_caption_short_tl,
@@ -2180,22 +2180,22 @@
                     \includegraphics[scale=\l_image_scale_tl]{#2}
                 }
             }
-        }{            
-            \bool_if:NTF \l_image_fitline_bool
+        }{ 
+            \hbox_set:Nn \l_image_box
             {
-                \dim_set_towidth:Nn \l_tmpa_dim { \box_use:N \l_image_box }                
+                \objectframe{ \includegraphics[scale=\l_image_scale_tl]{#1} }
+            }           
+            \bool_if:NT \l_image_fitline_bool
+            {
+                \dim_set_towidth:Nn \l_tmpa_dim 
+                { 
+                    \box_use:N \l_image_box
+                }
                 \dim_compare:nT { \l_tmpa_dim > \l_image_fitwidth_tl }
                 {
-                    \hbox_set:Nn \l_image_box{
-                        \objectframe{
-                            \includegraphics[width=\l_image_fitwidth_tl]{#1}
-                        }
-                    }
-                }
-            }{
-                \hbox_set:Nn \l_image_box{
-                    \objectframe{
-                        \includegraphics[scale=\l_image_scale_tl]{#1}
+                    \hbox_set:Nn \l_image_box
+                    {
+                        \objectframe{ \includegraphics[width=\l_image_fitwidth_tl]{#1} }
                     }
                 }
             }
@@ -2207,19 +2207,23 @@
                     \hspace{\l_image_gap_skip}
                     \includegraphics[scale=\l_image_scale_tl]{#2}
             }
-        }{            
-            \bool_if:NTF \l_image_fitline_bool
+        }{    
+            \hbox_set:Nn \l_image_box
             {
-                \dim_set_towidth:Nn \l_tmpa_dim { \box_use:N \l_image_box }
+                \includegraphics[scale=\l_image_scale_tl]{#1}
+            }        
+            \bool_if:NT \l_image_fitline_bool
+            {
+                \dim_set_towidth:Nn \l_tmpa_dim 
+                { 
+                    \box_use:N \l_image_box
+                }
                 \dim_compare:nT { \l_tmpa_dim > \l_image_fitwidth_tl }
                 {
-                    \hbox_set:Nn \l_image_box{
+                    \hbox_set:Nn \l_image_box
+                    {
                         \includegraphics[width=\l_image_fitwidth_tl]{#1}
                     }
-                }
-            }{
-                \hbox_set:Nn \l_image_box{
-                    \includegraphics[scale=\l_image_scale_tl]{#1}
                 }
             }
         }
@@ -2314,6 +2318,19 @@
 	}
 }
 
+\NewDocumentCommand \listimg { O{.25\onelineskip} m }
+{
+    \par\vspace{#1}
+    \includegraphics[scale=\l_image_scale_tl]{#2}
+    \bool_if:NT { \l_image_showfilename_bool }
+    {
+        \group_begin:
+        \tl_set:Nx \l_tmpa_tl { #2 }
+        \allowbreak \color{red} \scriptsize \tl_to_str:N \l_tmpa_tl
+        \group_end:
+    }
+}
+
 % \NewDocumentEnvironment {IllustImage} { s t^ O{} m d() +b }
 
 %\illustimage*^[ options ]{ image filename }( caption ){ description } -------------------------------
@@ -2362,9 +2379,9 @@
 }
 
 \IllustImageSetup{
-    beforeskip=.25\baselineskip,
-    extraskip=.5\baselineskip,
-    afterskip=.25\baselineskip,
+    beforeskip=.25\onelineskip,
+    extraskip=.5\onelineskip,
+    afterskip=.25\onelineskip,
     frame=false,
     minwidth=0pt,
     position=left,
@@ -2430,7 +2447,7 @@
     \hbox_set:Nn \l_text_box
     {
         \begin{minipage}{\l_illustimage_text_width_dim}
-            \g_common_text_style\l_illustimage_textstyle_tl #6
+            \g_common_text_style\l_illustimage_textstyle_tl\noindent #6
         \end{minipage}
     }
 	% restore image & text
@@ -2549,34 +2566,6 @@
     \illustimage{#4}{#6}
 }{}
 
-\tl_new:N \l_illust_symbol_options
-\NewDocumentCommand \SymbolSetup { m }
-{
-    \tl_set:Nn \l_illust_symbol_options {#1}
-}
-% \SymbolSetup{
-%     frame=false, voffset=0.75ex, valign=m
-% }
-
-\NewDocumentCommand\illustsymbol{ O{} m +m }
-{
-    \group_begin:
-    \exp_args:No \IllustImageSetup{ \l_illust_symbol_options }
-    \illustimage[#1]{#2}{#3}
-    \group_end:
-}
-
-\NewDocumentEnvironment { IllustItem } { o m +b }
-{
-    \IfValueT{#1} { \IllustImageSetup{#1} }
-    \illustimage{#2}
-    {
-        \begin{itemize}
-        #3
-        \end{itemize}
-    }
-}{}
-
 %\begin{IllustEnum}[options]{image_file}
 %\begin{IllustEnum}*    : restart the order number
 %\begin{IllustEnum}^    : apply ad-hoc options, specified to the option of "star" of \illustimage*)
@@ -2612,41 +2601,41 @@
     }
 }{}
 
-\keys_define:nn { marginimage }
-{
-    scale         .tl_set:N = \l_marginimage_scale,
-    voffset       .skip_set:N = \l_marginimage_voffset,
-    showfilename  .bool_set:N = \l_marginimage_showfilename_bool,
-}
+% \keys_define:nn { marginimage }
+% {
+%     scale         .tl_set:N = \l_marginimage_scale,
+%     voffset       .skip_set:N = \l_marginimage_voffset,
+%     showfilename  .bool_set:N = \l_marginimage_showfilename_bool,
+% }
 
-\NewDocumentCommand \MarginImageSetup { m }
-{
-    \keys_set:nn { marginimage } { #1 }
-}
+% \NewDocumentCommand \MarginImageSetup { m }
+% {
+%     \keys_set:nn { marginimage } { #1 }
+% }
 
-\MarginImageSetup{
-    scale=1,
-    voffset=2ex,
-    showfilename=false
-}
+% \MarginImageSetup{
+%     scale=1,
+%     voffset=2ex,
+%     showfilename=false
+% }
 
-\marginparmargin{left}
+% \marginparmargin{left}
 
-\NewDocumentCommand \marginimage { s O{} m }
-{
-    \IfBooleanT {#1} { \newpage }
-    \group_begin:
-    \MarginImageSetup{#2}
-     \marginpar{
-        \vspace{\l_marginimage_voffset}
-         \includegraphics[scale=\l_marginimage_scale]{#3}
-         \bool_if:NT { \l_marginimage_showfilename_bool}
-            { \newline \tiny \tl_to_str:n { #3 } }
-     }
-    \group_end:
-}
+% \NewDocumentCommand \marginimage { s O{} m }
+% {
+%     \IfBooleanT {#1} { \newpage }
+%     \group_begin:
+%     \MarginImageSetup{#2}
+%      \marginpar{
+%         \vspace{\l_marginimage_voffset}
+%          \includegraphics[scale=\l_marginimage_scale]{#3}
+%          \bool_if:NT { \l_marginimage_showfilename_bool }
+%             { \newline \tiny \tl_to_str:n { #3 } }
+%      }
+%     \group_end:
+% }
 
-% \img[]{foo} -------------------------------------------------------------
+% \img[raise]{foo} -------------------------------------------------------------
 \keys_define:nn { lineimg }
 {
     scale      .tl_set:N = \l_lineimg_scale,
@@ -2668,25 +2657,12 @@
 \NewDocumentCommand \img { O { \l_lineimg_raise } m }
 {
     \raisebox{#1}{
-        \,\includegraphics[scale=\l_lineimg_scale]{#2}\,
+        \space \includegraphics[scale=\l_lineimg_scale]{#2} \space
     }
     \bool_if:NT { \l_lineimg_showfilename_bool}
     {
         \group_begin:
         \allowbreak \color{red} \scriptsize \tl_to_str:n { #2 }
-        \group_end:
-    }
-}
-
-\NewDocumentCommand \listimg { O{.25\baselineskip} m }
-{
-    \par\vspace{#1}
-    \includegraphics[scale=\l_image_scale_tl]{#2}
-    \bool_if:NT { \l_image_showfilename_bool }
-    {
-        \group_begin:
-        \tl_set:Nx \l_tmpa_tl { #2 }
-        \allowbreak \color{red} \scriptsize \tl_to_str:N \l_tmpa_tl
         \group_end:
     }
 }
@@ -2836,7 +2812,7 @@
     }{
         \dim_set:Nn \l_tmpb_dim { \linewidth }
     }
-    \rotatebox{-90}{
+    \rotatebox{90}{
         \begin{minipage}{\l_tmpb_dim}            
             \table_caption:
 			\l_table_align_tl		
@@ -2867,7 +2843,7 @@
 {
     \tl_if_empty:NF \l_table_footnote
     {
-        \vspace{-.5\baselineskip}\par
+        \vspace{-.5\onelineskip}\par
         \begin{minipage}{\linewidth}
             \setfootnoterule{0pt}{0pt}{0pt}
             \l_table_footnote			
@@ -2920,7 +2896,6 @@
         }
     }
 }{}
-    
 
 \NewDocumentEnvironment { ImageTable } { s d<> +b }
 {
@@ -2941,13 +2916,7 @@
     }
 }{}
 
-\NewDocumentCommand \TableCommon { O{} }
-{
-    \TableSetup{#1}
-    \tl_set:Nn \arraystretch {\l_table_stretch_tl}
-    \l_table_font_tl
-    \l_table_fontsize_tl    
-}
+
 
 % image utilities ------------------------------------------------------------
 
@@ -2955,7 +2924,7 @@
 {
     \ImageSetup{showfilename=true}
     \IllustImageSetup{showfilename=true}
-    \MarginImageSetup{showfilename=true}
+    % \MarginImageSetup{showfilename=true}
     \IfBooleanT{#1} { 
         \LineImageSetup{showfilename=true} 
     }
@@ -2963,8 +2932,7 @@
 }
 
 \ior_new:N \l_txt_io
-
-\NewDocumentCommand \MakeAlbum { s O {0.5} m }
+\NewDocumentCommand \MakeAlbum { s O {1} m }
 {   
     \int_zero:N \l_tmpa_int
     \ImageSetup{scale=#2, fitline=true}
@@ -2986,7 +2954,7 @@
         {            
             \int_incr:N \l_tmpa_int
             \pdfbookmark[1]{\tl_to_str:N \l_tmpa_tl}{\int_use:N \l_tmpa_int}
-            \image{\l_tmpa_tl}\par
+            \image{\l_tmpa_tl}\par            
         }
     }
     \ior_close:N \l_txt_io
@@ -3018,6 +2986,7 @@
     \makeindex    
     \bool_gset_true:N \l_term_index_bool
     \bool_gset_true:N \l_terms_index_bool
+    \bool_gset_true:N \l_annotate_index_bool
     \bool_gset_true:N \l_macro_index_bool
     \IfBooleanT{ #1 }
     { 
@@ -3028,19 +2997,21 @@
 {
     \bool_gset_false:N \l_term_index_bool
     \bool_gset_false:N \l_terms_index_bool
+    \bool_gset_false:N \l_annotate_index_bool
     \bool_gset_false:N \l_macro_index_bool
 }
 
 % \term*|[index position]{\LaTeX}
 \tl_new:N \g_term_options_tl
+\tl_new:N \l_term_index_font_tl
 \keys_define:nn { term }
 {
+    font        .tl_set:N = \l_term_font_tl,    
     color       .tl_set:N = \l_term_color_tl,
-    font        .tl_set:N = \l_term_font_tl,
-    star        .tl_set:N = \l_term_star_tl,
-    vbar        .tl_set:N = \l_term_vbar_tl,
     index       .bool_set:N = \l_term_index_bool,
-	link		.bool_set:N = \l_term_link_bool % link to glossary
+    indexsame   .bool_set:N = \l_term_index_same_bool,
+    star        .tl_set:N = \l_term_star_tl,
+    vbar        .tl_set:N = \l_term_vbar_tl
 }
 \NewDocumentCommand \TermInitialize { m }
 {
@@ -3048,7 +3019,8 @@
 }
 \TermInitialize{
     color = black,
-    index = false 
+    index = false,
+    indexsame = false 
 }
 \NewDocumentCommand \TermSetup { o m }
 {
@@ -3058,6 +3030,11 @@
 	}{
     	\tl_set:Nn \g_term_options_tl { #2 }
 	}
+}
+
+\NewDocumentCommand \termindexprint { m m }
+{
+    \group_begin: #1 #2 \group_end:
 }
 
 \NewDocumentCommand \NewTerm { s m m }
@@ -3074,32 +3051,55 @@
         {
             \exp_args:Nno \keys_set:nn { term }{ \l_term_star_tl }
         }
-        \IfBooleanTF{ ##2 }
+        \IfBooleanT{ ##2 }
         {
             \exp_args:Nno \keys_set:nn { term }{ \l_term_vbar_tl }
         }
         \bool_if:NT \l_term_index_bool
         {
-            \IfValueTF{ ##3 }
+            \bool_if:NTF \l_term_index_same_bool
             {
-                \index{##3@##4}                
+                \tl_set:No \l_tmpa_tl 
+                { 
+                    \string\termindexprint{\tl_to_str:V \l_term_font_tl}{#1} 
+                }
+                \IfValueTF { ##3 }
+                {
+                    \index{##3@\tl_use:N \l_tmpa_tl}
+                }{
+                    \index{##4@\tl_use:N \l_tmpa_tl}
+                }
+                \IfValueT { ##5 }
+                {
+                    \IfValueTF { ##3 }
+                    {
+                        \index{##5!##3@\tl_use:N \l_tmpa_tl}
+                    }{
+                        \index{##5!##4@\tl_use:N \l_tmpa_tl}
+                    }
+                }
             }{
-				\IfValueTF { ##5 }
-				{
-					\index{##5!##4}
-				}{
-                	\index{##4}
-				}
+                \IfValueTF { ##3 }
+                {
+                    \index{##3@##4}
+                }{
+                    \index{##4}
+                }
+                \IfValueT { ##5 }
+                {
+                    \IfValueTF { ##3 }
+                    {
+                        \index{##5!##3@##4}
+                    }{
+                        \index{##5!##4}
+                    }
+                }
             }
         }
-		\bool_if:NTF \l_term_link_bool
-		{
-        	\textcolor{ \l_term_color_tl }{ \l_term_font_tl \hyperlink{##4}{##4} }
-		}{
-        	\textcolor{ \l_term_color_tl }{ \l_term_font_tl ##4 }
-		}
+        \textcolor{\l_term_color_tl}{\l_term_font_tl ##4 }	
     }    
 }
+
 \NewDocumentCommand \RenewTerm { m m }
 {
     \NewTerm*{ #1 }{ #2 }
@@ -3107,7 +3107,7 @@
 
 \NewTerm{\term}{
     font = {},
-    index = true,
+    index = false,
     star = { font=\itshape }
 }
 
@@ -3117,7 +3117,7 @@
     font = \sffamily\bfseries,
     color = darkgray,
     index = false,
-    star = { index=true }
+    % star = { index=true }
 }
 
 % machine interface
@@ -3138,32 +3138,37 @@
 % tex commands
 \NewDocumentCommand \macroprint { m }
 {
-    \str_set:Nx \l_tmpb_str { \tl_to_str:n {#1} }
-    \str_remove_all:Nn \l_tmpb_str { ~ }
-    \texttt{\str_use:N \l_tmpb_str}    
+    \str_set:Nx \l_tmpa_str { \tl_to_str:n {#1} }
+    \regex_replace_all:nnN { \? }{ \@ } \l_tmpa_str
+    \str_remove_all:Nn \l_tmpa_str { ~ }
+    \texttt{\str_use:N \l_tmpa_str}    
 }
+
 \NewDocumentCommand \macroindex { m }
 {
-    \str_set:Nx \l_tmpa_str { \cs_to_str:N #1 }
-    \str_put_right:Nn \l_tmpa_str {@ \macroprint{#1}}
-    \index{ \str_use:N \l_tmpa_str }
+    \tl_if_head_eq_catcode:nNTF { #1 } \c_catcode_active_tl
+    {
+        \str_set:Nx \l_tmpa_str { \cs_to_str:N #1 }
+    }{
+        \str_set:Nn \l_tmpa_str { #1 }
+    }        
+    \str_set:Nn \l_tmpb_str { #1 }
+    \regex_replace_all:nnN { \@ }{ \? } \l_tmpa_str
+    \regex_replace_all:nnN { \@ }{ \? } \l_tmpb_str
+    \exp_args:NVV \macro_index_write:nn \l_tmpa_str \l_tmpb_str
 }
+\cs_new:Npn \macro_index_write:nn #1 #2
+{
+    \index{#1@\macroprint{#2}}
+}
+
 \NewDocumentCommand \macro { m }
 {
-	\tl_if_head_eq_catcode:nNTF { #1 } \c_catcode_active_tl
-	{
-		\macroprint{#1}	
-        \bool_if:NT \l_macro_index_bool	
-        {
-		    \macroindex{#1}		
-        }
-	}{
-        \texttt{#1}		
-        \bool_if:NT \l_macro_index_bool	
-        {
-		    \index{\texttt{#1}}
-        }
-	}
+    \macroprint{#1}	
+    \bool_if:NT \l_macro_index_bool	
+    {
+        \macroindex{#1}		
+    }	
 }
 
 % lists  -------------------------------------------------------
@@ -3237,28 +3242,28 @@
 
 \keys_define:nn { terms }
 {
-    labeltype  .tl_set:N = \l_terms_label_type_tl,
+    labeltype   .tl_set:N = \l_terms_label_type_tl,
     offset      .skip_set:N = \l_terms_offset_skip,
     marker      .code:n = { \terms_define_marker:n {#1} },
-    markersep  .skip_set:N = \l_terms_marker_sep_skip,
+    markersep   .skip_set:N = \l_terms_marker_sep_skip,
     enumerate   .bool_set:N = \l_terms_enumerate_bool,
-    enummarker .tl_set:N = \l_terms_enummarker_tl,
+    enummarker  .tl_set:N = \l_terms_enummarker_tl,
     base        .tl_set:N = \l_terms_base_tl,
     font        .tl_set:N = \l_terms_font_tl,
     color       .tl_set:N = \l_terms_color_tl,
     delimiter   .tl_set:N = \l_terms_delimiter_tl,
-    labelwidth .dim_set:N = \l_terms_label_width_dim,
-    labelsep   .skip_set:N = \l_terms_label_sep_skip,
-	itemindent .dim_set:N = \l_terms_item_indent_dim,
-	leftmargin .dim_set:N = \l_terms_left_margin_dim,
+    labelwidth  .dim_set:N = \l_terms_label_width_dim,
+    labelsep    .skip_set:N = \l_terms_label_sep_skip,
+	itemindent  .dim_set:N = \l_terms_item_indent_dim,
+	leftmargin  .dim_set:N = \l_terms_left_margin_dim,
     index       .bool_set:N = \l_terms_index_bool,
-    indexfont   .tl_set:N = \l_terms_index_font_tl,
-	anchor		.bool_set:N = \l_terms_anchor_bool, % for glossary
-    topsep     .skip_set:N = \l_terms_top_sep_skip,
-    itemsep    .skip_set:N  = \l_terms_item_sep_skip,
+    indexcategory .tl_set:N = \l_terms_index_category_tl,
+    indexsame   .bool_set:N = \l_terms_index_same_bool,
+    topsep      .skip_set:N = \l_terms_top_sep_skip,
+    itemsep     .skip_set:N  = \l_terms_item_sep_skip,
     style       .tl_set:N = \l_terms_style_tl,
-    beforelist .tl_set:N = \l_terms_before_list_tl,
-    afterlist  .tl_set:N = \l_terms_after_list_tl,
+    beforelist  .tl_set:N = \l_terms_before_list_tl,
+    afterlist   .tl_set:N = \l_terms_after_list_tl,
     star        .tl_set:N = \l_terms_star_tl,
     vbar        .tl_set:N = \l_terms_vbar_tl
 }
@@ -3281,7 +3286,31 @@
     vbar = { delimiter=\hfill },
     enummarker = { \int_use:N \l_terms_int)\hskip\l_terms_marker_sep_skip }
 }
-\NewDocumentCommand \termsindexfont { m }{ #1 }
+
+\cs_new:Npn \terms_index:n #1
+{
+    \bool_if:NTF \l_terms_index_same_bool
+    {
+        \tl_set:No \l_tmpa_tl 
+        { 
+            \string\termindexprint{\tl_to_str:V \l_terms_font_tl}{#1} 
+        }
+        \tl_if_empty:NTF \l_terms_index_category_tl
+        {
+            \index{ \tl_use:N #1@\l_tmpa_tl }
+        }{
+            \index{ \tl_use:N \l_terms_index_category_tl!#1@\tl_use:N \l_tmpa_tl }     
+        }
+    }{
+        \tl_if_empty:NTF \l_terms_index_category_tl
+        {
+            \index{#1}
+        }{
+            \index{ \tl_use:N \l_terms_index_category_tl!#1 }
+        }
+    }
+}
+
 \NewDocumentCommand \TermsSetup { o m }
 {
 	\IfValueTF { #1 }
@@ -3291,37 +3320,71 @@
     	\tl_gset:Nn \g_terms_options_tl { #2 }
 	}
 }
-\cs_new:Npn \terms_label_anchor:n #1
+\cs_new:Npn \terms_label_macro_write:n #1 
 {
-	\bool_if:NTF \l_terms_anchor_bool
-	{
-		\hypertarget{#1}{#1}
-	}{
-		#1
-	}
+    \tl_if_in:nnTF { #1 }{ ~ }
+    {
+        \texttt{ \tl_to_str:n { #1 } }
+    }{
+        \macroprint{#1}
+        \bool_if:NT \l_terms_index_bool 
+        {
+            \macroindex{#1}
+            \tl_if_empty:NF \l_terms_index_category_tl
+            {            
+                \exp_args:NnV \label_macro_index:nn { #1 } \l_terms_index_category_tl
+            }
+        }
+    }        
 }
+
+\cs_new:Npn \label_macro_index:nn #1 #2
+{
+    \tl_if_head_eq_catcode:nNTF { #2 } \c_catcode_active_tl
+    {
+        \tl_set:Nx \l_tmpa_tl { \cs_to_str:N #2 }
+    }{
+        \tl_set:Nn \l_tmpa_tl { #2 }
+    }
+    \tl_if_head_eq_catcode:nNTF { #1 } \c_catcode_active_tl
+    {
+        \tl_set:Nx \l_tmpb_tl { \cs_to_str:N #1 }
+    }{
+        \tl_set:Nn \l_tmpb_tl { #1 }
+    }
+    \regex_replace_all:nnN { \@ }{ \? } \l_tmpb_tl
+    \str_set:Nn \l_tmpb_str { #1 }
+    \regex_replace_all:nnN { \@ }{ \? } \l_tmpb_str
+    \exp_args:Nooo \label_macro_index_write:nnn { \l_tmpa_tl }{ \l_tmpb_tl }{ \l_tmpb_str }
+}
+
+\cs_new:Npn \label_macro_index_write:nnn #1 #2 #3
+{
+    \index{#1!#2@\macroprint{#3}}
+}
+
+
+
 \cs_new:Npn \terms_label_default:n #1
 {
     \int_gincr:N \l_terms_int
-    \bool_if:NT \l_terms_index_bool { \index{\termsindexfont{#1}} }
+    \bool_if:NT \l_terms_index_bool { \terms_index:n {#1} }
     \group_begin:
         \color{\l_terms_color_tl}
         \l_terms_marker
-        \l_terms_font_tl 
-		\terms_label_anchor:n { #1 }
+        \l_terms_font_tl #1
     \group_end:
     \l_terms_delimiter_tl
 }
 \cs_new:Npn \terms_label_singleline:n #1
 {
     \int_gincr:N \l_terms_int
-    \bool_if:NT \l_terms_index_bool { \index{\termsindexfont{#1}} }
+    \bool_if:NT \l_terms_index_bool { \terms_index:n {#1} }
     \parbox[b]{\labelwidth}{
         \makebox[0pt][l]{
             \color{\l_terms_color_tl}
             \l_terms_marker
-            \l_terms_font_tl 
-			\terms_label_anchor:n { #1 }
+            \l_terms_font_tl #1
             \l_terms_delimiter_tl
         }
         \newline
@@ -3330,14 +3393,13 @@
 \cs_new:Npn \terms_label_multiline:n #1
 {
     \int_gincr:N \l_terms_int
-    \bool_if:NT \l_terms_index_bool { \index{\termsindexfont{#1}} }
+    \bool_if:NT \l_terms_index_bool { \terms_index:n {#1} }
     \hbox_set:Nn \l_tmpa_box 
     {
         \parbox[t]{\labelwidth}{
             \raggedright
             \color{\l_terms_color_tl}
-            \l_terms_font_tl 
-			\terms_label_anchor:n { #1 }
+            \l_terms_font_tl #1
         }
     }
     \hbox_set:Nn \l_tmpb_box {\l_terms_font_tl A}
@@ -3351,7 +3413,7 @@
         \color{\l_terms_color_tl}
         \l_terms_marker
         \l_terms_font_tl 
-        \macro{#1}
+        \terms_label_macro_write:n {#1}
     \group_end:
     \l_terms_delimiter_tl
 }
@@ -3363,7 +3425,7 @@
             \color{\l_terms_color_tl}
             \l_terms_marker
             \l_terms_font_tl 
-			\macro{#1}
+			\terms_label_macro_write:n {#1}
             \l_terms_delimiter_tl
         }
         \newline
@@ -3398,10 +3460,6 @@
             \dim_set_eq:NN \labelwidth \l_terms_label_width_dim
             \cs_set_eq:NN \makelabel \terms_label_macro_single:n
         }
-        { verbatimsingle }{
-            \dim_set_eq:NN \labelwidth \l_terms_label_width_dim
-            \cs_set_eq:NN \makelabel \terms_label_verbatim_single:n
-        }
     }
     \skip_set_eq:NN \labelsep \l_terms_label_sep_skip
    	\dim_set:Nn \leftmargin { \labelwidth+\labelsep }
@@ -3430,7 +3488,7 @@
         \RenewDocumentEnvironment
     }{
         \NewDocumentEnvironment
-    }{ #2 }{ s t| O{} d() }
+    }{ #2 }{ s t| O{} d() d<> }
     {
         \keys_set:nn { terms }{ #3 }
         \exp_args:Nno \keys_set:nn { terms }{ \g_terms_options_tl }
@@ -3454,8 +3512,11 @@
             \IfValueT{ ##4 }
             {
                 \tl_set:Nn \l_terms_base_tl { ##4 }
+            }            
+            \IfValueT{ ##5 }
+            {
+                \tl_set:Nn \l_terms_index_category_tl { ##5 }
             }
-            \cs_set_eq:NN \termsindexfont \l_terms_index_font_tl
             \terms_label_type_set:n { \l_terms_label_type_tl }
             \g_common_text_style\l_terms_style_tl
         }
@@ -3471,6 +3532,12 @@
     \NewTerms*{ #1 }{ #2 }
 }
 
+\NewTerms{terms}{}
+\NewTerms{UI}
+{
+    font = \sffamily\bfseries,
+    color = darkgray,
+}
 \NewTerms{ macros }
 {
     labeltype=macro,
@@ -3479,17 +3546,10 @@
     leftmargin=3.35em,
     style=\raggedright
 }
-\NewTerms{terms}{}
-\NewTerms{UI}
-{
-    font = \sffamily\bfseries,
-    color = darkgray,
-}
-\NewTerms{ Symbols }
+\NewTerms{ signs }
 {
     labeltype = multiline,
     labelwidth = 3em,
-    index = false,
     %beforelist = \RuleBox,
     %afterlist = \endRuleBox,
     delimiter = \hfill,
@@ -3587,8 +3647,8 @@
 }
 
 \CalloutSetup{
-    beforeskip=.25\baselineskip,
-    afterskip=.75\baselineskip,
+    beforeskip=\hznulldim,
+    afterskip=\hznulldim,
     column=3,
     font=\small,
     label={\makebox[1.25em]{\hfill\calloutno)}\enspace},
@@ -3733,7 +3793,7 @@
 \tcbuselibrary{breakable, skins, xparse}
 \tcbset{enhanced}
 
-\NewTColorBox{FrameBox}{ s }
+\NewTColorBox{FrameBox}{ s O{} }
 {
     colframe=gray, colback=white, after={\par\normalcolor},
     boxrule=0.5pt, arc=0pt, 
@@ -3744,7 +3804,7 @@
 		breakable=\l_bbox_breakable_default_tl
 	}
 }
-\NewTColorBox{LeftBarBox}{ s }
+\NewTColorBox{LeftBarBox}{ s O{} }
 {
     before~skip=0pt, after~skip=0pt, breakable=false, after={\par\normalcolor},
     colframe=white, colback=white, arc=0ex, boxrule=0pt,
@@ -3757,7 +3817,7 @@
 	}
 }
 
-\NewTColorBox{RightBarBox}{ s }
+\NewTColorBox{RightBarBox}{ s O{} }
 {
     before~skip=0pt, after~skip=0pt, breakable=false, after={\par\normalcolor},
     colframe=white, colback=white, arc=0ex, boxrule=0pt,
@@ -3800,7 +3860,7 @@
 	}
 }
 
-\NewTColorBox{RuleBox}{ s }
+\NewTColorBox{RuleBox}{ s O{} }
 {
     opacityfill=0,
     before~skip=0pt, after~skip=0pt, breakable=false, after={\par\normalcolor},
@@ -3832,9 +3892,6 @@
 	}
 }
 
-\tl_new:N \l_bbox_style_tl
-\tl_set:Nn \l_bbox_style_tl { \g_common_text_style\l_bbox_style_extra_tl }
-
 \keys_define:nn { BoundedBox }
 {
     beforeskip 		    .skip_set:N = \l_bbox_before_skip,
@@ -3845,11 +3902,9 @@
     signal      		.tl_set:N = \l_bbox_signal_tl,
     beforesignal		.tl_set:N = \l_bbox_before_signal_tl,
     aftersignal		    .tl_set:N = \l_bbox_after_signal_tl,
-    style       		.tl_set:N = \l_bbox_style_extra_tl,
+    style       		.tl_set:N = \l_bbox_style_tl,
     titlefont           .tl_set:N = \l_bbox_title_font_tl,
-    font        		.tl_set:N = \l_bbox_font_tl,
-    fontcolor  		    .tl_set:N = \l_bbox_font_color_tl,
-    wrapping    		.bool_set:N = \l_bbox_wrapping_bool,
+    % font        		.tl_set:N = \l_bbox_font_tl,
 	breakable-default	.tl_set:N = \l_bbox_breakable_default_tl,
 	breakable-adhoc		.tl_set:N = \l_bbox_breakable_adhoc_tl
 }
@@ -3861,10 +3916,9 @@
 
 \BoundedBoxInitialize {
     beforeskip = \hznulldim,
-    extraskip = -.5\baselineskip,
+    extraskip = -.5\onelineskip,
     afterskip = \hznulldim,
-    type = shade,
-    fontcolor = black,
+    type = ShadeBox,
     titlefont = \bfseries,
 	breakable-default = true,
 	breakable-adhoc = false
@@ -3883,47 +3937,9 @@
 
 \cs_new:Npn \bbox_type_set:n #1
 {
-    \str_case:onTF { #1 }
-    {
-        { frame }{
-            \cs_set_eq:NN \BBox \FrameBox
-            \cs_set_eq:NN \endBBox \endFrameBox
-        }        
-        { shade }{
-            \cs_set_eq:NN \BBox \ShadeBox
-            \cs_set_eq:NN \endBBox \endShadeBox
-        }        
-        { shadow }{
-            \cs_set_eq:NN \BBox \ShadowBox
-            \cs_set_eq:NN \endBBox \endShadowBox
-        }
-        { tab }{
-            \cs_set_eq:NN \BBox \TabBox
-            \cs_set_eq:NN \endBBox \endTabBox
-        }
-        { rule }{
-            \cs_set_eq:NN \BBox \RuleBox
-            \cs_set_eq:NN \endBBox \endRuleBox
-        }
-        { LeftBar }{
-            \cs_set_eq:NN \BBox \LeftBarBox
-            \cs_set_eq:NN \endBBox \endLeftBarBox
-        }
-        { RightBar }{
-            \cs_set_eq:NN \BBox \RightBarBox
-            \cs_set_eq:NN \endBBox \endRightBarBox
-        }
-	}{}        
-	{ \AdhocBoxType } % define like below
+    \cs_set_eq:Nc \BBox {#1} 
+    \cs_set_eq:Nc \endBBox {end#1}     
 }
-
-% \newtcolorbox{FooBox}{...} 
-% \RenewBoundedBox{foo}{type=FooBox}
-% \NewDocumentCommand \AdhocBoxType { }
-% {
-% 	\cs_set_eq:NN \BBox \FooBox
-% 	\cs_set_eq:NN \endBBox \endFooBox
-% }
 
 % \begin{BOUNDEDBOX}[options](title)
 % \begin{BOUNDEDBOX}*: without linespacing above and below
@@ -3931,7 +3947,8 @@
 
 \NewDocumentCommand \NewBoundedBox { s m m }
 {
-    \IfBooleanTF{ #1 }{
+    \IfBooleanTF{ #1 }
+    {
         \RenewDocumentEnvironment
     }{
         \NewDocumentEnvironment 
@@ -3968,12 +3985,10 @@
                 	\begin{BBox}[\l_bbox_symbol_tl\l_bbox_before_signal_tl\l_bbox_signal_tl\l_bbox_after_signal_tl]
 				}
             }
-                \bool_if:NT \l_bbox_wrapping_bool { \wrappingon }
-                \l_bbox_style_tl
-                \l_bbox_font_tl
-                \color{\l_bbox_font_color_tl}
+            \g_common_text_style\l_bbox_style_tl
+            \noindent\hspace{-\hzparskip} % 삽입되는 공백을 제거하기 위하여 
     }{
-                \end{BBox}            
+            \end{BBox}
             \object_skip_after:n { \l_bbox_after_skip }
         \group_end:
     }
@@ -4009,11 +4024,11 @@
 
 \NewBoundedBox{danger}{signal=\g_admonition_danger_tl, symbol={\img{AlertSymbol}~}}
 \NewBoundedBox{warning}{signal=\g_admonition_warning_tl, symbol={\img{AlertSymbol}~}}
-\NewBoundedBox{caution}{signal=\g_admonition_caution_tl, symbol={}}
-\NewBoundedBox{notice}{signal=\g_admonition_notice_tl, symbol={}}
-\NewBoundedBox{note}{signal=\g_admonition_note_tl, symbol={}}
-\NewBoundedBox{reference}{signal={}, font=\small}
-\NewBoundedBox{codebox}{}
+\NewBoundedBox{caution}{signal=\g_admonition_caution_tl}
+\NewBoundedBox{notice}{signal=\g_admonition_notice_tl}
+\NewBoundedBox{note}{signal=\g_admonition_note_tl}
+\NewBoundedBox{reference}{style=\small}
+\NewBoundedBox{codebox}{style=\small}
 
 % Troubleshooting ----------------------------------------------
 
@@ -4133,7 +4148,7 @@
     \tl_if_empty:NF \cover_image_background_front 
     {
 		\begin{tikzpicture}[remember~picture,overlay] 
-			\node~at~(current~page.center) { \includegraphics{\cover_image_background_front} };
+			\node~at~(current~page.center) { \includegraphics{\cover_image_background_front} };            	
 		\end{tikzpicture}
     }
 	\bool_if:NTF \cover_blank_front_bool
@@ -4146,6 +4161,11 @@
 			\tl_if_empty:NF \cover_image_logo_front
 			{
 				\includegraphics[scale=\l_image_scale_tl]{\cover_image_logo_front}
+                \bool_if:NT \l_image_showfilename_bool
+                {
+                    \tl_set:Nx \l_tmpa_tl { \cover_image_logo_front }
+                    \legend{\tl_to_str:N \l_tmpa_tl}
+                }	
 			}
 			\mbox{}\par\vspace{\cover_top_skip}
 			\begin{minipage}{\linewidth}
@@ -4159,7 +4179,12 @@
 			{
 				\par\vspace{1cm}
 				\begin{center}
-						\includegraphics[scale=\l_image_scale_tl]{\cover_image_product}
+                    \includegraphics[scale=\l_image_scale_tl]{\cover_image_product}
+                    \bool_if:NT \l_image_showfilename_bool
+                    {
+                        \tl_set:Nx \l_tmpa_tl { \cover_image_product }
+                        \legend{\tl_to_str:N \l_tmpa_tl}
+                    }                        
 				\end{center}
 			}
 			\vfill
@@ -4314,7 +4339,7 @@
     color       .tl_set:N = \l_annotate_color,
     space       .tl_set:N = \l_annotate_space,
     raise       .tl_set:N = \l_annotate_raise,
-	indexing	.bool_set:N = \l_annotate_indexing_bool,
+	index	    .bool_set:N = \l_annotate_index_bool,
     star        .tl_set:N = \l_annotate_star,
 }
 
@@ -4332,31 +4357,28 @@
     opening={},
     closing={},
     raise=0.75ex,
-	star={indexing=true},
+    index=false,
+	star={index=true},
 }
 
-\NewDocumentCommand \annotate { s t| O{} m }
+\NewDocumentCommand \annotate { s O{} m }
 {
 	\group_begin:
-		\AnnotateSetup{#3}
+		\AnnotateSetup{#2}
 		\IfBooleanT {#1}
 		{ 
 			\exp_args:No \AnnotateSetup{\l_annotate_star}
 		}
-		\IfBooleanT {#2}
-		{ 
-			\AnnotateSetup{\l_bbox_breakable_adhoc_tl} 
-		}
 		\l_annotate_space
 		\bool_if:NTF \l_annotate_breakable_bool
 		{
-			\exp_args:Nx \annotate_scope:n {\l_annotate_opening #4 \l_annotate_closing}
+			\exp_args:Nx \annotate_scope:n {\l_annotate_opening #3 \l_annotate_closing}
 		}{
-			\annotate_unbreakable:n {\l_annotate_opening #4 \l_annotate_closing}
+			\annotate_unbreakable:n {\l_annotate_opening #3 \l_annotate_closing}
 		}
-		\bool_if:NT \l_annotate_indexing_bool
+		\bool_if:NT \l_annotate_index_bool
 		{
-			\index{#4}
+			\index{#3}
 		}
 		\l_annotate_space
 	\group_end:
@@ -4553,7 +4575,7 @@
 }
 
 % 4배수 페이지
-\NewDocumentCommand \MakeQuaterPages {} 
+\NewDocumentCommand \MakeQuadriPages {} 
 {	
 	\clearpage
 	\pagestyle{empty}
@@ -4593,12 +4615,29 @@
 
 \keys_define:nn { CODE }
 {
-    font        .code:n = { \def\m@mverbfont{#1} },
-    fontsize    .tl_set:N = \l_code_font_tl,
+    font        .code:n = { \code_verbatim_font:n {#1} },
+    style       .tl_set:N = \l_code_style_tl,
+    fontsize    .tl_set:N = \l_code_fontsize_tl,
     width       .dim_set:N = \l_code_width_dim,
     offset      .skip_set:N = \l_code_raise_offset,
     beforeskip  .skip_set:N = \l_code_before_skip,
     afterskip    .skip_set:N = \l_code_after_skip
+}
+
+\cs_new:Npn \code_verbatim_font:n #1
+{
+    
+    \sys_if_engine_luatex:T
+    {
+        \str_if_eq:VnTF \hzlanguage { kor }
+        {
+            \def\m@mverbfont{\language=\l@nohyphenation #1}
+        }{
+            \def\m@mverbfont{#1}
+        }
+    }{
+        \def\m@mverbfont{#1}
+    }   
 }
 
 \NewDocumentCommand \CodeSetup { m }
@@ -4609,14 +4648,30 @@
     }
 }
 
+\protected\def\CRsymbol{\mbox{$\hookleftarrow$}}
+\def\verbatimbreakchar{\CRsymbol}
+\setlength\verbatimindent{0pt}
+\setlength\ragrparindent{0pt}
+\wrappingon
+
 %\def\m@mverbfont{\ttfamily}
 \CodeSetup{
     font=\ttfamily,
     fontsize=\small,
     width=0pt,
-    offset=-\baselineskip,    
+    offset=-\onelineskip,    
     beforeskip=\hznulldim, % available only for codedesc and \code_read_minipage:
-    afterskip=\hznulldim
+    afterskip=\hznulldim,
+    style={ \setSpacing{1.1} }
+}
+
+\NewDocumentEnvironment { codewrite }{ }
+{
+    \group_begin:
+    \exp_args:Nx \verbatimoutput { \tmpvrb }
+}{
+    \endverbatimoutput
+    \group_end: 
 }
 
 \NewDocumentEnvironment { codedesc }{ O{} +b }
@@ -4626,9 +4681,9 @@
     \hbox_set:Nn \l_tmpa_box 
     {
         \begin{minipage}{\linewidth}  
-            \begin{minipage}[t]{\l_code_width_dim}                
-                \begin{codebox}[beforeskip=0pt, afterskip=0pt]
-                \l_code_font_tl
+            \begin{minipage}[t]{\l_code_width_dim}
+                \l_code_style_tl                
+                \begin{codebox}[beforeskip=0pt, afterskip=0pt, font=\l_code_fontsize_tl]                
                 \bool_if:NTF \g_minted_bool
                 {                
                     \inputminted{ latex }{ \tmpvrb }
@@ -4639,14 +4694,14 @@
             \end{minipage}
             \hfill
             \begin{minipage}[t]{\l_code_description_width_dim}
-                \vspace{.5\baselineskip} 
+                \vspace{.5\onelineskip} 
                 \g_common_text_style
                 #2
             \end{minipage}
         \end{minipage}
     }
     \dim_set:Nn \l_tmpa_dim { \box_ht:N \l_tmpa_box + \box_dp:N \l_tmpa_box }
-    \dim_add:Nn \l_tmpa_dim { 1.5\baselineskip }    
+    \dim_add:Nn \l_tmpa_dim { 1.5\onelineskip }    
     \dim_set:Nn \l_tmpb_dim { \pagegoal - \pagetotal }
     \dim_compare:nTF { \l_tmpa_dim > \l_tmpb_dim }
 	{		
@@ -4662,6 +4717,7 @@
 \NewDocumentCommand \coderead { O{} }
 {
     \group_begin:
+    \l_code_style_tl
     \CodeSetup{#1}    
     \dim_compare:nTF { \l_code_width_dim > 0pt }    
     {
@@ -4676,9 +4732,8 @@
 {
     \object_skip_before:n {\l_code_before_skip}
     \begin{minipage}[t]{\l_code_width_dim}
-        \begin{codebox}[beforeskip=0pt, afterskip=0pt]
-        \vspace{\l_code_raise_offset}\mbox{}
-        \l_code_font_tl
+        \begin{codebox}[beforeskip=0pt, afterskip=0pt, font=\l_code_fontsize_tl]
+        \vspace{\l_code_raise_offset}\mbox{}        
         \bool_if:NTF \g_minted_bool
         {                
             \inputminted{ latex }{ \tmpvrb }
@@ -4698,9 +4753,9 @@
     }{
         \dim_set:Nn \l_tmpa_dim { \l_code_raise_offset }
     }
-    \begin{codebox}
+    \begin{codebox}[beforeskip=\l_code_before_skip, afterskip=\l_code_after_skip]
     \vspace{\l_tmpa_dim}\mbox{}
-    \l_code_font_tl
+    \l_code_fontsize_tl
     \bool_if:NTF \g_minted_bool
     {                
         \inputminted{ latex }{ \tmpvrb }
@@ -4708,15 +4763,6 @@
         \verbatiminput{ \tmpvrb }
     }
     \end{codebox}     
-}
-
-\NewDocumentEnvironment { codewrite }{ }
-{
-    \group_begin:
-    \exp_args:Nx \verbatimoutput { \tmpvrb }
-}{
-    \endverbatimoutput
-    \group_end: 
 }
 
 \NewDocumentEnvironment { code }{ }
@@ -4730,8 +4776,6 @@
     \coderead
 }
 
-
-
 \NewDocumentEnvironment { coderesult }{ }
 {
     \group_begin:
@@ -4740,10 +4784,25 @@
     \endverbatimoutput
     \group_end: 
 
-    \coderead
+    \object_skip_before:n {\l_code_before_skip}
+    \begin{codebox}[beforeskip=0pt, afterskip=0pt]
+    \vspace{\l_code_raise_offset}\mbox{}
+    \l_code_fontsize_tl
+    \bool_if:NTF \g_minted_bool
+    {                
+        \inputminted{ latex }{ \tmpvrb }
+    }{            
+        \verbatiminput{ \tmpvrb }
+    }
+    \end{codebox}  
     \input{\tmpvrb}
+    \object_skip_after:n {\l_code_after_skip}
 }
 
+\NewDocumentCommand \codeinput {}
+{
+    \input{\tmpvrb}
+}
 
 \RenewDocumentCommand \verb {v} 
 {
@@ -4754,7 +4813,7 @@
 
 % \LineSpacing: reduce
 % \LineSpacing*: increase
-\NewDocumentCommand \LineSpacing { s O{\baselineskip} }
+\NewDocumentCommand \LineSpacing { s O{\onelineskip} }
 {
     \IfBooleanTF { #1 }
     {
@@ -4765,7 +4824,7 @@
     }
 }
 
-\NewDocumentCommand \EnlargePage { O{\baselineskip} }
+\NewDocumentCommand \EnlargePage { O{\onelineskip} }
 {
     \enlargethispage{#1}
 }
@@ -4782,7 +4841,7 @@
 
 \NewDocumentCommand \skiplines { O{1} }
 {
-    \vspace{#1\baselineskip}
+    \vspace{#1\onelineskip}
 }
 
 
@@ -5180,13 +5239,8 @@
 
 \@ifpackageloaded{minted}{
     \setminted{encoding=UTF8, fontsize=\small, tabsize=2, breaklines=true, linenos=false, frame=none}
-    \patchcmd{\FV@ListVSpace}{\@topsepadd\topsep}{\vspace{.25\baselineskip}}{}{}
+    \patchcmd{\FV@ListVSpace}{\@topsepadd\topsep}{\vspace{.25\onelineskip}}{}{}
 }{}
-
-\AtBeginDocument{    
-    \setlength{\verbatimindent}{0pt}
-    \renewcommand*{\verbatimbreakchar}{}
-}
 
 \LoadStyleset
 

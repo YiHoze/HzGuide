@@ -1,1 +1,9 @@
-obsolete/
+_minted-HzGuide/
+*.aux
+*.idx
+*.ind
+*.lof
+*.toc
+*.vrb
+*.gz
+*.log

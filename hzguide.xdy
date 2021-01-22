@@ -1,0 +1,4 @@
+(merge-rule "简" "간")
+(merge-rule "\macroprint{\(.*\)}" "\1~e" :again :bregexp)
+(merge-rule "\termindexprint{.*}{\(.*\)}" "\1~e" :again :bregexp)
+(merge-rule "?" "a~b")

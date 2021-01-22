@@ -1,0 +1,1251 @@
+% \documentclass[minted]{hzguide}
+\documentclass[pairquote]{hzguide}
+
+\setmainfont{Noto Serif CJK KR}[BoldFont={* Bold}]
+\setsansfont{Noto Sans CJK KR}[BoldFont={* Medium}]
+
+\IfLuatex{
+    \hangulpunctuations=0 
+    \setmonohangulfont{Noto Sans Mono CJK KR}[Scale=0.95]    
+}[
+    \disablekoreanfonts    
+    \setmonofont{D2Coding}
+]
+
+\LayoutSetup{
+    paper=A4, 
+    column=vartwo,
+    ulmargin=25mm,
+    ulratio=1.5,
+    hook={\setheadfoot{10mm}{15mm}}
+}
+\sloppy
+\DecolorHyperlinks[MidnightBlue]
+\HeadingSetup{
+    cftsection,
+    chapterstyle=tight,
+    cjkchapter,
+    chaptercolor=MidnightBlue, 
+    sectioncolor=MidnightBlue, 
+    sectionstyle={firm, rule},
+    paragraphstyle=indent,
+    linespacing=1.33
+}
+\PageStyleSetup{
+    headrule=false,
+    headouter={},
+    evenfootleft={\thepage\ |\quad \leftmark},
+    oddfootright={\rightmark\quad |\ \thepage},
+    sectionmark=true
+}
+
+\ObjectSetup{
+    beforeskip=.1\onelineskip, 
+    afterskip=.1\onelineskip,
+    align=\centering
+}   
+\CodeSetup{
+    beforeskip=.5\onelineskip,
+    afterskip=-.1\onelineskip
+}
+\BoundedBoxSetup{
+    beforeskip=.75\onelineskip,
+    afterskip=-.1\onelineskip
+}
+
+\RenewTerms{macros}{
+    labeltype=macro,
+    delimiter=\hfill,
+    labelwidth=4.75em,
+    leftmargin=5.35em,
+    style=\raggedright,
+}
+
+\IndexingEnable*
+
+\ExplSyntaxOn
+\NewDocumentCommand \keyvalue { v }
+{
+    \group_begin:
+        \ttfamily =~#1
+    \group_end:
+    \newline
+}
+\NewDocumentCommand \keyvalueTF {}
+{
+    \texttt{=~true/false}\newline    
+}
+\NewDocumentCommand \true {}
+{
+    \texttt{true}
+}
+\NewDocumentCommand \false {}
+{
+    \texttt{false}
+}
+
+\NewDocumentCommand \hzcls { m m }
+{
+    \inputminted[linenos=true, firstline=#1, lastline=#2]{latex}{../../../texmf/tex/latex/HzGuide/hzguide.cls}
+}
+\ExplSyntaxOff
+
+\AnnotateSetup{index}
+
+\CoverSetup{
+      AfterFront=\cleartorecto,
+    BeforeBack=\cleartoverso,
+    title={HzGuide},
+    subtitle={테크니컬 라이터를 위한 레이텍 클래스},
+    ProductImage = cover_image.jpg,
+    DocumentType={설명서},
+    PubYear=2021,
+    revision={Rev. 1},
+    note={\hfill 미니멀리즘의 목표는 사용자에게 요구되는 수고를 최소화하는 것이다.},
+    manufacturer={이호재\quad\email{yihoze@gmail.com}},
+    address={서울 문정동에서}
+}
+
+\begin{document}
+
+\frontmatter*
+
+\FrontCover
+% \begin{IfVartwoEnlarge}
+\TableOfContents*
+\ListOfFigures*
+% \end{IfVartwoEnlarge}
+
+\chapter{머리말}
+
+이 문서는 루아텍으로 만들어졌다.
+지텍으로 컴파일하면 소스 코드를 부여주는 부분에서 결과가 달라질 것이다.
+나는 루아텍을 선호한다. 
+지텍에 비해 조금 느리지만, 폰트 처리에서 더 합리적이기 때문이다.
+
+\mainmatter*
+
+\chapter{개요}
+
+\term{HzGuide} 클래스는 \term{memoir} 클래스에 기반하여 설명서 작성을 돕기 위한 목적으로 만들어졌다. 
+
+\section{클래스 옵션}
+
+메므와 클래스 옵션들과 함께 다음 옵션들을 사용할 수 있다.
+
+\begin{code}
+\documentclass[language=korean, styleset=../foo.tex, Noto]{hzguide}
+\end{code}
+
+\begin{macros}<hzguide>
+\item[language] \keyvalue{korean, english, chinese, czech, danish, dutch, finnish, german, italian, japanese, norwegian, polish, portugeue, russian, slovakian, spanish, swedish, turkish, TC}
+\macro{chinese}는 \term{간체}\annotate{简体}, \macro{TC}는 \term{번체}\annotate{繁體}이다.
+영어는 \verb{language=english} 대신 \verb{english}로 지정할 수 있다.
+언어에 따라 \macro{polyglossia} 또는 \macro{xeCJK} 패키지가 호출된다.
+
+\item[styleset] \keyvalue{foo.tex}
+지정된 설정 파일을 불러들인다.
+
+\item[Noto] \keyvalueTF
+Noto 폰트가 사용된다.
+
+\item[minted] \keyvalueTF
+\macro{minted} 패키지가 사용된다.. \macro{\coderead} 명령이 \macro{\verbatiminput} 대신 \macro{\inputminted}를 사용하게 된다.
+
+\item[pairquote] \keyvalueTF
+\macro{csquotes} 패키지가 사용된다.
+
+\item[template] \keyvalueTF
+\macro{hztemplate.tex}을 불러들인다. 설명서 초안을 만들기 위한 목적으로 설명서에 사용되는, 아래와 같은, 여러 요소들을 예시하는 명령들을 제공한다.
+
+\begin{code}
+\chapter{Introduction}\tplpara
+\section{Features}\tpllist
+\section{Package Items}\tplimagetable
+\section{Specifications}\tplspectables
+\end{code}
+\end{macros}
+
+\chapter{페이지}
+
+\section{판형}
+
+\macro{\LayoutSetup} 명령을 이용하여 판면과 여백을 설정할 수 있다.
+
+\begin{code}
+\LayoutSetup{
+    paper=A4, 
+    column=vartwo
+}
+\end{code}
+
+\begin{macros}<\LayoutSetup>
+\item[paper] \keyvalue{A4, A3, B5, A5, A5V, letter, 46D, slide, arbitrary}
+일반적인 규격에서 벗어나는 판형을 만들려면 \macro{arbitrary}를 지정하고, 아래 옵션들을 적절하게 설정하라.
+
+\item[stockwidth] \keyvalue{250mm}
+인쇄 용지의 폭. 재단선이나 반달 색인을 표시해야 할 때 페이지보다 넓은 크기가 지정되어야 한다.
+
+\item[stockheight] \keyvalue{353mm}
+인용 용지의 높이
+
+\item[paperwidth] \keyvalue{210mm}
+페이지 폭
+
+\item[paperheight] \keyvalue{297mm}
+페이지 크기
+
+\item[landscape] \keyvalueTF
+페이지가 가로 방향으로 바뀐다.
+
+\item[column] \keyvalue{one, vartwo} 
+\term{변이단}\annotate{變二段}으로 조판하려면 \macro{vartwo}를 지정하라.
+
+\item[ulmargin] \keyvalue{36mm}
+상단 여백
+
+\item[ulratio] \keyvalue{1.0}
+하단 여백을 결정할 배율을 지정하라. "2"를 지정하면 하단 여백이 상단 여백의 두 배가 된다.
+
+\item[lrmagin] \keyvalue{35mm}
+좌우 여백
+
+\item[vartwomargin] \keyvalue{20mm}
+변이단으로 조판할 때 오른쪽 여백. 왼쪽 여백은 오른쪽 여백의 세 배가 된다.
+
+\item[showtrims] \keyvalueTF
+재단선이 표시된다.
+
+\item[showlayout] \keyvalueTF
+여백 영역과 텍스트 영역의 테두리에 선이 그어진다.
+
+\item[hook] 
+\keyvalue{\setheadfoot{0mm}{5mm}}
+이 예와 같은 구획 명령을 이 설정에 끼워넣을 수 있다.
+\end{macros}
+
+\section{면주}
+
+\macro{\PageStyleSetup} 명령을 이용하여 면주 모양을 변경할 수 있다. \macro{\LayoutSetup} 명령이 이 명령을 이용한다.
+
+\begin{code}
+\PageStyleSetup{
+    headrule=true,
+    evenheadleft=\leftmark,
+    oddheadright=\rightmark,
+    evenfootleft=\thepage,
+    oddfootright=\thepage,
+    chaptermark=true,
+    sectionmark=true,
+}
+\end{code}
+
+\begin{macros}<\PageStyleSetup>
+\item[font] \keyvalue{\rmfamily\small}
+폰트
+
+\item[headleft] \keyvalue{\leftmark, \rightmark, \thepage, 텍스트}
+상단 왼쪽 
+
+\item[headcenter] 상단 가운데 
+\item[headright] 상단 오른쪽
+\item[headinner] 상단 안쪽 (왼쪽 페이지의 오른쪽과 오른쪽 페이지의 왼쪽)
+\item[headouter] 상단 바깥쪽 (왼쪽 페이지의 왼쪽과 오른쪽 페이지의 오른쪽)
+\item[footleft] 하단 왼쪽
+\item[footcenter] 하단 가운데 
+\item[footright] 하단 오른쪽 
+\item[footinner] 하단 안쪽
+\item[footouter] 하단 바깥쪽
+\item[evenheadleft] 왼쪽 페이지의 상단 왼쪽
+\item[evenheadcenter] 왼쪽 페이지의 상단 가운데
+\item[evenheadright] 왼쪽 페이지의 상단 오른쪽
+\item[oddheadleft] 오른쪽 페이지의 상단 왼쪽
+\item[oddheadcenter] 오른쪽 페이지의 상단 가운데
+\item[oddheadright] 오른쪽 페이지의 상단 오른쪽
+\item[evenfootleft] 왼쪽 페이지의 하단 왼쪽
+\item[evenfootcenter] 왼쪽 페이지의 하단 가운데
+\item[evenfootright] 왼쪽 페이지의 하단 오른쪽
+\item[oddfootleft] 오른쪽 페이지의 하단 왼쪽
+\item[oddfootcenter] 오른쪽 페이지의 하단 가운데
+\item[oddfootright] 오른쪽 페이지의 하단 오른쪽
+\item[headrule] \keyvalueTF 
+상단 가로선
+\item[footrule] \keyvalueTF 
+하단 가로선
+\item[chaptermark] \keyvalueTF 
+\macro{\chaptermark} 명령이 활성화된다.
+\item[sectionmark] \keyvalueTF 
+\macro{\sectionmark} 명령이 활성화된다.
+\item[chapterpage] \keyvalueTF 
+상단 면주가 장 페이지에도 적용된다.
+\end{macros}
+
+\section{장, 절, 문단}
+
+\macro{\HeadingSetup} 명령을 이용하여 장과 절 제목의 모양을 그리고 문단 모양을 변경할 수 있다. 
+
+\begin{code}
+\HeadingSetup{
+    linespacing=1.25,
+    chapterfont=\normalfont\bfseries,
+    sectioncolor=MidnightBlue, 
+    paragraphstyle=indent 
+}
+\end{code}
+
+\begin{macros}<\HeadingSetup>
+\item[linespacing] \keyvalue{1.25} 
+줄 간격. 이것은 \macro{\baselinestretch}를 설정하는 것과 같다.
+
+\item[article] \keyvalueTF
+\macro{article} 스타일이 적용된다. 이를테면 차례 제목이 절 수준으로 바뀐다.
+
+\item[chapterwider] \keyvalueTF
+변이단 조판에서 장 제목이 왼쪽 여백에서 시작되게 한다.
+
+\item[chapterstyle] \keyvalue{tight}
+장 스타일. 이것은 \macro{\chapterstyle}를 설정하는 것과 같다. 
+그러나 메므와 클래스에 정의된 여러 장 스타일들 가운데 일부에 대해서만 아래 옵션들이 유효할 것이다.
+\macro{tight} 스타일은 디폴트에서 줄 간격을 줄인 것에 불과하다.
+\macro{veelo} 같은 스타일을 이용하려면, \macro{\printerchaptername}을 비롯한 여러 매크로들을 재정의해야 한다.
+
+\item[cjkchapter] \keyvalueTF
+한국어에 대해서는 "제\,1\,장"이, 중국어와 일본어에 대해서는 "第\,1\,章"이 식자된다.
+
+\item[chapteralign] \keyvalue{\raggedleft, \centering, \raggedright}
+장 제목의 정렬
+
+\item[chapterfont] \keyvalue{\normalfont\bfseries}
+장 제목의 폰트
+
+\item[chaptercolor] \keyvalue{black}
+장 제목의 색
+
+\item[chapternamesize] \keyvalue{\huge}
+장 이름의 크기 
+
+\item[chapternumbersize] \keyvalue{\HUGE}
+장 번호의 크기
+
+\item[chaptertitlesize] \keyvalue{\Huge}
+장 제목의 크기 
+
+\item[nochaptername] \keyvalueTF 
+장 이름이 식자되지 않는다. "제"도 식자되지 않는다.
+
+\item[chaptercontents] \keyvalueTF
+장 제목 아래에 장 차례가 만들어진다.
+
+\item[sectionstyle] \keyvalue{firm, sparse, tight, multiline, rule}
+절 스타일. \macro{multiline}은 변이단 조판에서 절 제목의 둘째 줄이 들여쓰기 되는 것을 방지한다.
+두 가지 옵션을 함께, 이를테면 \macro{multiline}과 \macro{rule}을 동시에 지정할 수 있다.
+
+\item[sectionalign] \keyvalue{\raggedleft, \centering, \raggedright}
+절 제목의 정렬
+
+\item[sectionfont] \keyvalue{\normalfont\bfseries}
+절 제목의 폰트
+
+\item[sectioncolor] \keyvalue{black}
+절 제목의 색
+
+\item[sectionsize] \keyvalue{\Large}
+절 제목의 크기
+
+\item[subsectionsize] \keyvalue{\large}
+하위 절 제목의 크기
+
+\item[subsubsectionsize] \keyvalue{\normalsize}
+최하위 절 제목의 크기
+
+\item[paragraphstyle] \keyvalue{interval/indent}
+절 모양. 디폴트는 \macro{interval}이다. 이것은 들여쓰기 없이 문단 사이를 띄운다.
+설정에 따라 목록들의 항목 간격도 함께 조정된다.
+
+\item[parskip] \keyvalue{0.25\onelineskip}
+문단 간격. \macro{paragraphstyle} 옵션에 \macro{interval}을 지정했을 때 이 값이 유효하다.
+
+\item[parindent] \keyvalue{1em}
+들여쓰기 크기. \macro{paragraphstyle} 옵션에 \macro{indent}를 지정했을 때 이 값이 유효하다.
+\end{macros}
+
+\chapter{그림과 표}
+
+다른 종류의 문서들에 비해 설명서가 갖는 두드러진 특징들 중 하나는 그림과 표를 많이 포함한다는 것이고 그래서 그것들의 배치를 텍에 맡겨 놓기 곤란하다는 것이다.
+
+\section{문단 사이에 이미지}
+
+\macro{\image} 명령이 그림을 문단 사이에 둔다.
+
+\begin{coderesult}
+\image[scale=0.5]{uncertain}
+(초고에서 그림 자리를 보여주기 위한 이미지)<초고 이미지>
+\end{coderesult}
+
+\begin{code}
+\ImageSetup{옵션}
+\image*|[옵션]{이미지 파일}[다른 이미지 파일](그림 제목)<짧은 제목>
+\end{code}
+
+\begin{macros}<\ImageSetup>
+\item[beforeskip] \keyvalue{\hznulldim, 0.5\onelineskip}
+그림 위 간격. 값이 \macro{\hznulldim}이면 \macro{\ObjectSetup}으로 설정된 값이 사용된다.
+
+\item[afterskip] \keyvalue{\hznulldim, 0.5\onelineskip}
+그림 아래 간격. \macro{\hznulldim}이면 \macro{\ObjectSetup}으로 설정된 값이 사용된다.
+
+\item[gap] \keyvalue{1em}
+다른 이미지 파일이 주어졌을 때 두 이미지 사이 간격
+
+\item[align] \keyvalue{\raggedleft, \centering, \raggedright}
+이미지 정렬
+
+\item[float] \keyvalueTF
+이 옵션은 이미지를 \macro{figure} 환경에 넣는다. 다시 말해 그림의 위치가 텍에 의해 결정된다.
+
+\item[float-placement] \keyvalue{tbh}
+figure 환경을 이용하는 경우에 위치 옵션
+
+\item[frame] \keyvalueTF
+이미지 테두리에 선이 그어진다.
+
+\item[fitline] \keyvalueTF
+이미지가 \macro{fitwidth}에 설정된 폭에 맞게 늘어나거나 줄어든다.
+
+\item[fitwidth] \keyvalue{\linewidth}
+이미지 폭
+
+\item[flush] \keyvalueTF
+변이단 조판에서 이미지가 왼쪽 여백으로 넘어간다.
+
+\item[scale] \keyvalue{1.0}
+주어진 배율만큼 이미지가 확대되거나 축소된다.
+
+\item[landscape] \keyvalueTF
+이미지가 90도 회전한다. 그림 제목도 함께 회전한다.
+
+\item[middle] \keyvalueTF
+이미지가 주어진 공간에서 세로로 중간에 놓인다.
+
+\item[caption] \keyvalue{텍스트}
+그림 제목 
+
+\item[caption-short] \keyvalue{텍스트}
+그림 차례에 들어가는 짧은 그림 제목
+
+\item[caption-verb] \keyvalueTF
+기호 문자들을 백슬래시 없이 그대로\annotate{verbatim} 그림 제목에 사용할 수 있다.
+
+\item[caption-ignore] \keyvalueTF
+그림 제목이 식자되지 않는다.
+
+\item[caption-fit] \keyvalueTF
+그림 제목의 폭이 이미지 폭에 맞춰진다.
+
+\item[label] \keyvalue{텍스트}
+상호참조를 위한 라벨. 달리 지정하지 않으면 이미지 파일 이름이 라벨이 된다.
+
+\item[legend] \keyvalueTF
+그림 제목에 번호가 붙지 않는다.
+
+\item[showfilename] \keyvalueTF
+이미지 파일의 이름이 표시된다.
+
+\item[star] \keyvalue{옵션}
+이것은 기본 설정과 다른 작동을 허용하기 위한 목적으로 고안되었다.
+주어진 옵션이 별표(*)가 붙은 \macro{\image*}에 적용된다. 
+
+\begin{code}
+\ImageSetup{
+    frame=false, scale=1, landscape=false, ...
+    star={frame=true, scale=0.5, ...},
+    vbar={landscape=true, ...}
+}
+\image{foo} \image*{foo} \image|{foo} \image*|{foo}
+\end{code}
+
+\item[vbar] \keyvalue{옵션}
+\macro{star} 옵션과 마찬가지로, 주어진 옵션이 수직선(|)이 붙은 \macro{\image|}에 적용된다. 
+\end{macros}
+
+\macro{\listimg} 명령은 목록 환경에서 이미지를 삽입하기 위해 고안되었다. \macro{\image} 명령을 위한 전역 설정들 가운데 \macro{scale}과 \macro{showfilename} 옵션만이 이 명령에 적용된다.
+
+\begin{coderesult}
+\begin{enumerate}
+\item 이 명령의 주요 목적은 소프트웨어 설명서에서 어떤 조작에 따르는 결과를 보여주는 것이다.
+\listimg{uncertains}
+\item 윗 글줄과 이미지 사이의 간격을 옵션으로 지정할 수 있다.
+\listimg[-1ex]{uncertains}
+\end{enumerate}
+\end{coderesult}
+
+\section{설명 딸린 이미지}
+
+\macro{\illustimage} 명령 또는 \macro{IllustImage} 환경이 이미지와 설명문을 나란히 배치한다.
+
+\begin{coderesult}
+\begin{IllustImage}{uncertainm}
+이 환경은 주어진 이미지에 대한 짧은 설명문을 곁에 두기 위한 목적으로 고안되었다.
+\macro{wrapfigure} 환경과 달리, 글이 이미지 높이를 넘쳐도 이미지 아래로 흐르지 않는다.
+\end{IllustImage}
+\end{coderesult}
+
+\begin{code}
+\IllustImageSetup{옵션}
+\illustimage*^[옵션]{이미지 파일}(그림 제목){텍스트}
+\begin{IllustImage}*^[옵션]{이미지 파일}(그림 제목)
+설명문
+\end{IllustImage}
+\end{code}
+
+\begin{macros}<\IllustImageSetup>
+\item[beforeskip] \keyvalue{0.25\onelineskip}
+그림 위 간격
+
+\item[extraskip] \keyvalue{0.5\onelineskip}
+그림 위 간격. 
+이 값이 삿갓표(\verb{^})가 붙은  \macro{\illustimage^} 또는 \macro{\begin{IllustImage}^} 에 적용된다. 
+
+\item[afterskip] \keyvalue{0.25\onelineskip}
+그림 아래 간격
+
+\item[frame] \keyvalueTF
+이미지 테두리에 선이 그어진다.
+
+\item[gap] \keyvalue{1em}
+이미지와 설명문 사이 간격
+
+\item[scale] \keyvalue{1.0}
+주어진 배율만큼 이미지가 확대되거나 축소된다.
+
+\item[position] \keyvalue{left/right}
+\macro{right}를 지정하면 설명이 왼쪽에, 이미지가 오른쪽에 배치된다.
+
+\item[voffset] \keyvalue{0pt}
+이미지 상단과 설명문 상단을 정렬하기 위해 설명문 위에 추가되는 간격
+
+\item[valign] \keyvalue{t/c/b}
+이미지와 설명문의 정렬 기준 (상단, 가운데, 하단)
+
+\item[caption] \keyvalue{텍스트}
+그림 제목 
+
+\item[caption-verb] \keyvalueTF
+기호 문자들을 백슬래시 없이 그대로\annotate{verbatim} 그림 제목에 사용할 수 있다.
+
+\item[caption-ignore] \keyvalueTF
+그림 제목이 식자되지 않는다.
+
+\item[caption-align] \keyvalue{\raggedright, \centering, \raggedleft}
+그림 제목 정렬
+
+\item[label] \keyvalue{텍스트}
+상호참조를 위한 라벨. 달리 지정하지 않으면 이미지 파일 이름이 라벨이 된다.
+
+\item[legend] \keyvalueTF
+그림 제목에 번호가 붙지 않는다.
+
+\item[minwidth] \keyvalue{0pt}
+이미지 영역의 최소 폭. 0 포인트보다 큰 값이 지정되었을 때 유효하다.
+
+\item[imagealign] \keyvalue{\raggedright, \centering, \raggedleft}
+이미지 영역 안에서 이미지 정렬
+
+\item[broad] \keyvalueTF
+변이단 조판에서 이미지 영역이 왼쪽 여백으로 넘어간다.
+
+\item[showfilename]  \keyvalueTF
+이미지 파일의 이름이 표시된다.
+
+\item[textstyle] \keyvalue{\raggedright\small}
+설명문 스타일 
+
+\item[star] \keyvalue{옵션}
+이것은 기본 설정과 다른 작동을 허용하기 위한 목적으로 고안되었다.
+주어진 옵션이 별표가 붙은 \macro{\illustimage*} 또는 \macro{\begin{IllustImage}*} 에 적용된다. 
+
+\item[enum] \keyvalue{옵션}
+주어진 옵션이 \macro{\begin{IllustEnum}} 에 적용된다. 
+\end{macros}
+
+\macro{IllustEnum}은 설치 절차와 같은 순서를 나타내기 위한 목적으로 \macro{IllustImage}로부터 만들어진 환경이다.
+
+\begin{coderesult}
+\IllustImageSetup{enum=frame}
+\begin{IllustEnum}*{uncertainm}
+    \item 첫 단계를 나타내기 위해 별표를 붙인다.
+\end{IllustEnum}
+\begin{IllustEnum}^{uncertainm}
+    \item 삿갓표를 붙이면 \macro{star}에 부여된 옵션들이 적용된다.
+\end{IllustEnum}
+\end{coderesult}
+
+필요하다면 \macro{IllustImage}를 이용하여 다른 옵션들로 작동하는 환경들을 만들 수 있다.
+
+\begin{code}
+\tl_new:N \l_illust_item_options
+\NewDocumentCommand \IllustItemSetup { m }
+{
+    \tl_set:Nn \l_illust_item_options { #1 }
+}
+\NewDocumentEnvironment { IllustItem }{ O{} m +b }
+{
+    \group_begin:
+        \exp_args:No \IllustImageSetup{ \l_illust_item_options }
+        \illustimage[#1]{#2}
+        {
+            \begin{itemize}
+                #3
+            \end{itemize}   
+        }
+    \group_end:
+}{}
+\end{code}
+
+\section{글줄 안에 이미지}
+
+스마트폰 설명서를 만드는 데에서 성가신 일들 가운에 하나가 버튼이나 아이콘 같은 작은 이미지들을 그려 넣은 것이다. \macro{\img} 명령이 이를 위해 고안되었다.
+
+\begin{coderesult}
+\LineImageSetup{scale=0.75}
+이 버튼이 \img[-0.1ex]{button_menu} 흔히 메뉴를 가리킨다.
+\end{coderesult}
+
+\begin{code}
+\LineImageSetup{옵션}
+\image[높이]{이미지 파일}
+\end{code}
+
+\begin{macros}<\LineImageSetup>
+\item[scale] \keyvalue{1.0}
+주어진 배율만큼 이미지가 확대되거나 축소된다.
+
+\item[raise] \keyvalue{-0.25ex}
+이미지가 기준선\annotate{baseline}으로부터 주어진 크기만큼 올라가거나 내려간다.
+
+\item[showfilename] \keyvalueTF
+이미지 파일의 이름이 표시된다.
+\end{macros}
+
+\section{이미지 도구}
+
+텍으로 만들어진 문서를 인디자인 같은 다른 프로그램의 형식으로 옮겨야 할 때, 이미지 아래에 표시된 파일 이름이 이미지들을 식별하는 데에 도움이 된다.
+\macro{\ShowImageFilename} 명령은 \macro{\ImageSetup}과 \macro{\IllustImageSetup}에, \macro{\ShowImageFilename*}은 \macro{\LineImageSetup}까지 포함하여, \macro{showfilename} 옵션을 지시한다.
+
+\begin{code}
+\MakeAlbum*[이미지 배율]{foo.txt}
+
+foo.txt:
+image_01.jpg
+image_02.png
+image_03.pdf
+\end{code}
+
+\macro{\MakeAlubm}은, 위 예와 같이, 텍스트 파일로부터 이미지 목록을 읽고 차례로 이미지들을 삽입한다.
+\macro{\MakeAlbum*}은 이미지 파일의 이름을 식자하지 않는다.
+
+\section{표}
+
+\macro{Table} 환경이 표의 스타일을 제어한다.
+
+\begin{code}
+\TableSetup{옵션}
+\begin{Table}*|[옵션](표 제목)<각주>
+\begin{tabularx}{\linewidth}{lXX}
+...
+\end{tabularx}
+\end{Table}
+\end{code}
+
+각주를 다는 방법에 대해 \pageref{sec:SpecTable} 페이지 \titleref{sec:SpecTable}\을 보라.
+
+\begin{macros}<\TableSetup>
+\item[beforeskip] \keyvalue{\hznulldim, 0.5\onelineskip}
+표 위 간격. 값이 \macro{\hznulldim}이면 \macro{\ObjectSetup}으로 설정된 값이 사용된다.
+
+\item[afterskip] \keyvalue{\hznulldim, 0.5\onelineskip}
+표 아래 간격. \macro{\hznulldim}이면 \macro{\ObjectSetup}으로 설정된 값이 사용된다.
+
+\item[float] \keyvalueTF
+이 옵션은 표 내용을 \macro{table} 환경에 넣는다. 다시 말해 표의 위치가 텍에 의해 결정된다.
+
+\item[float-placement] \keyvalue{tbh}
+table 환경을 이용하는 경우에 위치 옵션
+
+\item[align] \keyvalue{\raggedleft, \centering, \raggedright}
+표 정렬
+
+\item[landscape] \keyvalueTF
+표가 90도 회전한다. 그림 제목도 함께 회전한다.
+
+\item[caption] \keyvalue{텍스트}
+표 제목 
+
+\item[label] \keyvalue{텍스트}
+상호참조를 위한 라벨
+
+\item[legend] \keyvalueTF
+표 제목에 번호가 붙지 않는다.
+
+\item[font] \keyvalue{\rmfamily}
+폰트 
+
+\item[fontsize] \keyvalue{\small}
+폰트 크기
+
+\item[footnotestyle] \keyvalue{arabic, fnsymbol}
+각주 번호 스타일
+
+\item[stretch] \keyvalue{1.0}
+줄 간격. 이것은 \macro{\arraystretch}를 설정하는 것과 같다.
+
+\item[rowcolor] \keyvalueTF
+줄 바탕이 번갈아 흰색과 회색이 된다.
+
+\item[star] \keyvalue{옵션}
+이것은 기본 설정과 다른 작동을 허용하기 위한 목적으로 고안되었다.
+주어진 옵션이 별표가 붙은 \macro{\begin{Table}*}에 적용된다. 
+
+\begin{code}
+\TableSetup{
+    rowcolor=true, fontsize=\small, ...,
+    star={rowcolor=false, ...},
+    vbar={font=\footnotesize, ...}
+}
+\begin{Table}
+\begin{Table}*
+\begin{Table}|
+\begin{Table}*|
+\end{code}
+
+\item[vbar] \keyvalue{옵션}
+\macro{star} 옵션과 마찬가지로, 주어진 옵션이 수직선이 붙은 \macro{\begin{Table}|}에 적용된다. 
+\end{macros}
+
+\subsection{제품 사양을 보여주는 표}
+\label{sec:SpecTable}
+
+\macro{SpecTable} 환경은 설명서에서 빈번하게 사용되는 표 형식 중 하나인 제품 사양을 보여주기 위한 장치이다. 
+\macro{\TableSetup}에 의한 전역 설정이 이 환경에 유효하다.
+
+\begin{code}
+\begin{SpecTable}*[옵션](표 제목)<각주>
+...
+\end{SpecTable}
+\end{code}
+
+\begin{coderesult}
+\begin{SpecTable}[rowcolor]<
+\footnotetext[1]{If the temperature inside the battery pack rises ...}
+\footnotetext[2]{As the degradation of batteries is accelerated ...}
+>
+Nominal voltage\footnotemark[1] & 51.8 V \\
+Operating voltage & 45.2 V to 58.1 V \\
+Nominal capacity\footnotemark[2] & 126 A·h \\
+Nominal energy & 6.4 kW·h \\
+\end{SpecTable}
+\end{coderesult}
+
+별표 옵션(\macro{\begin{SpecTable}*})을 사용하면 첫째 칼럼에 \texttt{l} 형식이 적용된다.
+
+\subsection{제품 구성품을 보여주는 표}
+
+\macro{ImageTable} 환경은 제품과 함께 제공되는 액세서리를 보여주기 위한 장치이다.
+\macro{\TableSetup}에 의한 전역 설정이 이 환경에도 적용된다.
+
+\begin{code}
+\begin{ImageTable}*<각주>
+...
+\end{ImageTable}
+\end{code}
+
+\begin{coderesult}
+\begin{ImageTable}
+\img{uncertains} & \img{uncertains} & \img{uncertains} \\
+액세서리 & 액세서리 & 액세서리 \\
+\end{ImageTable}
+\end{coderesult}
+
+별표 옵션(\macro{\begin{ImageTable}*})을 사용하면 칼럼 수가 둘로 줄어든다.
+
+\chapter{목록과 용어}
+
+\section{나열과 절차}
+
+\macro{itemize}와 \macro{enumerate} 환경을 사용할 때 메므와 클래스가 제공하는 \macro{\tightlist} 명령이나 \macro{enumitem} 패키지가 제공하는 \macro{noitemsep} 옵션을 사용하여 항목 간격을 줄일 수 있다.
+편의를 높이고자 별표를 사용하여 이를 지시할 수 있도록 \macro{itemize} 및 \macro{enumerate} 환경이 재정의되었다.
+ 
+\begin{code}
+\begin{enumerate}\tightlist
+\begin{itemize}[noitemsep]
+\begin{enumerate}*
+\begin{itemize}*
+\end{code}
+
+필요한 경우가 드물겠지만, \macro{\SetListStyle} 명령을 이용하여 이 두 환경에 서로 다른 스타일을 적용할 수 있다.
+
+\begin{code}
+\SetListStyle{
+    enumerate={\raggedright\small}
+    itemize={\sffamily}
+}
+\end{code}
+
+\section{정의 목록}
+
+애플리케이션 프로그램의 설정 옵션들과 같은 것들을 설명하는 데에 \macro{description} 환경이 사용된다. 
+\macro{enumitem} 패키지가 제공하는 \macro{\newlist} 명령을 이용하여 다른 형태의 정의 목록을 만들 수 있지만 흡족하지 않다.
+
+\macro{\NewTerms} 명령은 다양한 형태의 정의 목록을 만드는 장치이다.
+
+\begin{code}
+\TermsSetup[환경 이름]{옵션}
+\NewTerms{환경 이름}{옵션}
+\RenewTerms{환경 이름}{옵션}
+\end{code}
+
+\macro{\TermsSetup}에 환경 이름을 지정하지 않으면 \macro{\NewTerms}에 의해 만들어진 모든 환경에 주어진 설정이 적용된다.
+
+\begin{macros}<\TermsSetup>
+\item[labeltype] \keyvalue{default, singleline, multiline, macro, macrosingle}
+\macro{singleline}을 지정하면 표제어가 한 줄을 차지한다. 
+\macro{macro}는 백슬래시를 비롯한 기호 문자들을 허용한다.
+이 두 가지를 결합한 것이 \macro{macrosingle}이다.
+\macro{multiline}을 지정하면, 표제어가 주어진 폭보다 길 때 두 줄이 된다.
+
+\item[offset] \keyvalue{0em}
+중첩된 환경에서 하위 수준의 왼쪽 여백에 추가되는 길이
+
+\item[marker] \keyvalue{{{},\textbullet}}
+표제어 앞에 붙이는 기호 문자. 앞의 것이 상위 수준에, 뒤의 것이 하위 수준에 적용된다.
+
+\item[markersep] \keyvalue{0.5em}
+기호 문자 뒤의 간격
+
+\item[enumerate] \keyvalueTF
+기호 문자 대신 번호가 붙는다.
+
+\item[enummarker] \keyvalue{{\int_use:N \l_terms_int)\hskip\l_terms_marker_sep_skip}}
+번호 형식
+
+\item[base] \keyvalue{MM}
+주어진 문자의 길이 만큼 표제어 영역의 폭이 정해진다.
+
+\item[font] \keyvalue{\bfseries}
+표제어 폰트
+
+\item[color] \keyvalue{black}
+표제어 색
+
+\item[delimiter] \keyvalue{:\hfill}
+표제어 뒤에 구획 문자
+
+\item[labelwidth] \keyvalue{2em}
+표제어 영역의 폭
+
+\item[labelsep] \keyvalue{0.5em}
+표제어 뒤의 간격
+
+\item[itemindent] \keyvalue{0em}
+표제어 뒤에 들여쓰기 폭
+
+\item[leftmargin] \keyvalue{0pt}
+왼쪽 여백
+
+\item[index] \keyvalueTF
+표제어가 색인에 추가된다.
+
+\item[indexcategory] \keyvalue{단어}
+표제어가 색인에서 주어진 단어 아래에 들어간다.
+
+\item[indexsame] \keyvalueTF
+표제어가 색인에서 지정된 것과 동일한 폰트로 식자된다.
+
+\item[topsep] \keyvalue{1.25\onelineskip, 3ex}
+목록 위 간격
+
+\item[itemsep] \keyvalue{0.25\onelineskip, 1ex}
+항목들 사이 간격
+
+\item[style] \keyvalue{\raggedright, ...}
+설명문 스타일
+
+\item[beforelist] \keyvalue{\RuleBox, \FrameBox, ...}
+환경 앞에 추가되는 명령. 
+이를테면 이 옵션과 아래 옵션에 \macro{FrameBox} 환경의 시작 명령과 종료 명령을 지정함으로써 목록을 상자 안에 넣을 수 있다.
+
+\item[afterlist] \keyvalue{\endRuleBox, \endFrameBox, ...}
+환경 뒤에 추가되는 명령
+
+\item[star] \keyvalue{옵션}
+이것은 기본 설정과 다른 작동을 허용하기 위한 목적으로 고안되었다. 
+주어진 옵션이 별표가 붙은 \verb{\begin{LIST}*}에 적용된다.
+
+\item[vbar] \keyvalue{옵션}
+\macro{star} 옵션과 마찬가지로, 주어진 옵션이 수직선이 붙은 \verb{\begin{LIST}|}에 적용된다.
+
+\end{macros}
+
+\macro{\NewTerms} 명령으로 다음과 같은 환경들이 저마다의 목적으로 정의되어 있다.
+
+\begin{code}
+\begin{terms}*|[옵션](표제어 폭)<상위 색인> \item[] \end{terms}
+\begin{UI}*|[옵션](표제어 폭)<상위 색인> \item[] \end{UI}
+\begin{macros}*|[옵션](표제어 폭)<상위 색인> \item[] \end{macros}
+\begin{signs}*|[옵션](표제어 폭)<상위 색인> \item[] \end{signs}
+\end{code}
+
+\noindent "\verb{(MMMM)}"을 지정하는 것은 \verb{base=MMMM} 또는 \verb{labelwidth=4em}을 설정하는 것과 마찬가지이다.
+"\verb{<단어>}"를  지정하는 것은 \verb{indexcategory=단어}를 설정하는 것과 같다.
+
+\begin{macros}<\NewTerms>
+\item[terms] 전문 용어\annotate{jargon}
+\item[UI] 사용자 인터페이스 문자열
+\item[macros] 레이텍 명령들 또는 그것들의 옵션.\footnote{이 문서의 작성을 돕기 위해 만들어졌다.} 표제어가 두 단어 이상으로 이루어져 있다면 \macro{\item[{}]} 또는 \macro{\vitem{}}을 이용하라. 공백을 포함하는 표제어들은 색인에 포함되지 않는다.
+\item[signs] 안전 표지 같은 이미지. 이 환경에서 \verb{\item[]} 대신 \macro{\imgitem[]}을 사용해야 한다.
+\end{macros}
+
+\section{용어}
+\label{sec:term}
+
+\macro{\NewTerm} 명령을 이용하여 버튼 라벨 같은 말들을 강조하거나 색인에 넣는 명령들을 만들 수 있다.
+
+\begin{code}
+\TermSetup[명령 이름]{옵션}
+\NewTerm{명령 이름}{옵션}
+\RenewTerm{명령 이름}{옵션}
+\end{code}
+
+\macro{\TermSetup}에 명령 이름을 지정하지 않으면 \macro{\NewTerm}에 의해 만들어진 모든 명령에 주어진 설정이 적용된다.
+
+\begin{macros}<\TermSetup>
+\item[font] \keyvalue{\sffamily\bfseries}
+용어 폰트
+
+\item[color] \keyvalue{black}
+용어 색
+
+\item[index] \keyvalueTF
+용어가 색인에 추가된다.
+
+\item[indexsame] \keyvalueTF
+표제어가 색인에서 지정된 것과 동일한 폰트로 식자된다.
+
+\item[star] \keyvalue{옵션}
+이것은 기본 설정과 다른 작동을 허용하기 위한 목적으로 고안되었다. 
+주어진 옵션이 별표가 붙은 \verb{\TERM*}에 적용된다.
+
+\item[vbar] \keyvalue{옵션}
+\macro{star} 옵션과 마찬가지로, 주어진 옵션이 수직선이 붙은 \verb{\TERM|}에 적용된다.
+\end{macros}
+
+\macro{\NewTerm} 명령으로 다음과 같은 명령들이 저마다의 목적으로 정의되어 있다.
+
+\begin{code}
+\term*|[색인 정렬]{단어}[상위 색인]
+\ui*|[색인 정렬]{단어}[상위 색인]
+\mi*|[색인 정렬]{단어}[상위 색인]
+\end{code}
+
+\noindent \verb{\term[csharp]{C\#}[language]}는 \verb{\index{csharp@C\#}} 그리고 \verb{\index{language!csharp@C\#}}을 만들어낸다.
+
+\begin{macros}<\NewTerm>
+\item[\term] 전문 용어\annotate{jargon}
+\item[\ui] 사용자 인터페이스 문자열
+\item[\mi] 기기의 지시등이나 버튼에 표시된 문자열
+\end{macros}
+
+여러 \macro{\ui} 명령으로 이루어진 \macro{\menu} 명령은 메뉴 경로를 나타내기 위한 장치이다.
+
+\begin{coderesult}
+\menu[File][Preferences]{User Snippets}{latex.json}
+\end{coderesult}
+
+메므와 클래스에 정의된 \macro{\cmd} 명령을 이용하여 텍 명령을 식자할 수 있다.
+이 명령은 색인 정렬을 위한 구분자로 "\verb{@}" 대신 "\verb{?}"를 사용한다.
+
+\section{레이텍 명령}
+
+\macro{\macro} 명령이 레이텍 명령들이나 그것들의 옵션을 고정폭 폰트로 식자한다.
+
+\begin{code}
+\macro{\includegraphics}
+\macro{scale}
+\end{code}
+
+\section{첨자}
+
+\macro{\annotate} 명령은 \macro{\textsuperscript} 및 \macro{\textsubscript}를 대체하기 위해 고안되었다.
+
+\begin{code}
+\AnnoateSetup{옵션}
+\annotate*[옵션]{주석 텍스트}
+\anota*[옵션]{주석 텍스트}
+\end{code}
+
+\noindent \macro{\anota}는 \macro{\annotate}의 다른 이름이다.
+
+\begin{macros}
+\item[breakable] \keyvalueTF
+이 옵션이 false이면 \verb{\textsuperscript}와 \verb{\textsubscript}가 사용된다. 이것은 줄 나눔이 허용되지 않는다는 것을 의미한다.
+
+\item[superscript] \keyvalueTF
+true이면 위 첨자로, false이면 아래 첨자로 식자된다.
+
+\item[opening] \keyvalue{(}
+주석 앞에 오는 문장 부호나 기호 문자
+
+\item[closing] \keyvalue{)}
+주석 뒤에 오는 문장 부호나 기호 문자
+
+\item[font] \keyvalue{\scriptsize}
+주석 폰트
+
+\item[color] \keyvalue{darkgray}
+주석 색
+
+\item[space] \keyvalue{\thinspace}
+주석 앞과 뒤에 오는 공백 문자
+
+\item[raise] \keyvalue{0.75ex}
+주석이 기준선으로부터 주어진 크기만큼 올라간다.
+\macro{superscript} 옵션이 \false이면 내려간다.
+
+\item[index] \keyvalueTF
+주석이 색인에 추가된다.
+
+\item[star] \keyvalue{옵션}
+이것은 기본 설정과 다른 작동을 허용하기 위한 목적으로 고안되었다.
+주어진 옵션이 별표가 붙은 \macro{\annotate*}에 적용된다.
+\end{macros}
+
+\section{색인}
+
+HzGuide 클래스는, 다양한 언어들의 조판을 목적으로 하기 때문에, 색인 정렬에 \term{texindy}를 사용할 것을 권장한다.
+
+\begin{code}
+\IndexingEnable*
+\IndexingDisable
+\BookmarkIndexHead
+\end{code}
+
+\macro{\IndexingEnalbe}은 앞에서 설명한 색인을 지원하는 명령과 환경들의 \macro{index} 옵션을 \true로 변경한다.
+
+\begin{itemize}*
+\item \macro{\NewTerm} 명령에 의해 만들어진 명령들
+\item \macro{\NewTerms} 명령에 의해 만들어진 환경들
+\item \macro{\annotate} 명령
+\item \macro{\macro} 명령
+\end{itemize}
+
+\macro{\BookmarkIndexHead} 명령은 색인 페이지에서 한글 자모 또는 알파벳을 가리키는 북마크를 PDF에 추가한다.
+별표가 붙은 \macro{\IndexingEnable*} 명령이 \macro{\BookmarkIndexHead} 명령을 호출한다.
+
+대부분의 경우에 \term{makeindex}나 \term{komkindex}가 문제를 일으키지 않을 것이다. 
+그러나 \macro{\macro} 명령이나 \macro{macros} 환경을 이용하여 "\verb{@}"\annotate{at sign}가 포함된 레이텍 명령어를 색인에 넣고자 할 때에는 다음과 같은 모듈과 함께 \term{texindy} 또는 \term{xindy}를 사용해야 한다.
+
+\begin{code}
+(merge-rule "\macroprint{\(.*\)}" "\1~e" :again :bregexp)
+(merge-rule "\termindexprint{.*}{\(.*\)}" "\1~e" :again :bregexp)
+(merge-rule "?" "a~b")
+\end{code}
+
+\chapter{박스와 경고문}
+
+\macro{tcolorbox} 패키지에 기반하여 여러 모양의 박스들이 정의되어 있다.
+
+\begin{FrameBox}
+\begin{verbatim}
+\begin{FrameBox} \end{FrameBox}
+\end{verbatim}
+\end{FrameBox} 
+\bigskip
+
+\begin{LeftBarBox}
+\begin{verbatim}
+\begin{LeftBarBox} \end{LeftBarBox}
+\end{verbatim}
+\end{LeftBarBox} 
+\bigskip
+
+\begin{RightBarBox}
+\begin{verbatim}
+\begin{RightBarBox} \end{RightBarBox}
+\end{verbatim}
+\end{RightBarBox} 
+\bigskip
+
+\begin{ShadeBox}[제목]
+\begin{verbatim}
+\begin{ShadeBox}[제목] \end{ShadeBox}
+\end{verbatim}
+\end{ShadeBox} 
+\bigskip
+
+\begin{ShadowBox}[제목]
+\begin{verbatim}
+\begin{ShadowBox}[제목] \end{ShadowBox}
+\end{verbatim}
+\end{ShadowBox} 
+\bigskip
+
+\begin{RuleBox}
+\begin{verbatim}
+\begin{RuleBox} \end{RuleBox}
+\end{verbatim}
+\end{RuleBox} 
+\bigskip
+
+\begin{TabBox}[제목]
+\begin{verbatim}
+\begin{TabBox}[제목] \end{TabBox}
+\end{verbatim}
+\end{TabBox}
+
+\macro{\NewBoundedBox} 명령이 이 박스들을 활용하는 환경들을 만들어낼 수 있다.
+
+\begin{code}
+\BoundedBoxSetup[환경 이름]{옵션}
+\NewBoundedBox{환경 이름}{옵션}
+\RenewBoundedBox{환경 이름}{옵션}
+\end{code}
+
+\macro{\BoundedBoxSetup}에 환경 이름을 지정하지 않으면 \macro{\NewBoundedBox}에 의해 만들어진 모든 환경에 주어진 설정이 적용된다.
+
+\begin{macros}<\BoundedBoxSetup>
+\item[beforeskip] \keyvalue{\hznulldim, 0.25\onelineskip}
+박스 위 간격. 값이 \macro{\hznulldim}이면 \macro{\ObjectSetup}으로 설정된 값이 사용된다.
+
+\item[extraskip] \keyvalue{-0.5\onelineskip}
+그림 위 간격.
+이 값이 삿갓표(\verb{^})가 붙은 \verb{\begin{BOX}^}에 적용된다. 
+
+\item[afterskip] \keyvalue{\hznulldim, 0.25\onelineskip}
+박스 아래 간격. \macro{\hznulldim}이면 \macro{\ObjectSetup}으로 설정된 값이 사용된다.
+
+\item[type] \keyvalue{FrameBox, LeftBarBox, RightBarBox, ShadeBox, ShadowBox, RuleBox, TabBox}
+박스 모양. 디폴트는 \macro{ShadeBox}이다.
+
+\item[symbol] \keyvalue{\img{foo}\space}
+제목 앞에 오는 이미지 
+
+\item[signal] \keyvalue{표어}
+특정한 목적을 위해 문서 전반에 걸쳐 사용되는 "경고"나 "주의" 같은 경고문 표어
+
+\item[beforesignal] \keyvalue{<, \space}
+제목 앞에 오는 문자
+
+\item[aftersignal] \keyvalue{>, \space}
+제목 뒤에 오는 문자
+
+\item[style] \keyvalue{\raggedright}
+문단 스타일
+
+\item[titlefont] \keyvalue{\bfseries}
+제목 폰트
+
+\item[breakable-default] \keyvalueTF
+이 옵션이 \true이면 박스의 쪽 나눔이 허용된다.
+
+\item[breakable-adhoc] \keyvalueTF
+이 옵션은 \macro{breakable-default}에 설정된 것과 반대로 설정되어야 한다.
+이 설정이 별표가 붙은 \verb{\begin{BOX}*}에 적용된다.
+\end{macros}
+
+\macro{\NewBoundedBox} 명령으로 다음과 같은 환경들이 저마다의 목적으로 정의되어 있다.
+
+심각성에 따른 경고문\annotate{admonition} 유형들은 \term{IEC/ISO 82079}나 \term{ASD-STE100} 같은 표준에 따라 약간 다르다.
+
+\begin{danger}
+\term{위험}은 사망이나 심각한 부상을 초래하는 상황을 가리킨다.
+\macro{danger} 환경이 이렇게 정의되어 있다.
+\begin{verbatim}
+\NewBoundedBox{danger}{
+    signal=\g_admonition_danger_tl, symbol={\img{AlertSymbol}~}
+}
+\end{verbatim}
+\end{danger}
+
+\begin{warning}
+\term{경고}는 사망이나 심각한 부상을 초래할 수 있는 상황을 가리킨다.
+\macro{warning} 환경이 이렇게 정의되어 있다.
+\begin{verbatim}
+\NewBoundedBox{warning}{
+    signal=\g_admonition_warning_tl, symbol={\img{AlertSymbol}~}
+}
+\end{verbatim}
+\end{warning}
+
+\begin{caution}
+\term{주의}\annotate{caution}는 경미한 부상한 초래하는 상황을 가리킨다.
+\macro{caution} 환경이 이렇게 정의되어 있다.
+\begin{verbatim}
+\NewBoundedBox{caution}{signal=\g_admonition_caution_tl}
+\end{verbatim}
+\end{caution}
+
+\begin{notice}
+\term{주의}\annotate{notice}는 물적 피해를 초래하는 상황을 가리킨다.
+\macro{notice} 환경이 이렇게 정의되어 있다.
+\begin{verbatim}
+\NewBoundedBox{notice}{signal=\g_admonition_notice_tl}
+\end{verbatim}
+\end{notice}
+
+\begin{note}
+\term{참고}는 주로 절차에서 추가 정보를 제공한다.
+\macro{note} 환경이 이렇게 정의되어 있다.
+\begin{verbatim}
+\NewBoundedBox{note}{signal=\g_admonition_note_tl}
+\end{verbatim}
+\end{note}
+
+\begin{reference}
+\macro{reference} 환경은 파일 경로 같은 것을 예시하기 위한 것으로 이렇게 정의되어 있다.
+\begin{verbatim}
+\NewBoundedBox{reference}{style=\small}
+\end{verbatim}
+\end{reference}
+
+\macro{\RenewTColorBox} 명령을 이용하여 이 박스들을 재정의할 수 있다.
+
+\begin{code}
+\RenewTColorBox{ShadeBox}{ s O{} }
+{
+    ... 
+    title=#2, 
+    IfBooleanTF={#1}{...}{...}
+}
+\end{code}
+
+또한 다음과 같이 새로운 박스를 만들고 그 박스를 이용하는 환경을 만들 수 있다.
+
+\begin{code}
+\NewTColorBox{MyBox}{ s O{} }
+{
+    ...
+}
+\NewBoundedBox{MyBoxEnv}{
+    type=MyBox,
+    ...
+}
+\end{code}
+
+\macro{\RenewBoundedBox} 명령을 이용하여 \term{경고문 표어}\annotate{signal word}들을 변경하는 것이 번거롭기 때문에 \macro{\AdmonitionSetup} 명령이 고안되었다.
+이를테면, \macro{language} 클래스 옵션에 \verb{german}이 지정되면 다음과 같은 선언이 발효된다.
+
+\begin{code}
+\AdmonitionSetup{
+    danger=GEFAHR,
+    warning=WARNUNG,
+    caution=VORSICHT,
+    notice=HINWEIS, 
+    note=ANMERKUNG
+}
+\end{code}
+
+\printindex
+
+\BackCover
+
+\end{document}
