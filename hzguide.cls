@@ -446,8 +446,7 @@
             caution=주의,
             notice=주의, %알림
             note=참고            
-        }
-        \ProblemSetup{name={}}
+        }        
     }
 }
 
@@ -1377,7 +1376,7 @@
         \dim_set:Nn \trimtop {\stockheight-\paperheight}
         \dim_set:Nn \trimedge {\stockwidth-\paperwidth}
         \settrims{.5\trimtop}{.5\trimedge}
-        \renewcommand*{\shipout}{\afterassignment\mem@shipi\setbox\@cclv=}
+        \AddToHook{shipout/background}[./trimmarks]{\ifshowtrims\put(0,0){\trimmarks}\fi}
 		\quarkmarks %\trimLmarks
     }{
         \showtrimsoff
@@ -1409,7 +1408,7 @@
 {
     \layout_column_one:
     \folio_common:
-    \SetObjectAlign{\raggedright}
+    \object_align:n {\raggedright}
 }
 
 \cs_new:Nn \layout_settle_vartwo:
@@ -1417,7 +1416,7 @@
     \layout_column_vartwo:
     \folio_vartwo:    
     % \tl_set:Nn \chapteralign {\raggedleft}
-    \SetObjectAlign{\raggedright}
+    \object_align:n {\raggedright}
 }
 
 \cs_new:Nn \layout_settle_slide:
@@ -1425,7 +1424,7 @@
     \layout_slide:
     \pagestyle{empty}
     \copypagestyle{chapter}{plain}
-    \SetObjectAlign{\centering}
+    \object_align:n {\centering}
 }
 
 \cs_new:Nn \layout_settle_arbitrary:
@@ -1436,7 +1435,7 @@
     \makeoddfoot{plain}{}{\hffont\thepage}{}
     \pagestyle{plain}
     \copypagestyle{chapter}{plain}
-    \SetObjectAlign{\centering}
+    \object_align:n {\centering}
 }
 
 % headings and paragraphs * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -1764,7 +1763,7 @@
 
     \bool_if:NT \g_chapter_contents_bool
     {
-        \EnableChapterContents
+        \ChapterContentsEnable
     }
 }
 
@@ -1851,9 +1850,17 @@
 }
 
 \makechapterstyle{tight}{
+    \chapterstyle{default}
     \setlength{\beforechapskip}{3\onelineskip}
     \setlength{\midchapskip}{.5\onelineskip}
     \setlength{\afterchapskip}{2\onelineskip}        
+}
+
+\makechapterstyle{sparse}{
+    \chapterstyle{default}
+    \setlength{\beforechapskip}{5\onelineskip}
+    \setlength{\midchapskip}{\onelineskip}
+    \setlength{\afterchapskip}{4\onelineskip}        
 }
 
 % heading utilities -----------------------------------------------
@@ -1935,7 +1942,7 @@
     top=0pt, bottom=0pt, left=0pt, right=0pt
 }
 
-\NewDocumentCommand \SetObjectAlign { m }
+\cs_new:Npn \object_align:n #1
 {
     \CaptionSetup{ align-short=#1, align=#1 }
     \ImageSetup{ align=#1 }
@@ -1947,7 +1954,7 @@
     beforeskip  .skip_set:N = \g_object_before_skip,
     afterskip   .skip_set:N = \g_object_after_skip,
     framecolor  .tl_set:N = \g_object_frame_color,
-    align       .code:n = { \SetObjectAlign{ #1 } }
+    align       .code:n = { \object_align:n {#1} }
 }
 
 \dim_new:N \hznulldim
@@ -2023,7 +2030,6 @@
     \captiontitlefont{ \g_caption_font_tl }
     \captiondelim{ \g_caption_delimiter_tl }
     \captionstyle[\g_caption_align_short_tl]{ \g_caption_align_tl }
-    %\captionstyle{ \g_caption_align_tl }
 }
 
 \CaptionSetup{
@@ -3804,6 +3810,7 @@
 		breakable=\l_bbox_breakable_default_tl
 	}
 }
+
 \NewTColorBox{LeftBarBox}{ s O{} }
 {
     before~skip=0pt, after~skip=0pt, breakable=false, after={\par\normalcolor},
@@ -3816,13 +3823,12 @@
 		breakable=\l_bbox_breakable_default_tl
 	}
 }
-
 \NewTColorBox{RightBarBox}{ s O{} }
 {
     before~skip=0pt, after~skip=0pt, breakable=false, after={\par\normalcolor},
     colframe=white, colback=white, arc=0ex, boxrule=0pt,
-    boxsep=0pt,  top=0pt, bottom=0pt, left=3em, right=1.5em,
-    borderline~east={1.5pt}{0pt}{gray}, 
+    boxsep=0pt,  top=0pt, bottom=0pt, left=1.5em, right=1.5em,
+    borderline~east={1.5pt}{0pt}{orange}, 
 	IfBooleanTF={#1}{
 		breakable=\l_bbox_breakable_adhoc_tl
 	}{
@@ -4029,57 +4035,12 @@
 \NewBoundedBox{note}{signal=\g_admonition_note_tl}
 \NewBoundedBox{reference}{style=\small}
 \NewBoundedBox{codebox}{style=\small}
-
-% Troubleshooting ----------------------------------------------
-
-\tl_new:N \ProblemListName
-\newlistof{listofproblems}{lop}{\ProblemListName}
-\newlistentry{problemsection}{lop}{0}
-\newlistentry{problem}{lop}{1}
-\setcounter{lopdepth}{2}
-\renewcommand\cftproblemsectionfont{\bfseries}
-\renewcommand\cftproblemsectionpagefont{\bfseries}
-\renewcommand{\cftproblemsectiondotsep}{2000}
-\renewcommand{\cftproblemdotsep}{5}
-\cftsetindents{problem}{2.5em}{0em}
-
-\keys_define:nn { problem }
-{
-    name  .tl_set:N = \ProblemListName,
-    style  .code:n = { \renewcommand\@lopmaketitle{#1} }
-}
-
-\NewDocumentCommand \problemsection { m }
-{
-    \section{#1}
-    \addcontentsline{lop}{problemsection}{#1}
-}
-
-\NewDocumentCommand \problem { s m }
-{
-    \IfBooleanTF {#1}
-    { 
-        \subsection*{#2} 
-    }{ 
-        \subsubsection*{#2} 
-    }
-    \addcontentsline{lop}{problem}{#2}
-}
-
-\NewDocumentCommand \ProblemSetup { m }
-{
-    \keys_set:nn { problem } { #1 }
-}
-
-\ProblemSetup{
-    name = {Problems},
-    style = \section*{\ProblemListName}
-}
+\NewBoundedBox{example}{type=RightBarBox, style=\small}
 
 % document cover * * * * * * * * * * * * * * * * * * * * * * * * *
 \keys_define:nn { cover }
 {
-    TopSkip             .skip_set:N = \cover_top_skip,
+    topskip             .skip_set:N = \cover_top_skip,
     FrontLogoImage      .tl_set:N = \cover_image_logo_front,	
     BackLogoImage       .tl_set:N = \cover_image_logo_back,	
     ProductImage        .tl_set:N = \cover_image_product,
@@ -4115,7 +4076,7 @@
 \tl_set:Nn \cover_pub_year { \int_to_arabic:n {\c_sys_year_int} }
 
 \CoverSetup{
-    TopSkip = .1\textheight,
+    topskip = .1\textheight,
     FontI = \sffamily\bfseries\color{darkgray},
     FontII = \sffamily\bfseries\color{darkgray},
     FontSizeI = \Huge,
@@ -4621,7 +4582,8 @@
     width       .dim_set:N = \l_code_width_dim,
     offset      .skip_set:N = \l_code_raise_offset,
     beforeskip  .skip_set:N = \l_code_before_skip,
-    afterskip    .skip_set:N = \l_code_after_skip
+    afterskip    .skip_set:N = \l_code_after_skip,
+    language    .tl_set:N = \l_code_language_tl
 }
 
 \cs_new:Npn \code_verbatim_font:n #1
@@ -4662,7 +4624,8 @@
     offset=-\onelineskip,    
     beforeskip=\hznulldim, % available only for codedesc and \code_read_minipage:
     afterskip=\hznulldim,
-    style={ \setSpacing{1.1} }
+    style=\setSpacing{1.1},
+    language=latex
 }
 
 \NewDocumentEnvironment { codewrite }{ }
@@ -4758,14 +4721,14 @@
     \l_code_fontsize_tl
     \bool_if:NTF \g_minted_bool
     {                
-        \inputminted{ latex }{ \tmpvrb }
+        \inputminted{ \l_code_language_tl }{ \tmpvrb }
     }{            
         \verbatiminput{ \tmpvrb }
     }
     \end{codebox}     
 }
 
-\NewDocumentEnvironment { code }{ }
+\NewDocumentEnvironment { code }{}
 {
     \group_begin:    
     \exp_args:Nx \verbatimoutput { \tmpvrb }
@@ -4776,7 +4739,7 @@
     \coderead
 }
 
-\NewDocumentEnvironment { coderesult }{ }
+\NewDocumentEnvironment { coderesult }{}
 {
     \group_begin:
     \exp_args:Nx \verbatimoutput { \tmpvrb }
@@ -4784,19 +4747,10 @@
     \endverbatimoutput
     \group_end: 
 
-    \object_skip_before:n {\l_code_before_skip}
-    \begin{codebox}[beforeskip=0pt, afterskip=0pt]
-    \vspace{\l_code_raise_offset}\mbox{}
-    \l_code_fontsize_tl
-    \bool_if:NTF \g_minted_bool
-    {                
-        \inputminted{ latex }{ \tmpvrb }
-    }{            
-        \verbatiminput{ \tmpvrb }
-    }
-    \end{codebox}  
-    \input{\tmpvrb}
-    \object_skip_after:n {\l_code_after_skip}
+    \code_read:
+    \begin{example}
+    \input{\tmpvrb}        
+    \end{example}    
 }
 
 \NewDocumentCommand \codeinput {}
@@ -4844,24 +4798,48 @@
     \vspace{#1\onelineskip}
 }
 
-
-\NewDocumentCommand \EnableChapterContents {}
+%\ChapterContentsEnable(chapter)[section depth]
+\NewDocumentCommand \ChapterContentsEnable { d() O{2} }
 {
     \newcounter{tocmarker} 
     \renewcommand\mempreaddchaptertotochook{ \cftinserthook{toc}{end-\thetocmarker} }
     \renewcommand\mempostaddchaptertotochook{ \stepcounter{tocmarker} \cftinserthook{toc}{start-\thetocmarker} }
     \let\normalchangetocdepth\changetocdepth
-    \renewcommand\memendofchapterhook{
-        \begingroup
+    \IfValueTF {#1}
+    {
+        \renewcommand\memendofchapterhook{
+            \int_compare:nTF { \value{chapter} = #1 }
+            {
+                \ChapterContents{#2}
+            }{}
+        }
+    }{
+        \renewcommand\memendofchapterhook{
+            \ChapterContents{#2}
+        }
+    }
+}
+
+\NewDocumentCommand \ChapterContents { m }
+{
+    \begingroup
         \setcounter{@memmarkcntra}{\value{tocdepth}}
         \let\changetocdepth\@gobble
         \normalchangetocdepth{-10}
-        \cftinsertcode{start-\thetocmarker}{\normalchangetocdepth{2}}
+        \cftinsertcode{start-\thetocmarker}{\normalchangetocdepth{#1}}
         \cftinsertcode{end-\thetocmarker}{\normalchangetocdepth{-10}}
         \let\printtoctitle\@gobble
+        \renewcommand\@tocmaketitle{}
         \tableofcontents*\bigskip
-        \endgroup
-        \setcounter{tocdepth}{\value{@memmarkcntra}}
+    \endgroup
+    \setcounter{tocdepth}{\value{@memmarkcntra}}
+}
+
+\NewDocumentCommand \ChapterContentsDisable {}
+{
+    \renewcommand\memendofchapterhook{
+        \cftinsertcode{start-\thetocmarker}{}
+        \cftinsertcode{end-\thetocmarker}{}
     }
 }
 
@@ -4914,7 +4892,6 @@
 
 \NewDocumentCommand \watermark { m }
 {
-    \ClearWatermark
     \WatermarkSetup {#1}
     \bool_if:NTF \l_watermark_text_type
     {
@@ -4927,7 +4904,7 @@
 \cs_new:Nn \watermark_text:
 {
     \AddToShipoutPictureBG
-    {
+    {        
         \dim_set:Nn \unitlength {1mm}
         \put(\l_watermark_x, \l_watermark_y)
         {
@@ -4963,6 +4940,11 @@
 \NewDocumentCommand \ClearWatermark {}
 {
     \ClearShipoutPictureBG
+    \bool_if:NT \g_thumbindex_active_bool
+    {
+        \int_decr:N \l_thumbindex_int
+        \thumbindex
+    }
 }
 
 % thumb index -----------------------------------------
@@ -4989,6 +4971,7 @@
     bgcolor   .tl_set:N = \l_thumbindex_bgcolor,
     style     .tl_set:N = \l_thumbindex_style,
     content   .tl_set:N = \l_thumbindex_content,
+    vertical  .bool_set:N = \l_thumbindex_vertical_bool
 }
 
 \cs_new:Npn \thumbindex_origin:n #1
@@ -5005,21 +4988,41 @@
     \int_sub:Nn \l_thumbindex_x { \fp_to_int:n { \dim_to_decimal_in_unit:nn {\l_thumbindex_width} {1mm} } }
     \int_add:Nn \l_thumbindex_x { \fp_to_int:n { \dim_to_decimal_in_unit:nn {\l_thumbindex_xoffset} {1mm} } }
     \int_set:Nn \l_thumbindex_height_int { \fp_to_int:n { \dim_to_decimal_in_unit:nn {\l_thumbindex_height} {1mm} } }
-    \tl_set:Nn \l_thumbindex_label
+
+    \bool_if:NTF \l_thumbindex_vertical_bool
     {
-        \colorbox{\l_thumbindex_bgcolor}{
-            \parbox[c][\l_thumbindex_height]{\l_thumbindex_width}{
-                \color{\l_thumbindex_fgcolor}
-                \l_thumbindex_style \l_thumbindex_content
+        \tl_set:Nn \l_thumbindex_label
+        {
+            \int_if_odd:nT {\value{page}}
+            {
+                \rotatebox{-90}{
+                    \colorbox{\l_thumbindex_bgcolor}{
+                        \parbox[c][\l_thumbindex_height]{\l_thumbindex_width}{
+                            \color{\l_thumbindex_fgcolor}
+                            \l_thumbindex_style \l_thumbindex_content
+                        }
+                    }
+                }
+            }
+        }    
+    }{    
+        \tl_set:Nn \l_thumbindex_label
+        {
+            \int_if_odd:nT {\value{page}}
+            {
+                \colorbox{\l_thumbindex_bgcolor}{
+                    \parbox[c][\l_thumbindex_height]{\l_thumbindex_width}{
+                        \color{\l_thumbindex_fgcolor}
+                        \l_thumbindex_style \l_thumbindex_content
+                    }
+                }
             }
         }
     }
-    \renewcommand\chaptermark[1]{\markboth{##1}{}\thumbindex}
 }
 
 \NewDocumentCommand \thumbindex {}
 {
-    \ClearWatermark
     \int_set:Nn \l_thumbindex_y { \l_thumbindex_origin - (\l_thumbindex_height_int + \l_thumbindex_interval) * \l_thumbindex_int }
     \int_compare:nTF { \l_thumbindex_y < \l_thumbindex_boffset } {
         \int_set:Nn \l_thumbindex_y { \l_thumbindex_origin }
@@ -5027,9 +5030,40 @@
     }{
         \int_incr:N \l_thumbindex_int
     }
-    \watermark{x=\l_thumbindex_x, y=\l_thumbindex_y, text=\l_thumbindex_label}
+
+    \AddToShipoutPictureBG
+    {        
+        \dim_set:Nn \unitlength {1mm}
+        \put(\l_thumbindex_x, \l_thumbindex_y)
+        {
+            \l_thumbindex_label
+        }
+    }
 }
-\let\ClearThumbIndex\ClearWatermark
+
+\bool_new:N \g_thumbindex_active_bool
+\NewDocumentCommand \ThumbIndexEnable {}
+{
+    \bool_if:NTF \g_ps_chaptermark_bool
+    {
+        \renewcommand\chaptermark[1]{\markboth{##1}{##1}\thumbindex}
+    }{
+        \renewcommand\chaptermark[1]{\thumbindex}
+    }
+    \bool_gset_true:N \g_thumbindex_active_bool
+}
+
+\NewDocumentCommand \ThumbIndexDisable {}
+{
+    \ClearShipoutPictureBG
+    \bool_if:NTF \g_ps_chaptermark_bool
+    {
+        \renewcommand\chaptermark[1]{\markboth{##1}{##1}}
+    }{
+        \renewcommand\chaptermark[1]{}
+    }
+    \bool_gset_false:N \g_thumbindex_active_bool
+}
 
 \ExplSyntaxOff
 
@@ -5238,8 +5272,15 @@
 \renewcommand{\figurerefname}{\figurename}
 
 \@ifpackageloaded{minted}{
-    \setminted{encoding=UTF8, fontsize=\small, tabsize=2, breaklines=true, linenos=false, frame=none}
-    \patchcmd{\FV@ListVSpace}{\@topsepadd\topsep}{\vspace{.25\onelineskip}}{}{}
+    \setminted{
+        encoding=UTF8, 
+        fontsize=\small, 
+        tabsize=2, 
+        breaklines=true, 
+        linenos=false, 
+        frame=none
+    }
+    \patchcmd{\FV@ListVSpace}{\@topsepadd\topsep}{\vspace{.25\onelineskip}}{}{}    
 }{}
 
 \LoadStyleset

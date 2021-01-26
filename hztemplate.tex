@@ -153,7 +153,6 @@
 {
     \par
     \begin{PlaceTable}
-        %\begin{tabu}{X[lp]X[lp]X[lp]}
         \begin{tabularx}{\linewidth}{XXX}
             \hline
             \textbf{A} & \textbf{B} & \textbf{C} \\\hline
@@ -167,21 +166,15 @@
     \end{PlaceTable}
 }
 
-\NewDocumentCommand \tplproblem {}
-{
-    \problem{Problem} \tplpara
-}
-
 \NewDocumentCommand \tplproblems { O{2} }
 {
-    %\listofproblems*
     \int_zero:N \l_tmpa_int 
     \int_set:Nn \l_tmpb_int {#1}
     \int_do_while:nNnn {\l_tmpa_int} < {\l_tmpb_int}
     {
         \int_incr:N \l_tmpa_int
         \str_set:Nx \l_tmpa_str { \int_to_Alph:n \l_tmpa_int }
-        \problemsection{Problem~\l_tmpa_str}
+        \section{Problem~\l_tmpa_str}
         {
             \group_begin:
                 \int_set:Nn \l_tmpa_int {0}
@@ -190,7 +183,7 @@
                 {
                     \int_incr:N \l_tmpa_int
                     \str_set:Nx \l_tmpa_str { \int_to_alph:n \l_tmpa_int }
-                    \problem{Problem~\l_tmpa_str}
+                    \subsection{Problem~\l_tmpa_str}
                     \tplpara*
                     \tpllist*
                 }
