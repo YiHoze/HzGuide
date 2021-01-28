@@ -1,5 +1,7 @@
 _minted-HzGuide/
 *.aux
+*.cmd
+*.csv
 *.idx
 *.ind
 *.lof

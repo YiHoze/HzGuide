@@ -14,8 +14,6 @@
 % IV. For those of designer interface level:
 %     Follow clause II. However, it is allowed to use lowercase with compound words.
 
-% \pagegoal, \pagetotal
-
 \ProvidesClass{hzguide}[2018/08/13]
 
 \LoadClassWithOptions{memoir}
@@ -98,6 +96,16 @@
     template    .bool_set:N = \g_template_bool,
 }
 
+\NewDocumentCommand \IfMinted { m o }
+{
+    \bool_if:NTF \g_minted_bool  
+    { 
+        #1 
+    }{
+        \IfValueT { #2 }{ #2 }
+    }
+}
+
 \tl_new:N \hzlanguage
 \bool_new:N \g_CJK_bool
 \bool_gset_false:N \g_CJK_bool
@@ -130,10 +138,10 @@
 }
 
 % \BookmarkLanguage{ENGLISH}[0]
-\NewDocumentCommand \BookmarkLanguage { m O{-1} }
-{
-    \bookmark[level=#2, page=1]{#1}	
-}
+% \NewDocumentCommand \BookmarkLanguage { m O{-1} }
+% {
+%     \bookmark[level=#2, page=1]{#1}	
+% }
 
 \NewDocumentCommand \IfLang { m +m o }
 {
@@ -364,7 +372,6 @@
 \IfLang{ger}
 {
     \RequirePackage{polyglossia}
-    %\renewcommand*{\sectionrefname}{Abschnitt~}
     \setmainlanguage[variant=german, spelling=new, latesthyphen=true]{german}
     \setotherlanguage{english}
     \AtBeginDocument{
@@ -372,7 +379,7 @@
             danger=GEFAHR,
             warning=WARNUNG,
             caution=VORSICHT,
-            notice=HINWEIS, %BEACHTEN
+            notice=HINWEIS, 
             note=ANMERKUNG
         }
     }
@@ -444,7 +451,7 @@
             danger=위험,
             warning=경고,
             caution=주의,
-            notice=주의, %알림
+            notice=주의, % 알림
             note=참고            
         }        
     }
@@ -589,131 +596,141 @@
 % utilities for single-source publishing * * * * * * * * * * * * * * * * * * * * *
 
 % document properties ----------------------------------------------------------------------
-\clist_new:N \g_doc_property_clist
-\NewDocumentCommand \DocumentSetup { m }
-{
-    \clist_gput_right:Nn \g_doc_property_clist { #1 }
-}
+\cs_generate_variant:Nn \prg_set_conditional:Npnn { c }
+\exp_args_generate:n { cnn }
 
-\prg_set_conditional:Npnn \doc_if_in:n #1 { TF }
+% \NewConditionals{command}{environment}{setup}
+\NewDocumentCommand \NewConditionals { m m m }
 {
-    \clist_if_in:NnTF \g_doc_property_clist { #1 }
-    {
-        \prg_return_true:
-    }{
-        \prg_return_false:
-    }
-}
+    \clist_new:c { g_#1_property_clist }
 
-\prg_set_conditional:Npnn \doc_if_or_in:nn #1 #2 { TF }
-{
-    \clist_if_in:NnTF \g_doc_property_clist { #1 }
+    \prg_set_conditional:cpnn { #1_if_in:n } ##1 { TF }
     {
-        \prg_return_true:
-    }{
-        \clist_if_in:NnTF \g_doc_property_clist { #2 }
+        \clist_if_in:cnTF { g_#1_property_clist }{ ##1 }
         {
             \prg_return_true:
         }{
             \prg_return_false:
         }
     }
-}
 
-\prg_set_conditional:Npnn \doc_if_and_in:nn #1 #2 { TF }
-{
-    \clist_if_in:NnTF \g_doc_property_clist { #1 }
+    \prg_set_conditional:cpnn { #1_if_or_in:nn } ##1 ##2 { TF }
     {
-        \clist_if_in:NnTF \g_doc_property_clist { #2 }
+        \clist_if_in:cnTF { g_#1_property_clist}{ ##1 }
         {
             \prg_return_true:
         }{
-            \prg_return_false:
-        }
-    }{
-        \prg_return_true:
-    }
-}
-
-% \begin{IfDoc}{foo}         : if "foo" is in the list of document properties
-% \begin{IfDoc}^{foo}        : if "foo" is NOT in the list of document properties
-% \begin{IfDoc}{foo}[goo]    : if "foo" or "goo" is in the list of document properties
-% \begin{IfDoc}*{foo}[goo]   : if "foo" and "goo" are in the list of document properties
-\NewDocumentEnvironment { IfDoc }{ s t^ m o +b }
-{
-    \IfBooleanTF { #2 }
-    {
-        \doc_if_in:nTF { #3 }
-        {}{
-            #5
-        }
-    }{
-        \IfValueTF { #4 }
-        {
-            \IfBooleanTF { #1 }
+            \clist_if_in:cnTF { g_#1_property_clist}{ ##2 }
             {
-                \doc_if_and_in:nnTF { #3 }{ #4 }
-                {
-                    #5
-                }{}
+                \prg_return_true:
             }{
-                \doc_if_or_in:nnTF { #3 }{ #4 }
-                {
-                    #5
-                }{}
+                \prg_return_false:
             }
-        }{        
-            \doc_if_in:nTF { #3 }
-            {
-                #5
-            }{}
         }
     }
-}{}
 
-% \ifdoc{foo}{TRUE}[FALSE]         : if "foo" is in the list of document properties
-% \ifdoc^{foo}{TRUE}[FALSE]        : if "foo" is NOT in the list of document properties
-% \ifdoc{foo}[goo]{TRUE}[FALSE]    : if "foo" or "goo" is in the list of document properties
-% \ifdoc*{foo}[goo]{TRUE}[FALSE]   : if "foo" and "goo" are in the list of document properties
-\NewDocumentCommand \ifdoc { s t^ m o m o }
-{
-    \IfBooleanTF { #2 }
+    \prg_set_conditional:cpnn { #1_if_and_in:nn } ##1 ##2 { TF }
     {
-        \doc_if_in:nTF { #3 }
+        \clist_if_in:cnTF { g_doc_property_clist }{ ##1 }
         {
-            \IfValueT { #6 }{ #6 }
+            \clist_if_in:cnTF { g_doc_property_clist}{ ##2 }
+            {
+                \prg_return_true:
+            }{
+                \prg_return_false:
+            }
         }{
-            #5
+            \prg_return_true:
         }
-    }{
-        \IfValueTF { #4 }
+    }
+
+    \conditional_create_setup:nn { #1 }{ #3 } 
+    \conditional_create_command:n { #1 }
+    \conditional_create_environment:nn { #1 }{ #2 }
+}
+
+\cs_new:Npn \conditional_create_setup:nn #1 #2
+{
+    \exp_args:Ncnn \NewDocumentCommand { #2Setup } { m }
+    {
+        \clist_gput_right:cn { g_#1_property_clist }{ ##1 }
+    }
+}
+
+% \ifxxx{foo}{TRUE}[FALSE]         : if "foo" is in; else
+% \ifxxx^{foo}{TRUE}[FALSE]        : if "foo" is NOT in; else
+% \ifxxx{foo}[goo]{TRUE}[FALSE]    : if "foo" or "goo" is in; else
+% \ifxxx*{foo}[goo]{TRUE}[FALSE]   : if "foo" and "goo" are inin; else
+\cs_new:Npn \conditional_create_command:n #1
+{
+    \exp_args:Ncnn \NewDocumentCommand { if#1 } { s t^ m o m o }
+    {
+        \IfBooleanTF { ##2 }
         {
-            \IfBooleanTF { #1 }
+            \use:c { #1_if_in:nTF } { ##3 }
             {
-                \doc_if_and_in:nnTF { #3 }{ #4 }
-                {
-                    #5
-                }{
-                    \IfValueT { #6 }{ #6 }
-                }
+                \IfValueT { ##6 }{ ##6 }
             }{
-                \doc_if_or_in:nnTF { #3 }{ #4 }
-                {
-                    #5
-                }{
-                    \IfValueT { #6 }{ #6 }
-                }
+                ##5
             }
-        }{        
-            \doc_if_in:nTF { #3 }
+        }{
+            \IfValueTF { ##4 }
             {
-                #5
-            }{
-                \IfValueT { #6 }{ #6 }
+                \IfBooleanTF { ##1 }
+                {
+                    \use:c { #1_if_and_in:nnTF } { ##3 }{ ##4 } 
+                    {
+                        ##5
+                    }{
+                        \IfValueT { ##6 }{ ##6 }
+                    }
+                }{
+                    \use:c { #1_if_or_in:nnTF } { ##3 }{ ##4 }
+                    {
+                        ##5
+                    }{
+                        \IfValueT { ##6 }{ ##6 }
+                    }
+                }
+            }{        
+                \use:c { #1_if_in:nTF } { ##3 }
+                {
+                    ##5
+                }{
+                    \IfValueT { ##6 }{ ##6 }
+                }
             }
         }
     }
 }
+
+% \begin{Ifxxx}{foo}         : if "foo" is in
+% \begin{Ifxxx}^{foo}        : if "foo" is NOT in
+% \begin{Ifxxx}{foo}[goo]    : if "foo" or "goo" is in
+% \begin{Ifxxx}*{foo}[goo]   : if "foo" and "goo" are in
+\cs_new:Npn \conditional_create_environment:nn #1 #2
+{
+    \NewDocumentEnvironment { If#2 }{ s t^ m o +b }
+    {
+        \IfBooleanTF { ##2 }
+        {
+            \use:c { #1_if_in:nTF } { ##3 } {}{ ##5 }
+        }{
+            \IfValueTF { ##4 }
+            {
+                \IfBooleanTF { ##1 }
+                {
+                    \use:c { #1_if_and_in:nnTF } { ##3 }{ ##4 } { ##5 }{}
+                }{
+                    \use:c { #1_if_or_in:nnTF } { ##3 }{ ##4 } { ##5 }{}
+                }
+            }{        
+                \use:c { #1_if_in:nTF } { ##3 } { ##5 }{}
+            }
+        }
+    }{}
+}
+\NewConditionals{doc}{Doc}{Document}
 
 % measuring boxes ----------------------------------------------------------------------
 
@@ -748,27 +765,27 @@
 % To enable default configuration, especially for Sphinx and Jupyter 
 % \IfNoAdhoc{layout}{\LayoutSetup{paper=A4,column=...}}
 % \IfNoAdhoc{heading}{\HeadingSetup{...}}
-\keys_define:nn { adhoc }
-{
-    layout      .bool_set:N = \g_adhoc_layout_bool,
-    heading     .bool_set:N = \g_adhoc_heading_bool,
-}
+% \keys_define:nn { adhoc }
+% {
+%     layout      .bool_set:N = \g_adhoc_layout_bool,
+%     heading     .bool_set:N = \g_adhoc_heading_bool,
+% }
 
-\NewDocumentCommand \AdhocSetup { m }
-{
-    \keys_set:nn { adhoc }{ #1 }
-}
+% \NewDocumentCommand \AdhocSetup { m }
+% {
+%     \keys_set:nn { adhoc }{ #1 }
+% }
 
-\AdhocSetup{layout=false, heading=false}
+% \AdhocSetup{layout=false, heading=false}
 
-\NewDocumentCommand \IfNoAdhoc { m m }
-{
-    \str_case:nn { #1 }
-    {
-        { layout }  { \bool_if:NF \g_adhoc_layout_bool {#2} }
-        { heading } { \bool_if:NF \g_adhoc_heading_bool {#2} }
-    }
-}
+% \NewDocumentCommand \IfNoAdhoc { m m }
+% {
+%     \str_case:nn { #1 }
+%     {
+%         { layout }  { \bool_if:NF \g_adhoc_layout_bool {#2} }
+%         { heading } { \bool_if:NF \g_adhoc_heading_bool {#2} }
+%     }
+% }
 
 % commonly used content -------------------------------------------------------
 \keys_define:nn { commonpath }
@@ -2607,40 +2624,6 @@
     }
 }{}
 
-% \keys_define:nn { marginimage }
-% {
-%     scale         .tl_set:N = \l_marginimage_scale,
-%     voffset       .skip_set:N = \l_marginimage_voffset,
-%     showfilename  .bool_set:N = \l_marginimage_showfilename_bool,
-% }
-
-% \NewDocumentCommand \MarginImageSetup { m }
-% {
-%     \keys_set:nn { marginimage } { #1 }
-% }
-
-% \MarginImageSetup{
-%     scale=1,
-%     voffset=2ex,
-%     showfilename=false
-% }
-
-% \marginparmargin{left}
-
-% \NewDocumentCommand \marginimage { s O{} m }
-% {
-%     \IfBooleanT {#1} { \newpage }
-%     \group_begin:
-%     \MarginImageSetup{#2}
-%      \marginpar{
-%         \vspace{\l_marginimage_voffset}
-%          \includegraphics[scale=\l_marginimage_scale]{#3}
-%          \bool_if:NT { \l_marginimage_showfilename_bool }
-%             { \newline \tiny \tl_to_str:n { #3 } }
-%      }
-%     \group_end:
-% }
-
 % \img[raise]{foo} -------------------------------------------------------------
 \keys_define:nn { lineimg }
 {
@@ -2674,10 +2657,7 @@
 }
 
 % table ------------------------------------
-% \newcolumntype{L}{>{\raggedright\arraybackslash}X}
 \newcolumntype{C}{>{\centering\arraybackslash}X}
-% \newcolumntype{R}{>{\raggedleft\arraybackslash}X}
-
 
 \cs_new:Npn \table_footnotestyle:n #1
 {
@@ -2690,7 +2670,7 @@
     beforeskip    	.skip_set:N = \l_table_before_skip,
     afterskip     	.skip_set:N = \l_table_after_skip,
     float         	.bool_set:N = \l_table_float_bool,
-	float-placement	.tl_set:N	= \l_image_float_placement_tl,
+	float-placement	.tl_set:N	= \l_table_float_placement_tl,
     align         	.tl_set:N 	= \l_table_align_tl,
     landscape     	.bool_set:N = \l_table_landscape_bool,
     caption       	.tl_set:N 	= \l_table_caption_tl,
@@ -2711,7 +2691,7 @@
 \NewDocumentCommand \TableSetup { m }
 {
     \keys_set:nn { table } { #1 }
-	%\exp_args:NNx \def\fps@table { \l_image_float_placement_tl }
+	\exp_args:NNx \def\fps@table { \l_table_float_placement_tl }
 }
 
 \TableSetup{
@@ -2989,10 +2969,10 @@
 \bool_new:N \l_macro_index_bool
 \NewDocumentCommand \IndexingEnable { s }
 {
-    \makeindex    
-    \bool_gset_true:N \l_term_index_bool
-    \bool_gset_true:N \l_terms_index_bool
-    \bool_gset_true:N \l_annotate_index_bool
+    \makeindex  
+    \TermSetup{index=true}
+    \TermsSetup{index=true}
+    \AnnotateSetup{index=true}
     \bool_gset_true:N \l_macro_index_bool
     \IfBooleanT{ #1 }
     { 
@@ -3001,9 +2981,9 @@
 }
 \NewDocumentCommand \IndexingDisable {}
 {
-    \bool_gset_false:N \l_term_index_bool
-    \bool_gset_false:N \l_terms_index_bool
-    \bool_gset_false:N \l_annotate_index_bool
+    \TermSetup{index=false}
+    \TermsSetup{index=false}
+    \AnnotateSetup{index=false}
     \bool_gset_false:N \l_macro_index_bool
 }
 
@@ -3690,12 +3670,10 @@
         \object_skip_before:n {\l_callout_before_skip}
         \begin{RuleBox} 
     }
-    %\setfootnoterule{0pt}{0pt}{0pt}
     \l_callout_font_tl    
     \IfBooleanTF {#1}
     {        
         \begin{calloutenum}
-        %\tightlist	
     }{
         \begin{flushleft}
         \IfValueT {#2} { \int_set:Nn \l_callout_column_int {#2} }
@@ -3724,9 +3702,7 @@
 
 
 \newlist{calloutenum}{enumerate}{1}
-\setlist[calloutenum]{
-	label=\arabic*),
-}
+\setlist[calloutenum]{label=\arabic*), noitemsep}
 
 \ExplSyntaxOff
 
@@ -3779,8 +3755,6 @@
     base=9
 }
 
-%\CirnumSetup{fontfeature={\addfontfeature{LetterSpace=-3}}}
-
 \NewDocumentCommand \cirnum { m }
 {
     \cirnumdraw
@@ -3795,7 +3769,6 @@
 
 % text boxes for admonition and reference
 
-%\tcbuselibrary{listings}
 \tcbuselibrary{breakable, skins, xparse}
 \tcbset{enhanced}
 
@@ -3816,7 +3789,7 @@
     before~skip=0pt, after~skip=0pt, breakable=false, after={\par\normalcolor},
     colframe=white, colback=white, arc=0ex, boxrule=0pt,
     boxsep=0pt, top=0pt, bottom=0pt, left=1.5em, right=0em,
-    borderline~west={1.5pt}{0pt}{gray}, 
+    borderline~west={1.5pt}{0pt}{orange}, 
 	IfBooleanTF={#1}{
 		breakable=\l_bbox_breakable_adhoc_tl
 	}{
@@ -3910,7 +3883,6 @@
     aftersignal		    .tl_set:N = \l_bbox_after_signal_tl,
     style       		.tl_set:N = \l_bbox_style_tl,
     titlefont           .tl_set:N = \l_bbox_title_font_tl,
-    % font        		.tl_set:N = \l_bbox_font_tl,
 	breakable-default	.tl_set:N = \l_bbox_breakable_default_tl,
 	breakable-adhoc		.tl_set:N = \l_bbox_breakable_adhoc_tl
 }
@@ -3941,10 +3913,12 @@
 	}
 }
 
+\tl_new:N \bbox
+
 \cs_new:Npn \bbox_type_set:n #1
 {
     \cs_set_eq:Nc \BBox {#1} 
-    \cs_set_eq:Nc \endBBox {end#1}     
+    \cs_set_eq:Nc \endBBox {end#1}
 }
 
 % \begin{BOUNDEDBOX}[options](title)
@@ -3968,7 +3942,7 @@
 			{                
                 \tl_set:Nn \l_bbox_signal_tl { ##4 }
 			}
-            \bbox_type_set:n { \l_bbox_type_tl }
+            \exp_args:Nx \bbox_type_set:n { \l_bbox_type_tl }
             \IfBooleanTF { ##1 }
             {
                 \object_skip_before:n { \l_bbox_extra_skip }
@@ -3992,7 +3966,7 @@
 				}
             }
             \g_common_text_style\l_bbox_style_tl
-            \noindent\hspace{-\hzparskip} % 삽입되는 공백을 제거하기 위하여 
+            \noindent\hspace{-\hzparskip} % to remove abundant space
     }{
             \end{BBox}
             \object_skip_after:n { \l_bbox_after_skip }
@@ -4034,8 +4008,6 @@
 \NewBoundedBox{notice}{signal=\g_admonition_notice_tl}
 \NewBoundedBox{note}{signal=\g_admonition_note_tl}
 \NewBoundedBox{reference}{style=\small}
-\NewBoundedBox{codebox}{style=\small}
-\NewBoundedBox{example}{type=RightBarBox, style=\small}
 
 % document cover * * * * * * * * * * * * * * * * * * * * * * * * *
 \keys_define:nn { cover }
@@ -4201,18 +4173,6 @@
 		\end{IfVartwoEnlarge}
 	}
 }
-
-% odds and ends * * * * * * * * * * * * * * * * * * * * * * * * *
-
-% \NewDocumentEnvironment { footnotes } {}
-% {
-%     \begin{enumerate}[label=\textsuperscript{\arabic*}, labelsep=0pt]
-%     \tightlist
-%     \footnotesize
-
-% }{
-%     \end{enumerate}
-% }
 
 % actions ---------------------------------------------------------------------
 
@@ -4398,10 +4358,11 @@
 \int_new:N \l_tsv_renderers_int
 \keys_define:nn { TSV }
 {
-    heading             .code:n = { \cs_set_eq:NN \TSVheading #1 },
-    space               .tl_set:N = \l_tsv_space_tl,
-    tabs                .tl_set:N = \l_tsv_tabs_tl,
-    renderers           .code:n = { \clist_set:Nn \l_tsv_renderers_clist {#1} }
+    csv         .bool_set:N = \l_csv_bool,    
+    heading     .code:n = { \cs_set_eq:NN \TSVheading #1 },
+    space       .tl_set:N = \l_tsv_space_tl,
+    tabs        .tl_set:N = \l_tsv_tabs_tl,
+    renderers   .code:n = { \clist_set:Nn \l_tsv_renderers_clist {#1} }
 }
 \NewDocumentCommand \texttsv { m }{ #1 }
 \NewDocumentCommand \TSVsetup { m }
@@ -4431,8 +4392,13 @@
         \ior_str_map_inline:Nn \l_tsv_ior
         {
             \str_set:Nn \l_tmpa_str { ##1 }
-            \regex_replace_all:nnN { \t }{ | } \l_tmpa_str
-            \seq_set_split:NnV \l_tmpa_seq { | } \l_tmpa_str                        
+            \bool_if:NTF \l_csv_bool
+            {
+                \seq_set_split:NnV \l_tmpa_seq { , } \l_tmpa_str
+            }{
+                \regex_replace_all:nnN { \t }{ | } \l_tmpa_str
+                \seq_set_split:NnV \l_tmpa_seq { | } \l_tmpa_str
+            }
             \tsv_render:N \l_tmpa_seq	            
         }
     \ior_close:N \l_tsv_ior   
@@ -4440,7 +4406,7 @@
 }
 
 \cs_new:Npn \tsv_render:N #1
-{
+{    
     \int_set:Nn \l_tmpa_int { \seq_count:N #1 }    
 	\int_compare:nTF { \l_tmpa_int = 1 }
 	{
@@ -4450,7 +4416,8 @@
             \TSVheading{ \l_tmpa_str }
         }
 	}{
-		\int_zero:N \l_tmpb_int
+        \noindent
+		\int_zero:N \l_tmpb_int        
 		\seq_map_inline:Nn #1
 		{	
             \int_incr:N \l_tmpb_int
@@ -4484,73 +4451,62 @@
 
 
 % decorative rules
-\keys_define:nn { wraprule }
-{
-    gap      	.tl_set:N = \l_wraprule_gap,
-    thickness	.tl_set:N = \l_wraprule_thickness,
-    raise		.dim_set:N = \l_wraprule_raise,
-    font        .tl_set:N = \l_wraprule_font
-}
+% \keys_define:nn { wraprule }
+% {
+%     gap      	.tl_set:N = \l_wraprule_gap,
+%     thickness	.tl_set:N = \l_wraprule_thickness,
+%     raise		.dim_set:N = \l_wraprule_raise,
+%     font        .tl_set:N = \l_wraprule_font
+% }
 
-\NewDocumentCommand \WrapruleSetup { m }
-{
-    \keys_set:nn { wraprule } { #1 }
-}
+% \NewDocumentCommand \WrapruleSetup { m }
+% {
+%     \keys_set:nn { wraprule } { #1 }
+% }
 
-\WrapruleSetup{
-    gap=\enspace,
-    thickness=0.75pt,
-    raise=0.5ex,
-    font=\ttfamily
-}
+% \WrapruleSetup{
+%     gap=\enspace,
+%     thickness=0.75pt,
+%     raise=0.5ex,
+%     font=\ttfamily
+% }
 
-\NewDocumentCommand \wraprule { s O{} m }
-{
-    \group_begin:
-    \WrapruleSetup{#2}
-    \hbox_set:Nn \l_tmpa_box {\l_wraprule_gap \l_wraprule_font #3 \l_wraprule_gap}
-    \dim_set:Nn \l_tmpa_dim { \box_wd:N \l_tmpa_box }
-    \dim_set:Nn \l_tmpb_dim { \linewidth - \l_tmpa_dim }
-    \IfBooleanTF {#1}
-    {
-        \noindent\raisebox{\l_wraprule_raise}{            
-            \raisebox{-\l_wraprule_raise}{\box_use:N \l_tmpa_box}
-            \rule{\l_tmpb_dim}{\l_wraprule_thickness}
-        }       
-    }{
-        \noindent\raisebox{\l_wraprule_raise}{
-            \rule{.5\l_tmpb_dim}{\l_wraprule_thickness}
-            \raisebox{-\l_wraprule_raise}{\box_use:N \l_tmpa_box}
-            \rule{.5\l_tmpb_dim}{\l_wraprule_thickness}      
-        }  
-    }
-    \group_end:
-}
+% \NewDocumentCommand \wraprule { s O{} m }
+% {
+%     \group_begin:
+%     \WrapruleSetup{#2}
+%     \hbox_set:Nn \l_tmpa_box {\l_wraprule_gap \l_wraprule_font #3 \l_wraprule_gap}
+%     \dim_set:Nn \l_tmpa_dim { \box_wd:N \l_tmpa_box }
+%     \dim_set:Nn \l_tmpb_dim { \linewidth - \l_tmpa_dim }
+%     \IfBooleanTF {#1}
+%     {
+%         \noindent\raisebox{\l_wraprule_raise}{            
+%             \raisebox{-\l_wraprule_raise}{\box_use:N \l_tmpa_box}
+%             \rule{\l_tmpb_dim}{\l_wraprule_thickness}
+%         }       
+%     }{
+%         \noindent\raisebox{\l_wraprule_raise}{
+%             \rule{.5\l_tmpb_dim}{\l_wraprule_thickness}
+%             \raisebox{-\l_wraprule_raise}{\box_use:N \l_tmpa_box}
+%             \rule{.5\l_tmpb_dim}{\l_wraprule_thickness}      
+%         }  
+%     }
+%     \group_end:
+% }
 
-\NewDocumentCommand \linerule { O{} }
-{
-    \group_begin:
-        \WrapruleSetup{#1}
-        \noindent\rule[\l_wraprule_raise]{\linewidth}{\l_wraprule_thickness}
-    \group_end:
-}
-
-% 4배수 페이지
-\NewDocumentCommand \MakeQuadriPages {} 
-{	
-	\clearpage
-	\pagestyle{empty}
-	\mbox{}
-	\int_set:Nn \l_tmpa_int { \int_mod:nn { \thepage }{ 4 } }
-	\int_set:Nn \l_tmpb_int { 4 - \l_tmpa_int }
-	\int_step_inline:nn { \l_tmpb_int }
-	{
-		\clearpage
-		\mbox{}
-	}
-}
+% \NewDocumentCommand \linerule { O{} }
+% {
+%     \group_begin:
+%         \WrapruleSetup{#1}
+%         \noindent\rule[\l_wraprule_raise]{\linewidth}{\l_wraprule_thickness}
+%     \group_end:
+% }
 
 % verbatim & literal -----------------------------------------------------------
+\RenewDocumentCommand \verb {v} 
+{
+    \texttt{#1}
+}
 
 \cs_new:Nn \obey_hspaces: { \penalty\z@\mbox{}\space }
 \NewDocumentCommand \obeyhspaces { }
@@ -4570,20 +4526,24 @@
     \obeyvlines
 }{}
 
-\tl_set:Nx \tmpvrb { \jobname.vrb }
+\NewBoundedBox{codebox}{style=\small}
+\NewBoundedBox{result}{type=LeftBarBox, style=\sffamily\small}
 
+\tl_set:Nx \tmpvrb { \jobname.vrb }
 \dim_new:N \l_code_description_width_dim
 
 \keys_define:nn { CODE }
 {
-    font        .code:n = { \code_verbatim_font:n {#1} },
-    style       .tl_set:N = \l_code_style_tl,
-    fontsize    .tl_set:N = \l_code_fontsize_tl,
     width       .dim_set:N = \l_code_width_dim,
-    offset      .skip_set:N = \l_code_raise_offset,
     beforeskip  .skip_set:N = \l_code_before_skip,
-    afterskip    .skip_set:N = \l_code_after_skip,
-    language    .tl_set:N = \l_code_language_tl
+    afterskip   .skip_set:N = \l_code_after_skip,
+    offset      .skip_set:N = \l_code_raise_offset,
+    font        .code:n = { \code_verbatim_font:n {#1} },
+    fontsize    .tl_set:N = \l_code_fontsize_tl,
+    linespacing .tl_set:N = \l_code_linespacing_tl,
+    language    .tl_set:N = \l_code_language_tl,
+    codebox     .tl_set:N = \l_code_codebox_tl,
+    resultbox   .tl_set:N = \l_code_resultbox_tl,
 }
 
 \cs_new:Npn \code_verbatim_font:n #1
@@ -4604,9 +4564,14 @@
 
 \NewDocumentCommand \CodeSetup { m }
 {
-    \keys_set:nn { CODE }{ #1 }
-    \dim_set:Nn \l_code_description_width_dim {
-        \linewidth - \l_code_width_dim - 1em
+    \keys_set:nn { CODE }{ #1 } 
+    \tl_if_empty:NF \l_code_codebox_tl
+    {
+        \RenewBoundedBox{ codebox }{ type=\l_code_codebox_tl }
+    }
+    \tl_if_empty:NF \l_code_resultbox_tl
+    {
+        \RenewBoundedBox{ result }{ type=\l_code_resultbox_tl }
     }
 }
 
@@ -4621,10 +4586,10 @@
     font=\ttfamily,
     fontsize=\small,
     width=0pt,
-    offset=-\onelineskip,    
-    beforeskip=\hznulldim, % available only for codedesc and \code_read_minipage:
+    offset=-\onelineskip,
+    beforeskip=\hznulldim, 
     afterskip=\hznulldim,
-    style=\setSpacing{1.1},
+    linespacing=1.1,
     language=latex
 }
 
@@ -4637,50 +4602,10 @@
     \group_end: 
 }
 
-\NewDocumentEnvironment { codedesc }{ O{} +b }
-{
-    \group_begin:
-    \CodeSetup{#1}
-    \hbox_set:Nn \l_tmpa_box 
-    {
-        \begin{minipage}{\linewidth}  
-            \begin{minipage}[t]{\l_code_width_dim}
-                \l_code_style_tl                
-                \begin{codebox}[beforeskip=0pt, afterskip=0pt, font=\l_code_fontsize_tl]                
-                \bool_if:NTF \g_minted_bool
-                {                
-                    \inputminted{ latex }{ \tmpvrb }
-                }{            
-                    \verbatiminput{ \tmpvrb }
-                }
-                \end{codebox}
-            \end{minipage}
-            \hfill
-            \begin{minipage}[t]{\l_code_description_width_dim}
-                \vspace{.5\onelineskip} 
-                \g_common_text_style
-                #2
-            \end{minipage}
-        \end{minipage}
-    }
-    \dim_set:Nn \l_tmpa_dim { \box_ht:N \l_tmpa_box + \box_dp:N \l_tmpa_box }
-    \dim_add:Nn \l_tmpa_dim { 1.5\onelineskip }    
-    \dim_set:Nn \l_tmpb_dim { \pagegoal - \pagetotal }
-    \dim_compare:nTF { \l_tmpa_dim > \l_tmpb_dim }
-	{		
-		\newpage
-	}{
-        \object_skip_before:n {\l_code_before_skip}
-    }
-    \box_use:N \l_tmpa_box     
-    \object_skip_after:n {\l_code_after_skip}
-    \group_end:
-}{}
-
 \NewDocumentCommand \coderead { O{} }
 {
     \group_begin:
-    \l_code_style_tl
+    \setSpacing{ \l_code_linespacing_tl }
     \CodeSetup{#1}    
     \dim_compare:nTF { \l_code_width_dim > 0pt }    
     {
@@ -4695,8 +4620,9 @@
 {
     \object_skip_before:n {\l_code_before_skip}
     \begin{minipage}[t]{\l_code_width_dim}
-        \begin{codebox}[beforeskip=0pt, afterskip=0pt, font=\l_code_fontsize_tl]
-        \vspace{\l_code_raise_offset}\mbox{}        
+        \begin{codebox}[beforeskip=0pt, afterskip=0pt]
+        \vspace{\l_code_raise_offset}\mbox{}  
+        \l_code_fontsize_tl      
         \bool_if:NTF \g_minted_bool
         {                
             \inputminted{ latex }{ \tmpvrb }
@@ -4748,9 +4674,9 @@
     \group_end: 
 
     \code_read:
-    \begin{example}
+    \begin{result}
     \input{\tmpvrb}        
-    \end{example}    
+    \end{result}    
 }
 
 \NewDocumentCommand \codeinput {}
@@ -4758,10 +4684,53 @@
     \input{\tmpvrb}
 }
 
-\RenewDocumentCommand \verb {v} 
+\NewDocumentEnvironment { codedesc }{ O{} +b }
 {
-    \texttt{#1}
-}
+    \group_begin:    
+    \CodeSetup{#1}
+    \dim_compare:nT { \l_code_width_dim = 0pt }    
+    {
+       \dim_set:Nn \l_code_width_dim { .45\linewidth }
+    }
+    \dim_set:Nn \l_code_description_width_dim {
+        \linewidth - \l_code_width_dim - 1em
+    }
+    \hbox_set:Nn \l_tmpa_box 
+    {
+        \begin{minipage}{\linewidth}  
+            \begin{minipage}[t]{\l_code_width_dim}
+                \setSpacing{ \l_code_linespacing_tl }
+                \begin{codebox}[beforeskip=0pt, afterskip=0pt]
+                \vspace{\l_code_raise_offset}\mbox{}  
+                \l_code_fontsize_tl
+                \bool_if:NTF \g_minted_bool
+                {                
+                    \inputminted{ latex }{ \tmpvrb }
+                }{            
+                    \verbatiminput{ \tmpvrb }
+                }
+                \end{codebox}
+            \end{minipage}
+            \hfill
+            \begin{minipage}[t]{\l_code_description_width_dim}
+                \vspace{.5\onelineskip} 
+                \g_common_text_style \noindent #2
+            \end{minipage}
+        \end{minipage}
+    }
+    \dim_set:Nn \l_tmpa_dim { \box_ht:N \l_tmpa_box + \box_dp:N \l_tmpa_box }
+    \dim_add:Nn \l_tmpa_dim { 1.5\onelineskip }    
+    \dim_set:Nn \l_tmpb_dim { \pagegoal - \pagetotal }
+    \dim_compare:nTF { \l_tmpa_dim > \l_tmpb_dim }
+	{		
+		\newpage
+	}{
+        \object_skip_before:n {\l_code_before_skip}
+    }
+    \box_use:N \l_tmpa_box     
+    \object_skip_after:n {\l_code_after_skip}
+    \group_end:
+}{}
 
 % spacing and miscellaneous utilities * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -4777,22 +4746,10 @@
         \vspace{\l_tmpa_skip}         
     }
 }
-
 \NewDocumentCommand \EnlargePage { O{\onelineskip} }
 {
     \enlargethispage{#1}
 }
-
-\NewDocumentCommand \pageframe { O{1ex} }
-{
-    \dim_set:Nn \l_tmpa_dim {#1}
-     \begin{tikzpicture}[overlay,remember~picture]
-        \node [xshift=\foremargin-\l_tmpa_dim, yshift=-\uppermargin+\l_tmpa_dim] at (current~page.north~west) (TopLeft) {};
-         \node [xshift=-\spinemargin+\l_tmpa_dim, yshift=\lowermargin-\l_tmpa_dim] at (current~page.south~east) (BottomRight) {};
-         \draw (TopLeft.center) rectangle (BottomRight.center);
-     \end{tikzpicture}
-}
-
 \NewDocumentCommand \skiplines { O{1} }
 {
     \vspace{#1\onelineskip}
