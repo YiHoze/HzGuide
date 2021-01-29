@@ -600,7 +600,7 @@
 \exp_args_generate:n { cnn }
 
 % \NewConditionals{command}{environment}{setup}
-\NewDocumentCommand \NewConditionals { m m m }
+\NewDocumentCommand \NewConditionals { m m o }
 {
     \clist_new:c { g_#1_property_clist }
 
@@ -644,9 +644,12 @@
         }
     }
 
-    \conditional_create_setup:nn { #1 }{ #3 } 
+    \conditional_create_setup:nn { #1 }{ #2 } 
     \conditional_create_command:n { #1 }
-    \conditional_create_environment:nn { #1 }{ #2 }
+    \IfValueT {#3}
+    {
+        \conditional_create_environment:nn { #1 }{ #3 }
+    }
 }
 
 \cs_new:Npn \conditional_create_setup:nn #1 #2
@@ -730,7 +733,16 @@
         }
     }{}
 }
-\NewConditionals{doc}{Doc}{Document}
+
+\NewConditionals{doc}{Document}[Doc]
+
+% To enable default configuration, especially for Sphinx and Jupyter 
+\NewConditionals{adhoc}{Adhoc}
+% conf.py:
+% \AdhocSetup{layout, heading}
+% sphinxkari.sty: 
+% \ifadhoc^{layout}{\LayoutSetup{...}}
+% \ifadhoc^{heading}{\HeadingSetup{...}}
 
 % measuring boxes ----------------------------------------------------------------------
 
@@ -756,97 +768,29 @@
     }
 }
 
-\NewDocumentCommand \styleinput { m }
-{
-    \IfFileExists{ ../#1 }{ \input{../#1} }{}
-    \IfFileExists{ #1 }{ \input{#1} }{}
-}
-
-% To enable default configuration, especially for Sphinx and Jupyter 
-% \IfNoAdhoc{layout}{\LayoutSetup{paper=A4,column=...}}
-% \IfNoAdhoc{heading}{\HeadingSetup{...}}
-% \keys_define:nn { adhoc }
+% \NewDocumentCommand \styleinput { m }
 % {
-%     layout      .bool_set:N = \g_adhoc_layout_bool,
-%     heading     .bool_set:N = \g_adhoc_heading_bool,
+%     \IfFileExists{ ../#1 }{ \input{../#1} }{}
+%     \IfFileExists{ #1 }{ \input{#1} }{}
 % }
-
-% \NewDocumentCommand \AdhocSetup { m }
-% {
-%     \keys_set:nn { adhoc }{ #1 }
-% }
-
-% \AdhocSetup{layout=false, heading=false}
-
-% \NewDocumentCommand \IfNoAdhoc { m m }
-% {
-%     \str_case:nn { #1 }
-%     {
-%         { layout }  { \bool_if:NF \g_adhoc_layout_bool {#2} }
-%         { heading } { \bool_if:NF \g_adhoc_heading_bool {#2} }
-%     }
-% }
-
-% commonly used content -------------------------------------------------------
-\keys_define:nn { commonpath }
-{
-    root        .tl_set:N = \g_common_path_root,
-    language    .code:n = { \LanguagePathSetup{#1} }
-}
-
-\NewDocumentCommand \CommonPathSetup { m }
-{
-    \keys_set:nn { commonpath } { #1 }
-}
-
-\tl_new:N \g_common_path_language
-\NewDocumentCommand \LanguagePathSetup { s m }
-{
-    \IfBooleanTF {#1}
-    {
-        \tl_set:Nn \g_common_path_language { #2 }
-    }{
-        \tl_set:No  \g_common_path_language { \g_common_path_root #2/ }
-    }
-}
-
-\CommonPathSetup{
-    root = { ../../../Common/ },
-    language = \hzlanguage
-}
-
-\NewDocumentCommand \commoninput { s m }
-{
-    \IfBooleanTF { #1 }
-    {
-        \input{\g_common_path_root #2}
-    }
-    {
-        \input{\g_common_path_language #2}
-    }
-}
 
 \keys_define:nn { finalizer }
 {	
 	final	.tl_set:N = \l_finalizer_final_tl,
 	draft 	.tl_set:N = \l_finalizer_draft_tl
 }
-
 \NewDocumentCommand \FinalizerSetup { m }
 {
 	\keys_set:nn { finalizer }{ #1 }
 }
-
 \NewDocumentCommand \FinalizerOn {}
 {
 	\tl_use:N \l_finalizer_final_tl
 }
-
 \NewDocumentCommand \FinalizerOff {}
 {
 	\tl_use:N \l_finalizer_draft_tl
 }
-
 \FinalizerSetup{
 	final = {\HideImageFilename\HidePending},
 	draft = {\ShowImageFilename*\ShowPending}
@@ -856,10 +800,9 @@
 
 \keys_define:nn { pending }
 {
-    before-color	.tl_set:N = \l_pending_beforecolor_tl,
-    after-color		.tl_set:N = \l_pending_aftercolor_tl,
-    font			.tl_set:N = \l_pending_font_tl,
-    hide			.bool_set:N = \l_pending_hide_bool
+    color	.tl_set:N = \l_pending_color_tl,
+    font	.tl_set:N = \l_pending_font_tl,
+    hide	.bool_set:N = \l_pending_hide_bool
 }
 
 \NewDocumentCommand \PendingSetup { m }
@@ -868,8 +811,7 @@
 }
 
 \PendingSetup{
-    before-color=purple,
-    after-color=blue,
+    color=purple,
     font=\small,
     hide=false
 }
@@ -878,7 +820,7 @@
 {
     \bool_if:NF \l_pending_hide_bool
     {
-        { \color{\l_pending_beforecolor_tl}\l_pending_font_tl #1 }
+        { \color{\l_pending_color_tl}\l_pending_font_tl #1 }
     }
 }
 
@@ -890,6 +832,7 @@
 \NewDocumentCommand \HidePending {}
 {
     \bool_set_true:N \l_pending_hide_bool
+    \cs_set_eq:NN \listofqueries \relax
 }
 
 \NewDocumentCommand \ShowPending {}
@@ -906,65 +849,22 @@
 
 \NewDocumentCommand \query { +m o }
 {
-	\stepcounter{query}	
 	\bool_if:NF \l_pending_hide_bool
     {
+	    \stepcounter{query}	
 		\hangfrom{
-			\textcolor{\l_pending_beforecolor_tl}{
-				\l_pending_font_tl \thequery
-			}
-		}\space
-		\textcolor{\l_pending_beforecolor_tl}{
-				\l_pending_font_tl #1
+			\textcolor{\l_pending_color_tl}{ \l_pending_font_tl \thequery }
 		}
-    }
-    \IfValueTF {#2}
-    { 
-		\addcontentsline{loq}{query}{\thequery\enspace #2 } 
-	}{ 
-		\addcontentsline{loq}{query}{\thequery\enspace #1 } 
-	}
-}
-
-\cs_set_eq:NN \orglistofqueries \listofqueries
-
-\RenewDocumentCommand \listofqueries { s }
-{
-    \group_begin:
-    \bool_if:NF \l_pending_hide_bool
-        {
-            %\color{\l_pending_beforecolor_tl}
-            \IfBooleanTF {#1} {\orglistofqueries*} {\orglistofqueries}
-        }
-    \group_end:
-}
-
-% deleted: \change*{}
-% added: \change{}
-% changed: \change[before]{after}
-\NewDocumentCommand \change { s o m }
-{
-    \bool_if:NTF \l_pending_hide_bool
-    {
-        \IfBooleanTF {#1} {\ignorespaces} {#3}
-    }{        
-        \IfBooleanTF {#1}
-        {
-            \textcolor{\l_pending_beforecolor_tl}{\sout{#3}}
-        }{
-            \IfValueTF {#2}
-            {
-                \textcolor{\l_pending_beforecolor_tl}{\sout{#2}}~
-                \textcolor{\l_pending_aftercolor_tl}{#3}                
-            }{                
-                \textcolor{\l_pending_aftercolor_tl}{#3}
-            }
+        \space
+		\textcolor{\l_pending_color_tl}{ \l_pending_font_tl #1 }
+        \IfValueTF {#2}
+        { 
+            \addcontentsline{loq}{query}{\thequery\enspace #2 } 
+        }{ 
+            \addcontentsline{loq}{query}{\thequery\enspace #1 } 
         }
     }
 }
-
-\cs_set_eq:NN \HideChanges \HidePending
-\cs_set_eq:NN \ShowChanges \ShowPending
 
 % layout * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -1885,10 +1785,10 @@
 \newcounter{unsec}[chapter] % when \setsecnumdepth{chapter} is declared
 \newcounter{unsubsec}[unsec]
 
-\tl_new:N \g_common_text_style 
+\tl_new:N \g_tex_text_style 
 \NewDocumentCommand \SetTextStyle { m o } 
 {
-    \tl_gset:Nn \g_common_text_style {#1}
+    \tl_gset:Nn \g_tex_text_style {#1}
     \IfValueT { #2 }
     {
         #2
@@ -2060,19 +1960,12 @@
 
 % graphics * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-\NewDocumentCommand \includegraphicsvoid {}
-{
-    \cs_set_eq:NN \orgincludegraphics \includegraphics
-    \renewcommand\includegraphics[2][]{\orgincludegraphics{uncertain}}
-}
+\graphicspath{ {images/}{../images/} }
 
-\graphicspath{ {images/}{../images/}{../../images/} }
-
-\NewDocumentCommand \ShowGraphicspath {}
+\NewDocumentCommand \ShowGraphicspath { O{\scriptsize} }
 {
     \group_begin:
-        \tiny
-        \tl_to_str:N \Ginput@path
+        #1 \tl_to_str:N \Ginput@path
     \group_end:
 }
 
@@ -2470,7 +2363,7 @@
     \hbox_set:Nn \l_text_box
     {
         \begin{minipage}{\l_illustimage_text_width_dim}
-            \g_common_text_style\l_illustimage_textstyle_tl\noindent #6
+            \g_tex_text_style\l_illustimage_textstyle_tl\noindent #6
         \end{minipage}
     }
 	% restore image & text
@@ -3504,7 +3397,7 @@
                 \tl_set:Nn \l_terms_index_category_tl { ##5 }
             }
             \terms_label_type_set:n { \l_terms_label_type_tl }
-            \g_common_text_style\l_terms_style_tl
+            \g_tex_text_style\l_terms_style_tl
         }
     }{
         \end{list}
@@ -3965,7 +3858,7 @@
                 	\begin{BBox}[\l_bbox_symbol_tl\l_bbox_before_signal_tl\l_bbox_signal_tl\l_bbox_after_signal_tl]
 				}
             }
-            \g_common_text_style\l_bbox_style_tl
+            \g_tex_text_style\l_bbox_style_tl
             \noindent\hspace{-\hzparskip} % to remove abundant space
     }{
             \end{BBox}
@@ -4714,7 +4607,7 @@
             \hfill
             \begin{minipage}[t]{\l_code_description_width_dim}
                 \vspace{.5\onelineskip} 
-                \g_common_text_style \noindent #2
+                \g_tex_text_style \noindent #2
             \end{minipage}
         \end{minipage}
     }

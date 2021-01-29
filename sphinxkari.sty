@@ -487,14 +487,24 @@
 \renewcommand\spxextra[1]{ (\emph{#1})}
 
 % layout & heading settings ---------------------------------------------------
-\IfNoAdhoc{layout}{
+\NewConditionals{adhoc}{Adhoc}
+\ifadhoc^{layout}{
     \LayoutSetup{paper=A4,column=one}
 }
-\IfNoAdhoc{heading}{
+\ifadhoc^{heading}{
     \HeadingSetup{
         parskip=.35\baselineskip,
         paragraphstyle=interval
     }
 }
+
+% conf.py: 
+% latex_elements = {
+%     'preamble': r'''
+%     \AdhocSetup{layout}
+%     \LayoutSetup{paper=B5,column=vartwo}
+%     \usepackage{sphinxkari}
+%     '''
+% }
 
 \copypagestyle{plain}{normal}
