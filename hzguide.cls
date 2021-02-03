@@ -96,16 +96,6 @@
     template    .bool_set:N = \g_template_bool,
 }
 
-\NewDocumentCommand \IfMinted { m o }
-{
-    \bool_if:NTF \g_minted_bool  
-    { 
-        #1 
-    }{
-        \IfValueT { #2 }{ #2 }
-    }
-}
-
 \tl_new:N \hzlanguage
 \bool_new:N \g_CJK_bool
 \bool_gset_false:N \g_CJK_bool
@@ -114,16 +104,16 @@
 {
     \str_case:nn {#1}
     {
-        {english}     { \tl_set:Nn \hzlanguage {eng} } % 0  ENGLISH
-        {chinese}     { \tl_set:Nn \hzlanguage {chi} } % 1  中文
-        {czech}       { \tl_set:Nn \hzlanguage {cze} } % 2  ČEŠTINA
-        {danish}      { \tl_set:Nn \hzlanguage {dan} } % 3  DANSK
-        {dutch}       { \tl_set:Nn \hzlanguage {dut} } % 4  NEDERLANDS
-        {finnish}     { \tl_set:Nn \hzlanguage {fin} } % 5  SUOMI
-        {french}      { \tl_set:Nn \hzlanguage {fre} } % 6  FRANÇAIS
-        {german}      { \tl_set:Nn \hzlanguage {ger} } % 7  DEUTSCH
-        {italian}     { \tl_set:Nn \hzlanguage {ita} } % 8  ITALIANO
-        {japanese}    { \tl_set:Nn \hzlanguage {jap} } % 9  日本語
+        {english}     { \tl_set:Nn \hzlanguage {eng} } %  0 ENGLISH
+        {chinese}     { \tl_set:Nn \hzlanguage {chi} } %  1 中文
+        {czech}       { \tl_set:Nn \hzlanguage {cze} } %  2 ČEŠTINA
+        {danish}      { \tl_set:Nn \hzlanguage {dan} } %  3 DANSK
+        {dutch}       { \tl_set:Nn \hzlanguage {dut} } %  4 NEDERLANDS
+        {finnish}     { \tl_set:Nn \hzlanguage {fin} } %  5 SUOMI
+        {french}      { \tl_set:Nn \hzlanguage {fre} } %  6 FRANÇAIS
+        {german}      { \tl_set:Nn \hzlanguage {ger} } %  7 DEUTSCH
+        {italian}     { \tl_set:Nn \hzlanguage {ita} } %  8 ITALIANO
+        {japanese}    { \tl_set:Nn \hzlanguage {jap} } %  9 日本語
         {korean}      { \tl_set:Nn \hzlanguage {kor} } % 10 한국어
         {norwegian}   { \tl_set:Nn \hzlanguage {nor} } % 11 NORSK
         {polish}      { \tl_set:Nn \hzlanguage {pol} } % 12 POLSKI
@@ -133,15 +123,11 @@
         {spanish}     { \tl_set:Nn \hzlanguage {spa} } % 16 ESPAÑOL
         {swedish}     { \tl_set:Nn \hzlanguage {swe} } % 17 SVENSKA
         {turkish}     { \tl_set:Nn \hzlanguage {tur} } % 18 TÜRKÇE
-        {TC}          { \tl_set:Nn \hzlanguage {TC} } % traditional chinese
+        {TC}          { \tl_set:Nn \hzlanguage {TC} }  % traditional chinese
     }
 }
 
-% \BookmarkLanguage{ENGLISH}[0]
-% \NewDocumentCommand \BookmarkLanguage { m O{-1} }
-% {
-%     \bookmark[level=#2, page=1]{#1}	
-% }
+
 
 \NewDocumentCommand \IfLang { m +m o }
 {
@@ -768,12 +754,6 @@
     }
 }
 
-% \NewDocumentCommand \styleinput { m }
-% {
-%     \IfFileExists{ ../#1 }{ \input{../#1} }{}
-%     \IfFileExists{ #1 }{ \input{#1} }{}
-% }
-
 \keys_define:nn { finalizer }
 {	
 	final	.tl_set:N = \l_finalizer_final_tl,
@@ -994,6 +974,7 @@
     \dim_gset:Nn \vartwomargin {10mm}
 }
 
+% slide
 \cs_new:Nn \layout_paper_slide:
 {
     \dim_gset:Nn \stockwidth {9in}
@@ -1304,8 +1285,8 @@
     {
         { common }    { \layout_settle_common: }
         { vartwo }    { \layout_settle_vartwo: }
-        { slide }    { \layout_settle_slide: }
-        { arbitrary }  { \layout_settle_arbitrary: }
+        { slide }     { \layout_settle_slide: }
+        { arbitrary } { \layout_settle_arbitrary: }
     }{ 
         \layout_settle_common: 
     }
@@ -1782,7 +1763,7 @@
 
 % heading utilities -----------------------------------------------
 
-\newcounter{unsec}[chapter] % when \setsecnumdepth{chapter} is declared
+\newcounter{unsec}[chapter] % in case that \setsecnumdepth{chapter} is declared
 \newcounter{unsubsec}[unsec]
 
 \tl_new:N \g_tex_text_style 
@@ -1839,13 +1820,6 @@
 \NewDocumentCommand \SubsectionNewpageOff {}
 {
     \setsubsechook{} 
-}
-
-\NewDocumentEnvironment {SectionNewpage} {}
-{ 
-    \SectionNewpageOn 
-}{ 
-    \SectionNewPageOff
 }
 
 % objects ---------------------------------------------------------------------
@@ -3474,16 +3448,20 @@
 
 % option list
 \int_new:N \l_opt_cnt_int
-\cs_new_nopar:Nn \opt_selected: { ☑ } 
-\cs_new_nopar:Nn \opt_unselected: { ☐ }
+% \cs_new_nopar:Nn \opt_selected: { ☑ } 
+% \cs_new_nopar:Nn \opt_unselected: { ☐ }
+\newfontfamily\sbfamily{HCR~Dotum}
+\DeclareTextFontCommand{\textsb}{\sbfamily}
+\newcommand*\optselected{☑}
+\newcommand*\optunselected{☐}
 \cs_new_nopar:Nn \opt_label:
 {
     \int_gincr:N \l_opt_cnt_int
     \clist_if_in:NoTF \l_tmpa_clist {\int_use:N \l_opt_cnt_int}
     {
-		\opt_selected:
+		\textsb{\optselected}
 	}{
-		\opt_unselected:
+		\textsb{\optunselected}
 	}
 }
 
@@ -4129,10 +4107,10 @@
 \NewDocumentCommand \URL { s m }
 {
     \IfBooleanTF {#1}
-    { 
-        \href{https://#2}{\nolinkurl{#2}}
-    }{ 
+    {       
         \href{http://#2}{\nolinkurl{#2}}
+    }{ 
+        \href{https://#2}{\nolinkurl{#2}}        
     }
 }
 
@@ -4627,18 +4605,6 @@
 
 % spacing and miscellaneous utilities * * * * * * * * * * * * * * * * * * * * * * * * *
 
-% \LineSpacing: reduce
-% \LineSpacing*: increase
-\NewDocumentCommand \LineSpacing { s O{\onelineskip} }
-{
-    \IfBooleanTF { #1 }
-    {
-        \vspace{#2} 
-    }{
-        \skip_set:Nn \l_tmpa_skip {#2 * -1}
-        \vspace{\l_tmpa_skip}         
-    }
-}
 \NewDocumentCommand \EnlargePage { O{\onelineskip} }
 {
     \enlargethispage{#1}
