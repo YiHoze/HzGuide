@@ -1,5 +1,4 @@
-% templates for document components  * * * * * * * * * * * * * * * * * * * * *
-
+\ExplSyntaxOn
 \seq_new:N \g_template_text_seq
 \cs_new:Npn \template_add_text:n #1
 {
@@ -39,39 +38,38 @@
     \IfValueTF {#2}
     {
         \str_set:Nn \l_tmpa_str { #2 }
-    }
-    {
+    }{
         \IfBooleanTF{#1}
             { \str_set:Nn \l_tmpa_str { enumerate } }
             { \str_set:Nn \l_tmpa_str { itemize } }
     }
     \IfValueTF {#3}
-        { \template_list:nn {\l_tmpa_str}{#3} }
-        { \template_list:nn {\l_tmpa_str}{} }
+    { \template_list:nn {\l_tmpa_str}{#3} }
+    { \template_list:nn {\l_tmpa_str}{} }
 }
 
 \cs_new:Npn \template_list:nn #1 #2
 {
     \begin{#1}
     \int_zero:N \l_tmpa_int
-    \int_do_while:nNnn {\l_tmpa_int} < {4}
+    \int_do_while:nNnn {\l_tmpa_int} < { 3 }
     {
         \int_incr:N \l_tmpa_int
-        \str_if_eq:nnTF {terms} {#1}
-            { \template_item_label: {#2} }
-            { \template_item: {#2} }
+        \str_if_eq:noTF {terms} {#1}
+        { \template_item_label:n {#2} }
+        { \template_item:n {#2} }
     }
     \end{#1}
 }
 
-\cs_new:Npn \template_item_label: #1
-{
+\cs_new:Npn \template_item_label:n #1
+{    
     \tl_set:Nn \l_tmpa_tl {Term~\int_to_Alph:n {\l_tmpa_int}}
     \item[\l_tmpa_tl] \tpltext
     \tl_if_empty:nF {#1} { \template_list:nn {#1}{} }
 }
 
-\cs_new:Npn \template_item: #1
+\cs_new:Npn \template_item:n #1
 {
     \item \tpltext
     \tl_if_empty:nF {#1} { \template_list:nn {#1}{} }
@@ -118,7 +116,7 @@
         }
 }
 
-\NewDocumentCommand \tplactions { O{5} }
+\NewDocumentCommand \tpltopics { O{3} }
 {
     \int_zero:N \l_tmpa_int 
     \int_set:Nn \l_tmpb_int {#1}
@@ -126,9 +124,8 @@
     {
         \int_incr:N \l_tmpa_int
         \str_set:Nx \l_tmpa_str { \int_to_Alph:n \l_tmpa_int }
-        \section{action~\l_tmpa_str}
+        \section{topic~\l_tmpa_str}
         \tpllist*
-
     }
 }
 
@@ -152,7 +149,7 @@
 \NewDocumentCommand \tpltable {}
 {
     \par
-    \begin{PlaceTable}
+    \begin{Table}
         \begin{tabularx}{\linewidth}{XXX}
             \hline
             \textbf{A} & \textbf{B} & \textbf{C} \\\hline
@@ -163,7 +160,7 @@
             5 & 5 & 5\\
             \hline
         \end{tabularx}
-    \end{PlaceTable}
+    \end{Table}
 }
 
 \NewDocumentCommand \tplproblems { O{2} }
@@ -191,3 +188,4 @@
         }
     }
 }
+\ExplSyntaxOff

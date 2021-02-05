@@ -216,6 +216,7 @@
 	\renewcommand*{\printpartname}{\partnamefont\prenum}
 	\renewcommand*{\printpartnum}{\partnumfont\thepart\space\partnamefont\partname}
 	\renewcommand*{\partnamenum}{\space}
+    \xspaceaddexceptions{의 에 은 는 이 가 을 를 와 과 로 으 \으로 \은 \는 \이 \가 \을 \를 \와 \과}
 }
 
 \ExplSyntaxOff
@@ -1114,6 +1115,7 @@
             \rule{\textwidth}{0.75pt}
         \fi
     ]
+    \nopagebreak
 }
 
 \NewDocumentCommand \SectionMultilineRule { m }
@@ -3836,7 +3838,7 @@
         \RenewDocumentEnvironment
     }{
         \NewDocumentEnvironment 
-    }{ #2 }{ s t^ O{} d() }
+    }{ #2 }{ s t^ O{} d() +b }
     {
         \exp_args:Nno \keys_set:nn { BoundedBox }{ \g_bounded_box_options_tl }
         \keys_set:nn { BoundedBox }{ #3 }
@@ -3858,24 +3860,28 @@
 				\IfBooleanTF { ##1 }
 				{
                 	\begin{BBox}*
+                    \g_tex_text_style\l_bbox_style_tl\noindent ##5
+                    \end{BBox}
 				}{
 					\begin{BBox}
+                    \g_tex_text_style\l_bbox_style_tl\noindent ##5
+                    \end{BBox}
 				}
             }{
 				\IfBooleanTF { ##1 }
 				{
                 	\begin{BBox}*[\l_bbox_symbol_tl\l_bbox_before_signal_tl\l_bbox_signal_tl\l_bbox_after_signal_tl]
+                    \g_tex_text_style\l_bbox_style_tl\noindent ##5
+                    \end{BBox}
 				}{
                 	\begin{BBox}[\l_bbox_symbol_tl\l_bbox_before_signal_tl\l_bbox_signal_tl\l_bbox_after_signal_tl]
+                    \g_tex_text_style\l_bbox_style_tl\noindent ##5
+                    \end{BBox}
 				}
             }
-            \g_tex_text_style\l_bbox_style_tl
-            \noindent\hspace{-\hzparskip} % to remove abundant space
-    }{
-            \end{BBox}
             \object_skip_after:n { \l_bbox_after_skip }
         \group_end:
-    }
+    }{}
 }
 
 \NewDocumentCommand \RenewBoundedBox { m m }
@@ -4532,18 +4538,34 @@
     \group_end: 
 }
 
-\NewDocumentCommand \coderead { O{} }
+\NewDocumentCommand \coderead { s O{} }
 {
     \group_begin:
     \setSpacing{ \l_code_linespacing_tl }
-    \CodeSetup{#1}    
-    \dim_compare:nTF { \l_code_width_dim > 0pt }    
+    \CodeSetup{#2}   
+    \IfBooleanTF { #1 } 
     {
-       \code_read_minipage:
+        \code_read_verbatim:
     }{
-        \code_read:
+        \dim_compare:nTF { \l_code_width_dim > 0pt }    
+        {
+            \code_read_minipage:
+        }{
+            \code_read_box:
+        }
     }
     \group_end:
+}
+
+\cs_new:Nn \code_read_verbatim:
+{
+    \l_code_fontsize_tl      
+    \bool_if:NTF \g_minted_bool
+    {                
+        \inputminted{ latex }{ \tmpvrb }
+    }{            
+        \verbatiminput{ \tmpvrb }
+    }
 }
 
 \cs_new:Nn \code_read_minipage:
@@ -4552,19 +4574,13 @@
     \begin{minipage}[t]{\l_code_width_dim}
         \begin{codebox}[beforeskip=0pt, afterskip=0pt]
         \vspace{\l_code_raise_offset}\mbox{}  
-        \l_code_fontsize_tl      
-        \bool_if:NTF \g_minted_bool
-        {                
-            \inputminted{ latex }{ \tmpvrb }
-        }{            
-            \verbatiminput{ \tmpvrb }
-        }
+        \code_read_verbatim:
         \end{codebox}     
     \end{minipage}
     \object_skip_after:n {\l_code_after_skip}
 }
 
-\cs_new:Nn \code_read:
+\cs_new:Nn \code_read_box:
 {
     \int_compare:nTF { \@listdepth > 0 }  
     {
@@ -4574,13 +4590,7 @@
     }
     \begin{codebox}[beforeskip=\l_code_before_skip, afterskip=\l_code_after_skip]
     \vspace{\l_tmpa_dim}\mbox{}
-    \l_code_fontsize_tl
-    \bool_if:NTF \g_minted_bool
-    {                
-        \inputminted{ \l_code_language_tl }{ \tmpvrb }
-    }{            
-        \verbatiminput{ \tmpvrb }
-    }
+    \code_read_verbatim:
     \end{codebox}     
 }
 
@@ -4603,7 +4613,7 @@
     \endverbatimoutput
     \group_end: 
 
-    \code_read:
+    \code_read_box:
     \begin{result}
     \input{\tmpvrb}        
     \end{result}    
@@ -4649,7 +4659,7 @@
         \end{minipage}
     }
     \dim_set:Nn \l_tmpa_dim { \box_ht:N \l_tmpa_box + \box_dp:N \l_tmpa_box }
-    \dim_add:Nn \l_tmpa_dim { 1.5\onelineskip }    
+    \dim_add:Nn \l_tmpa_dim { 2\onelineskip }    
     \dim_set:Nn \l_tmpb_dim { \pagegoal - \pagetotal }
     \dim_compare:nTF { \l_tmpa_dim > \l_tmpb_dim }
 	{		

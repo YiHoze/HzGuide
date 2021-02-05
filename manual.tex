@@ -1,0 +1,62 @@
+\documentclass[10pt, openany, english, template]{hzguide}
+
+\LayoutSetup{}
+\HeadingSetup{chapterstyle=tandh}
+\setsecnumdepth{chapter}
+\SectionNewpageOn
+\DecolorHyperlinks*[blue]
+\ChapterContentsEnable(5)
+
+\CoverSetup{
+FrontLogoImage = {alertsymbol},
+BackLogoImage = {alertsymbol},
+ProductImage = {uncertain},
+title = {Product X},
+DocumentType = {User Guide},
+revision = {Rev. 1},
+note = {Keep this manual for later use.},
+manufacturer = Manufacturer,
+address = Seoul
+}
+
+\begin{document}
+\frontmatter*
+\FrontCover
+\tableofcontents
+
+\mainmatter*
+\chapter{Introduction}\tplpara
+\section{Features}\tpllist
+\section{Package Items}\tplimagetable
+\section{Specifications}\tplspectables
+
+\chapter{Safety}
+\section{General Precautions}\tpllist[itemize][itemize]
+\section{Tools}\tplimagetable
+\section{Safety Gear}\tplimagetable
+
+\chapter{Installation}
+\section{Installation Requirements}\tpllist
+\section{Installing X}\tplprocedure[5]
+\section{Checking X}\tplprocedure
+\section{Starting X}\tpllist*
+
+\chapter{Operation}\tplactions
+
+\chapter{Troubleshooting}\tplproblems
+
+\chapter{Maintenance}
+\section{Precautions for Maintenance}\tpllist
+\section{Scheduled Inspection}\tpllist
+
+\chapter{Warranty}
+\section{Warranty Coverage}\tplpara*
+\section{Limitation of Liability}\tplpara*\tpllist
+\section{Contact Information}\tplpara*
+
+\appendix
+\chapter{Technical Information}\tplspectables
+\chapter{Glossary}\tpllist[terms]
+
+\BackCover
+\end{document}
