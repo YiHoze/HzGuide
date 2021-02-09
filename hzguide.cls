@@ -15,7 +15,6 @@
 
 \LoadClassWithOptions{memoir}
 
-\RequirePackage{xparse}
 \RequirePackage{l3keys2e}
 \RequirePackage{etoolbox}
 \RequirePackage{calc} 
@@ -174,6 +173,16 @@
 \bool_if:NT \g_minted_bool
 {
     \RequirePackage{minted}
+    \setminted{
+        encoding=UTF8, 
+        fontsize=\small,         
+        tabsize=2, 
+        breaklines=true, 
+        breakafter=\\/,
+        linenos=false, 
+        frame=none
+    }
+    \patchcmd{\FV@ListVSpace}{\@topsepadd\topsep}{\vspace{.25\onelineskip}}{}{}    
 }
 
 \bool_if:NT \g_pairquote_bool
@@ -597,21 +606,18 @@
 
 \NewDocumentCommand \IfVartwo { m O{} }
 {
-    \bool_if:NTF \g_column_vartwo_bool   { #1 }  { #2 }
+    \bool_if:NTF \g_column_vartwo_bool { #1 }{ #2 }
 }
 
-\NewDocumentEnvironment {IfVartwoEnlarge} { O{-\vartwosecindent} }
+\NewDocumentEnvironment {IfVartwoEnlarge} { O{-\vartwosecindent} +b }
 {
     \bool_if:NT \g_column_vartwo_bool
     {
         \begin{adjustwidth}{#1}{0pt}
-    }
-}{
-    \bool_if:NT \g_column_vartwo_bool
-    {
+        #2
         \end{adjustwidth}
     }
-}
+}{}
 
 \cs_new:Npn \layout_paper_configure:n #1
 {
@@ -1484,12 +1490,6 @@
     }
     \group_end:
 }
-
-% \NewDocumentCommand \Appendix {}
-% {
-%     \appendix
-%     \addtocontents{toc}{\protect\contentsline{chapter}{\appendixname}{}{}}
-% }
 
 % ## chpater contents
 
@@ -4465,7 +4465,7 @@
 \NewBoundedBox{codebox}{style=\small}
 \NewBoundedBox{result}{type=LeftBarBox, style=\sffamily\small}
 
-\tl_set:Nx \tmpvrb { \jobname.vrb }
+\tl_set:Nx \l_code_file_tl { \jobname.vrb }
 \dim_new:N \l_code_description_width_dim
 
 \keys_define:nn { CODE }
@@ -4480,6 +4480,7 @@
     language    .tl_set:N = \l_code_language_tl,
     codebox     .tl_set:N = \l_code_codebox_tl,
     resultbox   .tl_set:N = \l_code_resultbox_tl,
+    file        .code:n = { \tl_set:Nx \l_code_file_tl { #1 } }
 }
 
 \cs_new:Npn \code_verbatim_font:n #1
@@ -4509,6 +4510,10 @@
     {
         \RenewBoundedBox{ result }{ type=\l_code_resultbox_tl }
     }
+    \bool_if:NT \g_minted_bool
+    {
+        \setminted{fontsize=\l_code_fontsize_tl}
+    }
 }
 
 \protected\def\CRsymbol{\mbox{$\hookleftarrow$}}
@@ -4532,7 +4537,7 @@
 \NewDocumentEnvironment { codewrite }{ }
 {
     \group_begin:
-    \exp_args:Nx \verbatimoutput { \tmpvrb }
+    \exp_args:Nx \verbatimoutput { \l_code_file_tl }
 }{
     \endverbatimoutput
     \group_end: 
@@ -4562,9 +4567,9 @@
     \l_code_fontsize_tl      
     \bool_if:NTF \g_minted_bool
     {                
-        \inputminted{ latex }{ \tmpvrb }
+        \inputminted{ latex }{ \l_code_file_tl }
     }{            
-        \verbatiminput{ \tmpvrb }
+        \verbatiminput{ \l_code_file_tl }
     }
 }
 
@@ -4597,7 +4602,7 @@
 \NewDocumentEnvironment { code }{}
 {
     \group_begin:    
-    \exp_args:Nx \verbatimoutput { \tmpvrb }
+    \exp_args:Nx \verbatimoutput { \l_code_file_tl }
 }{
     \endverbatimoutput
     \group_end: 
@@ -4608,20 +4613,20 @@
 \NewDocumentEnvironment { coderesult }{}
 {
     \group_begin:
-    \exp_args:Nx \verbatimoutput { \tmpvrb }
+    \exp_args:Nx \verbatimoutput { \l_code_file_tl }
 }{
     \endverbatimoutput
     \group_end: 
 
     \code_read_box:
     \begin{result}
-    \input{\tmpvrb}        
+    \input{\l_code_file_tl}        
     \end{result}    
 }
 
 \NewDocumentCommand \codeinput {}
 {
-    \input{\tmpvrb}
+    \input{\l_code_file_tl}
 }
 
 \NewDocumentEnvironment { codedesc }{ O{} +b }
@@ -4645,9 +4650,9 @@
                 \l_code_fontsize_tl
                 \bool_if:NTF \g_minted_bool
                 {                
-                    \inputminted{ latex }{ \tmpvrb }
+                    \inputminted{ latex }{ \l_code_file_tl }
                 }{            
-                    \verbatiminput{ \tmpvrb }
+                    \verbatiminput{ \l_code_file_tl }
                 }
                 \end{codebox}
             \end{minipage}
@@ -5030,18 +5035,6 @@
 \renewcommand{\chapterrefname}{\chaptername~}
 \renewcommand{\tablerefname}{\tablename}
 \renewcommand{\figurerefname}{\figurename}
-
-\@ifpackageloaded{minted}{
-    \setminted{
-        encoding=UTF8, 
-        fontsize=\small, 
-        tabsize=2, 
-        breaklines=true, 
-        linenos=false, 
-        frame=none
-    }
-    \patchcmd{\FV@ListVSpace}{\@topsepadd\topsep}{\vspace{.25\onelineskip}}{}{}    
-}{}
 
 \LoadStyleset
 
