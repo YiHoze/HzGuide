@@ -4183,7 +4183,7 @@
             \int_incr:N \l_tmpb_int
             \tl_if_empty:nTF { ##1 } 
             {
-                \mbox{}
+                \space
             }{
                 \tsv_render_item:Nn \l_tmpb_int { ##1 }
             }
