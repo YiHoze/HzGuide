@@ -611,11 +611,13 @@
 
 \NewDocumentEnvironment {IfVartwoEnlarge} { O{-\vartwosecindent} +b }
 {
-    \bool_if:NT \g_column_vartwo_bool
+    \bool_if:NTF \g_column_vartwo_bool
     {
         \begin{adjustwidth}{#1}{0pt}
         #2
         \end{adjustwidth}
+    }{
+        #2
     }
 }{}
 
@@ -3823,8 +3825,6 @@
 	}
 }
 
-\tl_new:N \bbox
-
 \cs_new:Npn \bbox_type_set:n #1
 {
     \cs_set_eq:Nc \BBox {#1} 
@@ -4726,10 +4726,10 @@
     FontSizeIV = \Large,
     TitleAlign = \raggedright,
     ProductImage = cover_image,
-    AfterFront=\clearpage, %\cleartorecto,
-    BeforeBack=\clearpage, %\cleartoverso,
-	BlankFront=false,
-	BlankBack=false
+    AfterFront = \clearpage, %\cleartorecto,
+    BeforeBack = \clearpage, %\cleartoverso,
+	BlankFront = false,
+	BlankBack = false
 }
 
 \NewDocumentCommand \CoverFontSize { m }

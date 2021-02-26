@@ -1,4 +1,4 @@
-\documentclass[minted, pairquote]{hzguide}
+\documentclass[pairquote]{hzguide}
 
 \setmainfont{NotoSerifCJKkr-Regular.otf}[BoldFont={NotoSerifCJKkr-Bold.otf}, ItalicFont={NotoSerif-LightItalic.ttf}]
 \setsansfont{NotoSansCJKkr-Regular.otf}[BoldFont={NotoSansCJKkr-Medium.otf}]
@@ -288,7 +288,7 @@ HzGuide는 \term{memoir}에 기반하여 \term{테크니컬 라이터}\annotate{
 메므와 클래스 옵션들과 함께 다음 옵션들을 사용할 수 있다.
 
 \begin{code}
-\documentclass[minted, minted, minted,, minted, mintedlanguage=korean, styleset=../foo.tex, Noto]{hzguide}
+\documentclass[minted,, minted, mintedlanguage=korean, styleset=../foo.tex, Noto]{hzguide}
 \end{code}
 
 \begin{macros}<hzguide>
@@ -333,7 +333,7 @@ Noto 폰트가 사용된다.
 \macro{language} 클래스 옵션에 주어진 언어의 첫 세 글자가 저장되고, 그것을 \macro{\IfLang} 명령과 \macro{IfLanguage} 환경에 사용할 수 있다.
 
 \begin{code}
-\documentclass[minted, minted, minted,, minted, mintedlanguage=german]{hzguide}
+\documentclass[minted,, minted, mintedlanguage=german]{hzguide}
 \IfLang{ger}{…}
 \begin{IfLanguage}{ger} … \end{IfLanguage}
 \end{code}
@@ -2672,7 +2672,7 @@ UTF-8 bytes         : \textcolor{violet}{EC9CA0}   11101100 10011100 10100000
 \appendix
 
 \chapter{텍 라이브 설정하기}
-\label:{chp:tlconf_cmd}
+\label{chp:tlconf_cmd}
 
 HzGuide 클래스와 함께 제공되는 \cmd{tlconf.cmd} 스크립트가 텍 라이브를 설치한 다음에 폰트 경로를 비롯한 설정에 들여야 하는 성가신 수고를 줄여준다.
 
