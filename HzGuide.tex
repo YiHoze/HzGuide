@@ -1,4 +1,4 @@
-\documentclass[pairquote]{hzguide}
+\documentclass[minted, minted, pairquote]{hzguide}
 
 \setmainfont{NotoSerifCJKkr-Regular.otf}[BoldFont={NotoSerifCJKkr-Bold.otf}, ItalicFont={NotoSerif-LightItalic.ttf}]
 \setsansfont{NotoSansCJKkr-Regular.otf}[BoldFont={NotoSansCJKkr-Medium.otf}]
@@ -51,7 +51,7 @@
 \makeatletter
 \patchcommand{\@smemmain}{}{\ThumbIndexEnable} % \mainmatter*
 \makeatother
-\patchcommand{\printindex}{\cleartoverso\ThumbIndexDisable}{}
+\patchcommand{\printindex}{\ThumbIndexDisable\cleartoverso}{}
 
 \ObjectSetup{
     beforeskip=.1\onelineskip, 
@@ -288,7 +288,7 @@ HzGuide는 \term{memoir}에 기반하여 \term{테크니컬 라이터}\annotate{
 메므와 클래스 옵션들과 함께 다음 옵션들을 사용할 수 있다.
 
 \begin{code}
-\documentclass[minted,, minted, mintedlanguage=korean, styleset=../foo.tex, Noto]{hzguide}
+\documentclass[minted, minted, minted,, minted, mintedlanguage=korean, styleset=../foo.tex, Noto]{hzguide}
 \end{code}
 
 \begin{macros}<hzguide>
@@ -333,7 +333,7 @@ Noto 폰트가 사용된다.
 \macro{language} 클래스 옵션에 주어진 언어의 첫 세 글자가 저장되고, 그것을 \macro{\IfLang} 명령과 \macro{IfLanguage} 환경에 사용할 수 있다.
 
 \begin{code}
-\documentclass[minted,, minted, mintedlanguage=german]{hzguide}
+\documentclass[minted, minted, minted,, minted, mintedlanguage=german]{hzguide}
 \IfLang{ger}{…}
 \begin{IfLanguage}{ger} … \end{IfLanguage}
 \end{code}
