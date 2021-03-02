@@ -1,4 +1,4 @@
-\documentclass[minted, minted, pairquote]{hzguide}
+\documentclass[pairquote, minted]{hzguide}
 
 \setmainfont{NotoSerifCJKkr-Regular.otf}[BoldFont={NotoSerifCJKkr-Bold.otf}, ItalicFont={NotoSerif-LightItalic.ttf}]
 \setsansfont{NotoSansCJKkr-Regular.otf}[BoldFont={NotoSansCJKkr-Medium.otf}]
@@ -288,12 +288,13 @@ HzGuide는 \term{memoir}에 기반하여 \term{테크니컬 라이터}\annotate{
 메므와 클래스 옵션들과 함께 다음 옵션들을 사용할 수 있다.
 
 \begin{code}
-\documentclass[minted, minted, minted,, minted, mintedlanguage=korean, styleset=../foo.tex, Noto]{hzguide}
+\documentclass[language=japanese, styleset=../foo.tex, Noto]{hzguide}
 \end{code}
 
 \begin{macros}<hzguide>
 \item[language] \keyvalue{korean, english, chinese, TC, czech, danish, dutch, finnish, german, italian, japanese, norwegian, polish, portugeue, russian, slovakian, spanish, swedish, turkish }
 \macro{chinese}는 \term{간체}\annotate*{简体}, \macro{TC}는 \term{번체}\annotate*{繁體}이다.
+디폴트는 \macro{korean}이다. 
 영어는 \verb{language=english} 대신 \verb{english}로 지정할 수 있다.
 언어에 따라 \macro{polyglossia} 또는 \macro{xeCJK} 패키지가 호출된다.
 
@@ -324,7 +325,7 @@ Noto 폰트가 사용된다.
 \begin{code}
 \IfXetex{ TRUE }[ FALSE ]
 \IfLuatex{ TRUE }[ FALSE ]
-\iflang{언어}{ TRUE }[ FALSE ]
+\IfLang{언어}{ TRUE }[ FALSE ]
 \begin{IfLanguage}{언어} \end{IfLanguage}
 \end{code}
 
@@ -333,7 +334,7 @@ Noto 폰트가 사용된다.
 \macro{language} 클래스 옵션에 주어진 언어의 첫 세 글자가 저장되고, 그것을 \macro{\IfLang} 명령과 \macro{IfLanguage} 환경에 사용할 수 있다.
 
 \begin{code}
-\documentclass[minted, minted, minted,, minted, mintedlanguage=german]{hzguide}
+\documentclass[language=german]{hzguide}
 \IfLang{ger}{…}
 \begin{IfLanguage}{ger} … \end{IfLanguage}
 \end{code}
