@@ -3080,8 +3080,6 @@
     \index{#1!#2@\macroprint{#3}}
 }
 
-
-
 \cs_new:Npn \terms_label_default:n #1
 {
     \int_gincr:N \l_terms_int
@@ -3600,13 +3598,21 @@
 }
 
 \bool_new:N \l_macro_index_bool
+\NewDocumentCommand \MacroIndexEnable {}
+{
+    \bool_gset_true:N \l_macro_index_bool
+}
+\NewDocumentCommand \MacroIndexDisable {}
+{
+    \bool_gset_false:N \l_macro_index_bool
+}
 \NewDocumentCommand \IndexingEnable { s }
 {
     \makeindex  
     \TermSetup{index=true}
     \TermsSetup{index=true}
     \AnnotateSetup{index=true}
-    \bool_gset_true:N \l_macro_index_bool
+    \MacroIndexEnable
     \IfBooleanT{ #1 }
     { 
         \BookmarkIndexHead 
@@ -3618,7 +3624,7 @@
     \TermSetup{index=false}
     \TermsSetup{index=false}
     \AnnotateSetup{index=false}
-    \bool_gset_false:N \l_macro_index_bool
+    \MacroIndexDisable
 }
 
 % ## circled numbers
@@ -4420,12 +4426,15 @@
     \index{#1@\macroprint{#2}}
 }
 
-\NewDocumentCommand \macro { m }
+\NewDocumentCommand \macro { s m }
 {
-    \macroprint{#1}	
+    \macroprint{#2}	
     \bool_if:NT \l_macro_index_bool	
     {
-        \macroindex{#1}		
+        \IfBooleanF{#1}
+        {
+            \macroindex{#2}
+        }
     }	
 }
 
