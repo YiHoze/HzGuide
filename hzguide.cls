@@ -4222,7 +4222,7 @@
 \cs_generate_variant:Nn \prg_set_conditional:Npnn { c }
 \exp_args_generate:n { cnn }
 
-% \NewConditionals{command}{environment}{setup}
+% \NewConditionals{command}{setup}[environment]
 \NewDocumentCommand \NewConditionals { m m o }
 {
     \clist_new:c { g_#1_property_clist }

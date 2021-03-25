@@ -8,4 +8,5 @@ _minted-HzGuide/
 *.vrb
 *.gz
 *.log
+*.ps1
 tmp.tex
