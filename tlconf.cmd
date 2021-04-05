@@ -12,24 +12,14 @@ if /i .%1. == .sumatrapdf. goto SumatraPDF
 if /i .%1. NEQ .batch. goto eof
 
 :cnf
-rem checking if TeX Live is found
+REM checking if TeX Live is found
 kpsewhich -var-value=TEXMFROOT >nul 2>&1
 if errorlevel 1 (
 echo TeX Live not on searchpath. Aborting.
 exit /b
 )
 
-rem updating texmf.cnf
-set cnf=%tlroot%\texmf.cnf
-set org=%tlroot%\texmf.org
-dir %org% >nul 2>&1
-if errorlevel == 1 copy %cnf% %org%
-echo OSFONTDIR=$SystemRoot/fonts//;$localappdata/Microsoft/Windows/Fonts// > %cnf%
-echo TEXLIVE_WINDOWS_TRY_EXTERNAL_PERL = 0 >> %cnf%
-echo %cnf%:
-type %cnf%
-
-rem creating local.conf
+REM creating local.conf
 set localconf=%tlroot%\texmf-var\fonts\conf\local.conf
 set code=%LOCALAPPDATA%/Microsoft/Windows/Fonts
 set code=%content:\=/%
