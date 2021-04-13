@@ -2606,7 +2606,6 @@
     \CaptionSetup{font=\color{red}\sffamily\footnotesize}
 }
 
-\ior_new:N \l_txt_io
 \NewDocumentCommand \MakeAlbum { s O {1} m }
 {   
     \int_zero:N \l_tmpa_int
@@ -2618,8 +2617,8 @@
         \ImageSetup{showfilename=true} 
         \CaptionSetup{align=\raggedright}
     }
-    \ior_open:Nn \l_txt_io { #3 }
-    \ior_map_inline:Nn \l_txt_io
+    \ior_open:Nn \g_tmpa_ior { #3 }
+    \ior_map_inline:Nn \g_tmpa_ior
     {
         \tl_set:Nn \l_tmpa_tl { ##1 }
         \tl_trim_spaces:N \l_tmpa_tl
@@ -2632,7 +2631,7 @@
             \image{\l_tmpa_tl}\par            
         }
     }
-    \ior_close:N \l_txt_io
+    \ior_close:N \g_tmpa_ior
 }
 
 % ## table 
