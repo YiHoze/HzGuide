@@ -4404,7 +4404,7 @@
     \str_set:Nx \l_tmpa_str { \tl_to_str:n {#1} }
     \regex_replace_all:nnN { \? }{ \@ } \l_tmpa_str
     \str_remove_all:Nn \l_tmpa_str { ~ }
-    \texttt{\str_use:N \l_tmpa_str}    
+    \texttt{\str_use:N \l_tmpa_str}
 }
 
 \NewDocumentCommand \macroindex { m }
@@ -4414,7 +4414,7 @@
         \str_set:Nx \l_tmpa_str { \cs_to_str:N #1 }
     }{
         \str_set:Nn \l_tmpa_str { #1 }
-    }        
+    }
     \str_set:Nn \l_tmpb_str { #1 }
     \regex_replace_all:nnN { \@ }{ \? } \l_tmpa_str
     \regex_replace_all:nnN { \@ }{ \? } \l_tmpb_str
