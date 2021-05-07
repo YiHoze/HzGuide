@@ -2435,7 +2435,7 @@
 % \begin{IllustEnum}*    : restart the order number
 % \begin{IllustEnum}^    : apply ad-hoc options, specified to the option of "star" of \illustimage*)
 
-\NewDocumentEnvironment { IllustEnum } { s t^ o m +b }
+\NewDocumentEnvironment { IllustEnum } { s t^ o m d() +b }
 {
     \exp_args:No \IllustImageSetup{ \l_illustimage_enum_tl }
     \IfBooleanT {#1} 
@@ -2450,19 +2450,23 @@
 	{ 
         \IllustImageSetup{#3} 
     }
+    \IfValueT {#5} 
+    { 
+        \tl_set:Nn \l_illustimage_caption_tl {#5} 
+    }
     \IfBooleanTF{#1}
     {
         \illustimage{#4}{
             \begin{enumerate}[series=IlluEnum, leftmargin=1.5em]
-                #5
+                #6
             \end{enumerate}
-        }        
+        }
     }{
         \illustimage{#4}{
             \begin{enumerate}[series=IlluEnum, resume=IlluEnum, leftmargin=1.5em]
-                #5
+                #6
             \end{enumerate}
-        }         
+        }
     }
 }{}
 
