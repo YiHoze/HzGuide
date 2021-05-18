@@ -2194,7 +2194,7 @@
     {
         \group_begin:
         \tl_set:Nx \l_tmpa_tl { #2 }
-        \allowbreak \color{red} \scriptsize \tl_to_str:N \l_tmpa_tl
+        \allowbreak \color{ImageName} \scriptsize \tl_to_str:N \l_tmpa_tl
         \group_end:
     }
 }
@@ -2350,15 +2350,15 @@
         \begin{minipage}[\l_illustimage_valign_tl]{\l_illustimage_image_width_dim}
             \vspace{0pt}
 			\l_illustimage_image_align_tl
-            \mbox{} \box_use:N \l_image_box      
-            \illustimage_caption:      
+            \mbox{} \box_use:N \l_image_box
+            \illustimage_caption:
         \end{minipage}
         \hfill 
         \begin{minipage}[\l_illustimage_valign_tl]{\l_illustimage_text_width_dim}
             \vspace{0pt}
             \vspace{\l_illustimage_voffset_skip}
-            \box_use:N \l_text_box        
-        \end{minipage}        
+            \box_use:N \l_text_box
+        \end{minipage}
     \end{minipage}
     \object_skip_after:n {\l_illustimage_after_skip}
 }
@@ -2498,7 +2498,7 @@
     \bool_if:NT { \l_lineimg_showfilename_bool}
     {
         \group_begin:
-        \allowbreak \color{red} \scriptsize \tl_to_str:n { #2 }
+        \allowbreak \color{ImageName} \scriptsize \tl_to_str:n { #2 }
         \group_end:
     }
 }
@@ -2598,7 +2598,7 @@
 \newlist{calloutenum}{enumerate}{1}
 \setlist[calloutenum]{label=\arabic*), noitemsep}
 
-% ## album
+\definecolor{ImageName}{named}{violet}
 
 \NewDocumentCommand \ShowImageFilename { s }
 {
@@ -2607,8 +2607,10 @@
     \IfBooleanT{#1} { 
         \LineImageSetup{showfilename=true} 
     }
-    \CaptionSetup{font=\color{red}\sffamily\footnotesize}
+    \CaptionSetup{font=\color{ImageName}\footnotesize}
 }
+
+% ## album
 
 \NewDocumentCommand \MakeAlbum { s O {1} m }
 {   
@@ -4075,7 +4077,7 @@
 {
     \bool_if:NF \l_pending_hide_bool
     {
-        { \color{\l_pending_color_tl}\l_pending_font_tl #1 }
+        { \textcolor{ \l_pending_color_tl }{ \l_pending_font_tl #1 } }
     }
 }
 
@@ -4097,7 +4099,7 @@
 
 \newcounter{query}
 \renewcommand\thequery{\arabic{query})}
-\newlistof{listofqueries}{loq}{Queries}
+\newlistof{listofqueries}{loq}{질의}
 \newlistentry{query}{loq}{0}
 \setcounter{loqdepth}{1}
 \renewcommand*\cftqueryafterpnum{\bigskip}
@@ -4108,7 +4110,7 @@
     {
 	    \stepcounter{query}	
 		\hangfrom{
-			\textcolor{\l_pending_color_tl}{ \l_pending_font_tl \thequery }
+			\textcolor{ \l_pending_color_tl }{ \l_pending_font_tl \thequery }
 		}
         \space
 		\textcolor{\l_pending_color_tl}{ \l_pending_font_tl #1 }
