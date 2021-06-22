@@ -111,7 +111,7 @@
 \keys_define:nn { HzGuide }
 {
     language    .code:n = { \LanguageSetup{ #1 } },
-    % korean      .code:n = { \LanguageSetup{ korean } },
+    korean      .code:n = { \LanguageSetup{ korean } },
     english     .code:n = { \LanguageSetup{ english } },
     styleset    .tl_set:N = \g_style_set_tl,
     Noto        .bool_set:N = \g_Noto_bool,
@@ -208,7 +208,7 @@
     \newcommand\prenum{第}
 }
 
-\IfLang{kor}{    
+\IfLang{kor}{
     \IfLuatex{
         \RequirePackage[hangul]{luatexko}
     }[
@@ -3613,7 +3613,7 @@
 }
 \NewDocumentCommand \IndexingEnable { s }
 {
-    \makeindex  
+    \makeindex
     \TermSetup{index=true}
     \TermsSetup{index=true}
     \AnnotateSetup{index=true}
