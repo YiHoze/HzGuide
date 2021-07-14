@@ -1,10 +1,10 @@
-\ProvidesPackage{sphinxkari}
+\ProvidesPackage{hzsphinx}
 
 \RequirePackage[absolute]{textpos}
 
 % font ------------------------------------------------------------------------
 
-\RequirePackage{mathptmx}
+% \RequirePackage{mathptmx}
 
 \setmainfont{Noto Serif}[BoldFont={* SemiBold}, Mapping=tex-text-sq]
 \setsansfont{Noto Sans}[BoldFont={* SemiBold}, Mapping=tex-text-sq]
@@ -416,15 +416,15 @@
 	}
 }
 
-\RenewBoundedBox{note}{type=shade, title-font=\sffamily\bfseries}
-\DeclareDocumentEnvironment {sphinxadmonition} { mm }
-{   
-    \str_set:Nx \l_tmpa_str { #2 }
-    \str_remove_all:Nn \l_tmpa_str {:}
-    \begin{note}(\space\l_tmpa_str\space)
-}{
-    \end{note}
-}
+\RenewBoundedBox{note}{type=shade, titlefont=\sffamily\bfseries}
+% \DeclareDocumentEnvironment {sphinxadmonition} { mm }
+% {   
+%     \str_set:Nx \l_tmpa_str { #2 }
+%     \str_remove_all:Nn \l_tmpa_str {:}
+%     \begin{note}(\space\l_tmpa_str\space)
+% }{
+%     \end{note}
+% }
 \ExplSyntaxOff
 
 
@@ -487,12 +487,14 @@
 \renewcommand\spxextra[1]{ (\emph{#1})}
 
 % layout & heading settings ---------------------------------------------------
-\NewConditionals{adhoc}{Adhoc}
+% \NewConditionals{adhoc}{Adhoc}
 \ifadhoc^{layout}{
     \LayoutSetup{paper=A4,column=one}
 }
 \ifadhoc^{heading}{
     \HeadingSetup{
+        chapterstyle=sparse,
+        cjkchapter=true,
         parskip=.35\baselineskip,
         paragraphstyle=interval
     }

@@ -1096,7 +1096,7 @@
 
 \cs_new:Npn \style_chapter_configure:n #1 
 {
-    \chapterstyle{#1}    
+    \chapterstyle{#1}
     \renewcommand{\chapnamefont}{\chapterline\chapternamesize}
     \renewcommand{\chapnumfont}{\chapterline\chapternumbersize}
     \renewcommand{\chaptitlefont}{\chapterline\chaptertitlesize}    
@@ -1308,7 +1308,7 @@
     \ObjectSetup{
         beforeskip=.75\onelineskip, 
         afterskip=.75\onelineskip
-    }    
+    }
 }
 
 \cs_new:Nn \style_paragraph_interval:
@@ -1455,14 +1455,14 @@
     \chapterstyle{default}
     \setlength{\beforechapskip}{3\onelineskip}
     \setlength{\midchapskip}{.5\onelineskip}
-    \setlength{\afterchapskip}{2\onelineskip}        
+    \setlength{\afterchapskip}{2\onelineskip}
 }
 
 \makechapterstyle{sparse}{
     \chapterstyle{default}
     \setlength{\beforechapskip}{5\onelineskip}
     \setlength{\midchapskip}{\onelineskip}
-    \setlength{\afterchapskip}{4\onelineskip}        
+    \setlength{\afterchapskip}{4\onelineskip}
 }
 
 \NewDocumentCommand \TableOfContents { s o }
@@ -3021,7 +3021,7 @@
         {
             \index{ \tl_use:N #1@\l_tmpa_tl }
         }{
-            \index{ \tl_use:N \l_terms_index_category_tl!#1@\tl_use:N \l_tmpa_tl }     
+            \index{ \tl_use:N \l_terms_index_category_tl!#1@\tl_use:N \l_tmpa_tl }
         }
     }{
         \tl_if_empty:NTF \l_terms_index_category_tl
@@ -3053,11 +3053,11 @@
         {
             \macroindex{#1}
             \tl_if_empty:NF \l_terms_index_category_tl
-            {            
+            {
                 \exp_args:NnV \label_macro_index:nn { #1 } \l_terms_index_category_tl
             }
         }
-    }        
+    }
 }
 
 \cs_new:Npn \label_macro_index:nn #1 #2
@@ -3760,8 +3760,8 @@
 
 \NewTColorBox{RuleBox}{ s O{} }
 {
-    opacityfill=0,
-    before~skip=0pt, after~skip=0pt, breakable=false, after={\par\normalcolor},
+    opacityfill=0, 
+    before~skip=0pt, after~skip=0pt, after={\par\normalcolor},
     arc=0ex, boxrule=0pt,
     boxsep=0.25ex,  top=0.75ex, bottom=0.75ex, left=0em, right=0em,
     borderline~north={0.5pt}{0pt}{darkgray},
@@ -3778,7 +3778,26 @@
     enhanced,
     before~skip=0pt, after~skip=0pt, after={\par\normalcolor},
     boxrule=0.5pt, colframe=gray, colback=white, arc=0.5ex,
-    boxsep=.5ex, top=1.5ex, bottom=0.5ex, left=0.5em, right=0.5em,
+    boxsep=0.5ex, top=1.5ex, bottom=0.5ex, left=0.5em, right=0.5em,
+    colbacktitle=white, coltitle=black,
+    attach~boxed~title~to~top~left={xshift=.5cm, yshift=-1.75mm},
+    boxed~title~style={size=minimal, enhanced, boxrule=0.25pt, colframe=white},
+    fonttitle=\l_bbox_title_font_tl, title=\quad#2\quad, 
+	IfBooleanTF={#1}{
+		breakable=\l_bbox_breakable_adhoc_tl
+	}{
+		breakable=\l_bbox_breakable_default_tl
+	}
+}
+
+\NewTColorBox{TabRuleBox}{ s O{} }
+{
+    opacityfill=0,
+    before~skip=0pt, after~skip=0pt, after={\par\normalcolor},
+    arc=0ex, boxrule=0pt, colback=white,
+    boxsep=0.5ex,  top=1.5ex, bottom=0.75ex, left=0em, right=0em,
+    borderline~north={0.5pt}{0pt}{darkgray},
+    borderline~south={0.5pt}{0pt}{darkgray}, 
     colbacktitle=white, coltitle=black,
     attach~boxed~title~to~top~left={xshift=.5cm, yshift=-1.75mm},
     boxed~title~style={size=minimal, enhanced, boxrule=0.25pt, colframe=white},
@@ -3817,7 +3836,7 @@
 
 \BoundedBoxInitialize {
     beforeskip = \hznulldim,
-    extraskip = -.5\onelineskip,
+    extraskip = 0pt,
     afterskip = \hznulldim,
     type = ShadeBox,
     titlefont = \bfseries,
@@ -3856,7 +3875,7 @@
         \group_begin:
             \keys_set:nn { BoundedBox }{ ##3 } 
 			\IfValueT { ##4 }
-			{                
+			{
                 \tl_set:Nn \l_bbox_signal_tl { ##4 }
 			}
             \exp_args:Nx \bbox_type_set:n { \l_bbox_type_tl }
@@ -3866,7 +3885,7 @@
             }{
                 \object_skip_before:n { \l_bbox_before_skip }
             }
-            \tl_if_empty:NTF \l_bbox_signal_tl    
+            \tl_if_empty:NTF \l_bbox_signal_tl
             {
 				\IfBooleanTF { ##1 }
 				{

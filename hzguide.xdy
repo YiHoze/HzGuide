@@ -1,3 +1,5 @@
+(require "lang/korean/utf8-lang.xdy")
+
 (merge-rule "简" "간~b")
 (merge-rule "\macroprint{\(.*\)}" "\1~e" :again :bregexp)
 (merge-rule "\termindexprint{.*}{\(.*\)}" "\1~e" :again :bregexp)
