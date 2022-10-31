@@ -1,0 +1,189 @@
+\seq_new:N \g_template_text_seq
+\cs_new:Npn \template_add_text:n #1
+{
+    \seq_gput_right:Nn \g_template_text_seq {#1}
+}
+
+\group_begin:
+    \char_set_catcode_space:n {`\ }
+    \template_add_text:n {Lorem ipsum dolor sit amet, consectetuer adipiscing elit. }
+    \template_add_text:n {Etiam lobortis facilisis sem. Nullam nec mi et neque pharetra sollicitudin. Praesent imperdiet mi nec ante. }
+    \template_add_text:n {Donec ullamcorper, felis non sodales commodo, lectus velit ultrices augue, a dignissim nibh lectus placerat pede. Vivamus nunc nunc, molestie ut, ultricies vel, semper in, velit. Ut porttitor. Praesent in sapien. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Duis fringilla tristique neque. }
+    \template_add_text:n {Sed interdum libero ut metus. Pellentesque placerat. Nam rutrum augue a leo. Morbi sed elit sit amet ante lobortis sollicitudin. Praesent blandit blandit mauris. Praesent lectus tellus, aliquet aliquam, luctus a, egestas a, turpis. Mauris lacinia lorem sit amet ipsum. Nunc quis urna dictum turpis accumsan semper.}
+\group_end:
+
+\cs_new:Npn \template_print_text:n #1
+{
+    \seq_item:Nn \g_template_text_seq {#1}
+}
+
+\NewDocumentCommand \tpltext { O{1} }
+{
+    \int_step_function:nnnN {1}{1}{#1} \template_print_text:n
+}
+
+\NewDocumentCommand \tplpara { s }
+{
+    \IfBooleanTF {#1}
+        { \tpltext[3] }
+        { \tpltext[2]  }
+    \par
+}
+
+% \tpllist*[terms][enumerate]
+\NewDocumentCommand \tpllist { s o o }
+{
+    \tplpara
+    \IfValueTF {#2}
+    {
+        \str_set:Nn \l_tmpa_str { #2 }
+    }{
+        \IfBooleanTF{#1}
+            { \str_set:Nn \l_tmpa_str { enumerate } }
+            { \str_set:Nn \l_tmpa_str { itemize } }
+    }
+    \IfValueTF {#3}
+    { \template_list:nn {\l_tmpa_str}{#3} }
+    { \template_list:nn {\l_tmpa_str}{} }
+}
+
+\cs_new:Npn \template_list:nn #1 #2
+{
+    \begin{#1}
+    \int_zero:N \l_tmpa_int
+    \int_do_while:nNnn {\l_tmpa_int} < { 3 }
+    {
+        \int_incr:N \l_tmpa_int
+        \str_if_eq:noTF {terms} {#1}
+        { \template_item_label:n {#2} }
+        { \template_item:n {#2} }
+    }
+    \end{#1}
+}
+
+\cs_new:Npn \template_item_label:n #1
+{    
+    \tl_set:Nn \l_tmpa_tl {Term~\int_to_Alph:n {\l_tmpa_int}}
+    \item[\l_tmpa_tl] \tpltext
+    \tl_if_empty:nF {#1} { \template_list:nn {#1}{} }
+}
+
+\cs_new:Npn \template_item:n #1
+{
+    \item \tpltext
+    \tl_if_empty:nF {#1} { \template_list:nn {#1}{} }
+}
+
+\NewDocumentCommand \tplimage {}
+{
+    \par\image{uncertain}
+}
+
+\NewDocumentCommand \tplimg {}
+{
+    \img{uncertainm}
+}
+
+\NewDocumentCommand \tplimagetable {}
+{
+    \tplpara
+    \par
+    \begin{ImageTable}
+        \tplimg & \tplimg & \tplimg \\
+        First~item & Second~item & Third~item \\
+        \tplimg & \tplimg & \tplimg \\
+        Fourth~item & Fifth~item & Sixth~item \\
+    \end{ImageTable}
+}
+
+\NewDocumentCommand \tplprocedure { O{3} }
+{
+    \int_set:Nn \l_tmpa_int {1}
+    \int_set:Nn \l_tmpb_int {#1}
+    \tplpara
+    \par
+    \begin{IllustEnum}*{uncertainm}
+        \item \tplpara
+    \end{IllustEnum}
+    \int_do_while:nNnn {\l_tmpa_int} < {\l_tmpb_int}
+        {
+            \int_incr:N \l_tmpa_int
+            \par
+            \begin{IllustEnum}{uncertainm}
+                \item \tplpara
+            \end{IllustEnum}
+        }
+}
+
+\NewDocumentCommand \tpltopics { O{3} }
+{
+    \int_zero:N \l_tmpa_int 
+    \int_set:Nn \l_tmpb_int {#1}
+    \int_do_while:nNnn {\l_tmpa_int} < {\l_tmpb_int}
+    {
+        \int_incr:N \l_tmpa_int
+        \str_set:Nx \l_tmpa_str { \int_to_Alph:n \l_tmpa_int }
+        \section{topic~\l_tmpa_str}
+        \tpllist*
+    }
+}
+
+\NewDocumentCommand \tplspectable {}
+{
+    \par
+    \begin{SpecTable}
+    First~spec & Value \\
+    Second~spec & Value \\
+    Third~spec & Value \\
+    Fourth~spec & Value \\
+    Fifth~spec & Value \\
+    \end{SpecTable}
+}
+
+\NewDocumentCommand \tplspectables { O{3} }
+{
+    \int_step_inline:nnnn {1}{1}{#1}{ \tplspectable }
+}
+
+\NewDocumentCommand \tpltable {}
+{
+    \par
+    \begin{Table}
+        \begin{tabularx}{\linewidth}{XXX}
+            \hline
+            \textbf{A} & \textbf{B} & \textbf{C} \\\hline
+            1 & 1 & 1\\
+            2 & 2 & 2\\
+            3 & 3 & 3\\
+            4 & 4 & 4\\
+            5 & 5 & 5\\
+            \hline
+        \end{tabularx}
+    \end{Table}
+}
+
+\NewDocumentCommand \tplproblems { O{2} }
+{
+    \int_zero:N \l_tmpa_int 
+    \int_set:Nn \l_tmpb_int {#1}
+    \int_do_while:nNnn {\l_tmpa_int} < {\l_tmpb_int}
+    {
+        \int_incr:N \l_tmpa_int
+        \str_set:Nx \l_tmpa_str { \int_to_Alph:n \l_tmpa_int }
+        \section{Problem~\l_tmpa_str}
+        {
+            \group_begin:
+                \int_set:Nn \l_tmpa_int {0}
+                \int_set:Nn \l_tmpb_int {#1}
+                \int_do_while:nNnn {\l_tmpa_int} < {\l_tmpb_int}
+                {
+                    \int_incr:N \l_tmpa_int
+                    \str_set:Nx \l_tmpa_str { \int_to_alph:n \l_tmpa_int }
+                    \subsection{Problem~\l_tmpa_str}
+                    \tplpara*
+                    \tpllist*
+                }
+            \group_end:
+        }
+    }
+}

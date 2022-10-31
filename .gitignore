@@ -1,0 +1,12 @@
+_bak
+_minted-HzGuide/
+*.aux
+*.csv
+*.idx
+*.ilg
+*.ind
+*.lof
+*.toc
+*.vrb
+*.gz
+*.log
