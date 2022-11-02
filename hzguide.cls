@@ -3506,8 +3506,8 @@
         \NewDocumentEnvironment
     }{ #2 }{ s t| O{} d() d<> }
     {
-        \keys_set:nn { terms }{ #3 }
         \exp_args:Nno \keys_set:nn { terms }{ \g_terms_options_tl }
+        \keys_set:nn { terms }{ #3 }
         \IfBooleanT{ ##1 }
         {
             \exp_args:Nno \keys_set:nn { terms }{ \l_terms_star_tl }
@@ -3720,8 +3720,8 @@
         \NewDocumentCommand
     } #2 { s t| o m o }
     {
-        \keys_set:nn { term }{ #3 }
         \exp_args:Nno \keys_set:nn { term }{ \g_term_options_tl }
+        \keys_set:nn { term }{ #3 }
         \IfBooleanT{ ##1 }
         {
             \exp_args:Nno \keys_set:nn { term }{ \l_term_star_tl }
@@ -4766,7 +4766,7 @@
     font=\ttfamily,
     fontsize=\small,
     width=0pt,
-    offset=-.85\onelineskip,
+    offset=-.75\onelineskip,
     beforeskip=\hznulldim,
     afterskip=\hznulldim,
     linespacing=1.1,

@@ -50,11 +50,7 @@
 \makeatother
 \patchcommand{\printindex}{\ThumbIndexDisable\cleartoverso}{}
 
-\ObjectSetup{
-    beforeskip=.1\onelineskip, 
-    afterskip=.1\onelineskip,
-    align=\centering
-} 
+\ObjectSetup{align=\centering} 
 
 \RenewTerms{macros}{
     labeltype=macro,
@@ -62,7 +58,7 @@
     marker = {{},{}},
     delimiter=\hfill,
     labelwidth=4.75em,
-    leftmargin=5.35em
+    leftmargin=5.35em,
 }
 \IndexingEnable*
 
@@ -2176,7 +2172,7 @@ HzGuide 클래스는, 다양한 언어들의 조판을 목적으로 하기 때�
 "짧은 텍스트"가 주어지면 질문 차례에 들어간다.
 \macro{\listofqueries}가 질문 차례를 만든다.
 
-\section{TSV 또는 CSV 파일 읽기}
+\section{TSV 또는 CSV 파일 읽기}\label{sec:readtsv}
 
 \macro{\ReadTSV} 명령은 \term{TSV}\annotate{tab-separated values} 또는 \term{CSV}\annotate{comma-separated values} 파일을 읽고 지정된 스타일로 식자한다.
 
