@@ -1442,6 +1442,10 @@
         { indent }   { \style_paragraph_indent: }
         { interval }   { \style_paragraph_interval: }
     }
+    \setlist{partopsep=0pt, topsep=0.5\onelineskip, itemsep=0pt}
+    \setlist[itemize]{labelindent=1em,labelwidth=0.5em,labelsep=0.5em, leftmargin=*}
+    \setlist[enumerate]{labelindent=1em,labelwidth=1.25em,labelsep=0.5em, leftmargin=*}
+    \TermsInitialize{topsep=0.5\onelineskip,itemsep=.25ex}
 }
 
 \cs_new:Nn \style_paragraph_indent:
@@ -1449,10 +1453,7 @@
     \skip_set:Nn \hzparskip {0pt}
     \abnormalparskip{\hzparskip}
     \SetTextStyle{\setlength\parindent{\hzparindent}}
-    \setlist{partopsep=0pt, topsep=.25\onelineskip, itemsep=.25ex}
-    \setlist[itemize]{labelindent=.5em,labelwidth=1em,labelsep=.5em}
-    \setlist[enumerate]{labelindent=.5em,labelwidth=1.25em,labelsep=.5em}
-    \TermsInitialize{topsep=0.5\onelineskip,itemsep=.25ex}
+
     \ObjectSetup{
         beforeskip=.75\onelineskip,
         afterskip=.75\onelineskip
@@ -1464,10 +1465,6 @@
     \abnormalparskip{\hzparskip}
     \setlength{\parindent}{0em}
     \SetTextStyle{\abnormalparskip{\hzparskip}}
-    \setlist{partopsep=0pt, topsep=.5\onelineskip, itemsep=0pt}
-    \setlist[itemize]{labelindent=0em,labelwidth=1em,labelsep=.5em}
-    \setlist[enumerate]{labelindent=0em,labelwidth=1.25em,labelsep=.5em}
-    \TermsInitialize{topsep=0.5ex,itemsep=.25ex}
     \ObjectSetup{
         beforeskip=.5\onelineskip,
         afterskip=.5\onelineskip
