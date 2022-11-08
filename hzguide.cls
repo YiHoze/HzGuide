@@ -4701,8 +4701,8 @@
 
 % ## listing
 
-\NewBoundedBox{codebox}{style=\small}
-\NewBoundedBox{result}{type=LeftBarBox, style=\sffamily\small}
+\NewBoundedBox{CodeBox}{style=\small}
+\NewBoundedBox{ResultBox}{type=LeftBarBox, style=\sffamily\small}
 
 \tl_set:Nx \l_code_file_tl { \jobname.vrb }
 \dim_new:N \l_code_description_width_dim
@@ -4719,7 +4719,8 @@
     language    .tl_set:N = \l_code_language_tl,
     codebox     .tl_set:N = \l_code_codebox_tl,
     resultbox   .tl_set:N = \l_code_resultbox_tl,
-    file        .code:n = { \tl_set:Nx \l_code_file_tl { #1 } }
+    file        .code:n = { \tl_set:Nx \l_code_file_tl { #1 } },
+    vbar        .tl_set:N = \l_code_vbar_tl
 }
 
 \cs_new:Npn \code_verbatim_font:n #1
@@ -4743,11 +4744,11 @@
     \keys_set:nn { CODE }{ #1 }
     \tl_if_empty:NF \l_code_codebox_tl
     {
-        \RenewBoundedBox{ codebox }{ type=\l_code_codebox_tl }
+        \RenewBoundedBox{ CodeBox }{ type=\l_code_codebox_tl }
     }
     \tl_if_empty:NF \l_code_resultbox_tl
     {
-        \RenewBoundedBox{ result }{ type=\l_code_resultbox_tl }
+        \RenewBoundedBox{ ResultBox }{ type=\l_code_resultbox_tl }
     }
     \bool_if:NT \g_minted_bool
     {
@@ -4770,7 +4771,8 @@
     beforeskip=\hznulldim,
     afterskip=\hznulldim,
     linespacing=1.1,
-    language=latex
+    language=latex,
+    vbar={language=text}
 }
 
 \NewDocumentEnvironment { codewrite }{ }
@@ -4782,11 +4784,15 @@
     \group_end:
 }
 
-\NewDocumentCommand \coderead { s O{} }
+\NewDocumentCommand \coderead { s t| O{} }
 {
     \group_begin:
     \setSpacing{ \l_code_linespacing_tl }
-    \CodeSetup{#2}
+    \CodeSetup{ #3 }
+    \IfBooleanT{ #2 }
+    {
+        \exp_args:No \CodeSetup{ \l_code_vbar_tl }
+    }
     \IfBooleanTF { #1 }
     {
         \code_read_verbatim:
@@ -4816,10 +4822,10 @@
 {
     \object_skip_before:n {\l_code_before_skip}
     \begin{minipage}[t]{\l_code_width_dim}
-        \begin{codebox}[beforeskip=0pt, afterskip=0pt]
+        \begin{CodeBox}[beforeskip=0pt, afterskip=0pt]
         \vspace{\l_code_raise_offset}\mbox{}
         \code_read_verbatim:
-        \end{codebox}
+        \end{CodeBox}
     \end{minipage}
     \object_skip_after:n {\l_code_after_skip}
 }
@@ -4832,10 +4838,10 @@
     }{
         \dim_set:Nn \l_tmpa_dim { \l_code_raise_offset }
     }
-    \begin{codebox}[beforeskip=\l_code_before_skip, afterskip=\l_code_after_skip]
+    \begin{CodeBox}[beforeskip=\l_code_before_skip, afterskip=\l_code_after_skip]
     \vspace{\l_tmpa_dim}\mbox{}
     \code_read_verbatim:
-    \end{codebox}
+    \end{CodeBox}
 }
 
 \NewDocumentEnvironment { code }{}
@@ -4858,9 +4864,9 @@
     \group_end:
 
     \code_read_box:
-    \begin{result}
+    \begin{ResultBox}
     \input{\l_code_file_tl}
-    \end{result}
+    \end{ResultBox}
 }
 
 \NewDocumentCommand \codeinput {}
@@ -4884,7 +4890,7 @@
         \begin{minipage}{\linewidth}
             \begin{minipage}[t]{\l_code_width_dim}
                 \setSpacing{ \l_code_linespacing_tl }
-                \begin{codebox}[beforeskip=0pt, afterskip=0pt]
+                \begin{CodeBox}[beforeskip=0pt, afterskip=0pt]
                 \vspace{\l_code_raise_offset}\mbox{}
                 \l_code_fontsize_tl
                 \bool_if:NTF \g_minted_bool
@@ -4893,7 +4899,7 @@
                 }{
                     \verbatiminput{ \l_code_file_tl }
                 }
-                \end{codebox}
+                \end{CodeBox}
             \end{minipage}
             \hfill
             \begin{minipage}[t]{\l_code_description_width_dim}

@@ -133,11 +133,11 @@
     }{
         \dim_set:Nn \l_tmpa_dim { \l_code_raise_offset }
     }
-    \begin{codebox}[beforeskip=\l_code_before_skip, afterskip=\l_code_after_skip]
+    \begin{CodeBox}[beforeskip=\l_code_before_skip, afterskip=\l_code_after_skip]
     \vspace{\l_tmpa_dim}\mbox{}
     \l_code_fontsize_tl
     \inputminted[linenos=true, firstline=#2, lastline=#3]{latex}{#1}
-    \end{codebox}
+    \end{CodeBox}
 }
 \makeatother
 
@@ -2576,13 +2576,16 @@ xelatex $tex
 
 \item[file] \keyvalue{\jobname.vrb}
 소스 코드를 임시로 저장하는 파일의 이름
+
+\item[vbar] \keyvalue{옵션}
+이것은 기본 설정과 다른 작동을 허용하기 위한 목적으로 고안되었다. 주어진 옵션이 수직선(\macro*{|})이 붙은 \macro{\coderead|}에 적용된다. 디폴트는 \macro*{language=text}이다.
 \end{macros}
 
 \macro{\verb} 명령과 \macro{verbatim} 환경은 다른 명령이나 환경에 인자가 될 수 없기 때문에, 소스 코드의 저장과 읽기를 분리해야 하는 경우들이 있다.
 
 \begin{code}
 \begin{codewrite} \end{codewrite}
-\coderead*
+\coderead*|[옵션]
 \codeinput
 \begin{codedesc} \end{codedesc}
 \end{code}

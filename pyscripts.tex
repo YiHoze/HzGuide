@@ -469,7 +469,7 @@ C:\>wordig -a="\w+" -g *.tex
 -o "sub\" → sub\foo.tex
 -o "sub\_replaced" → sub\foo_replaced.tex
 \end{codewrite}
-\coderead[language=text]
+\coderead|
 
 \term{디렉토리 구분자}\annotate{directory separator}로 백슬래시(\verb{\}) 대신 슬래시(\verb{/})를 사용할 수 있다.
 
@@ -498,7 +498,6 @@ C:\>wordig.py -E cp949 *.txt
 
 \item[-x] .tsv 파일을 .xlsx로 변환한다.
 \item[-t] .xlsx 파일을 .tsv로 변환한다.
-\item[-l] 이 옵션이 주어지지 않으면, 출력 파일들이 op.py에 의해 열린다.
 \end{macros}
 
 아무 옵션도 지시하지 않으면 주어진 파일들의 글자 수와 단어 수가 표시된다.
@@ -533,7 +532,7 @@ C:\>wordig -a="(ref.+?\})([은는이가을를와과으로])" -s="\1\\\2" *.tex
 \\end\{.+\}
 \\[a-zA-Z*]{1,25}
 \end{codewrite}
-\coderead[language=text]
+\coderead|
 
 \begin{code}
 C:\>wordig -P detex.tsv -o "_cleaned" *.tex 
@@ -546,7 +545,7 @@ C:\>wordig -P detex.tsv -o "_cleaned" *.tex
 \\[a-zA-Z*^|+]+
 \\begin(\{.+?\}[*^|+]*)
 \end{codewrite}
-\coderead[language=text]
+\coderead|
 
 \begin{code}
 C:\>wordig -A extractex.txt -g *.tex 
@@ -559,7 +558,7 @@ C:\>wordig -A extractex.txt -g *.tex
 \begin{codewrite}
 acre, degree, fahrenheit, foot, gallon, hp, inch, km/h, knot, mile, Newton, pascal, pint, point, pound, psi, pyeong, yard
 \end{codewrite}
-\coderead[language=text]
+\coderead|
 
 다른 단위와 구분될 수 있을 만큼 사용할 단위의 처음 글자들을 숫자와 함께 지정하라.
 아래 예에서 첫 줄의 \verb{p}는 \verb{pascal}로, 둘째 줄의 \verb{po}는 \verb{point}로 간주된다.
@@ -976,9 +975,9 @@ mytex.py -f -o %~n2.tex -s %~n2.tsv UI
 \coderead[language=batch]
 
 \begin{code}
-C:\>xlsx2pdf.cmd UI.xlsx UI_kor_eng.tsv "1-3"
-C:\>xlsx2pdf.cmd UI.xlsx UI_eng_fre.tsv "1,3,4"
-C:\>xlsx2pdf.cmd UI.xlsx UI_eng_ger.tsv "1,3,5"
+C:\>xlsx2pdf.cmd UI.xlsx UI_kor_eng "1-3"
+C:\>xlsx2pdf.cmd UI.xlsx UI_eng_fre "1,3,4"
+C:\>xlsx2pdf.cmd UI.xlsx UI_eng_ger "1,3,5"
 \end{code}
 
 \begin{note}
