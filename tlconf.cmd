@@ -5,17 +5,17 @@ for /f "usebackq delims=" %%p in (`kpsewhich -var-value=TEXMFROOT`) do set tlroo
 set tlroot=%tlroot:/=\%
 
 if /i .%1. == .. goto help
-if /i .%1. == .cnf. goto cnf
+if /i .%1. == .conf. goto conf
 if /i .%1. == .texedit. goto texedit
 if /i .%1. == .texmfhome. goto texmfhome
 if /i .%1. == .sumatrapdf. goto SumatraPDF
 if /i .%1. NEQ .batch. goto eof
 
-:cnf
+:conf
 REM checking if TeX Live is found
 kpsewhich -var-value=TEXMFROOT >nul 2>&1
 if errorlevel 1 (
-echo TeX Live not on searchpath. Aborting.
+echo TeX Live not on searchpath. Aborted.
 exit /b
 )
 
@@ -70,12 +70,12 @@ type %localconf%
 
 echo.
 echo.
-echo tlconf.cmd cnf              : Create local.conf with the user's local font directory.
+echo tlconf.cmd conf              : Create local.conf with the user's local font directory.
 echo tlconf.cmd texedit [...]    : Set the TEXEIDT environment variable. The default is
 echo                               code.exe -r -g  %%s:%%d
 echo tlconf.cmd texmfhome [...]  : Set the TEXMFHOME environment variable. The default is
 echo                               C:\home\texmf
-echo tlconf.cmd sumatrapdf [...] : Set the inverse search command-line option of SumatraPDF. The  defualt is
+echo tlconf.cmd sumatrapdf [...] : Set the inverse search command-line option of SumatraPDF. The  default is
 echo                               code.exe -r -g  %%f:%%l
 echo tlconf.cmd batch            : Proceed with all options.
 
