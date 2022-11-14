@@ -347,8 +347,8 @@
 
     \bool_if:NT \g_Noto_bool
     {
-        \setmainfont{Noto~Serif~KR}[BoldFont={*~Bold}]
-        \setsansfont{Noto~Sans~KR}[BoldFont={*~Medium}]
+        \setmainfont{Noto~Serif~KR}[BoldFont={*~Bold}, Script=Hangul, Language=Korean]
+        \setsansfont{Noto~Sans~KR}[BoldFont={*~Medium}, Script=Hangul, Language=Korean]
         % \setmainhangulfont{Noto~Serif~KR}[BoldFont={*~Bold}]
         % \setsanshangulfont{Noto~Sans~KR}[BoldFont={*~Medium}]
     }
@@ -3700,7 +3700,7 @@
 	{
 		\NewTerm*{ #1 }{ #2 }
 	}{
-    	\tl_set:Nn \g_term_options_tl { #2 }
+    	\tl_gset:Nn \g_term_options_tl { #2 }
 	}
 }
 
@@ -3784,7 +3784,6 @@
 
 \NewTerm{\term}{
     font = {},
-    index = false,
     star = { font=\itshape }
 }
 
@@ -3793,15 +3792,12 @@
 {
     font = \sffamily\bfseries,
     color = darkgray,
-    index = false,
-    % star = { index=true }
 }
 
 % machine interface
 \NewTerm{\mi}
 {
     font = \sffamily\mdseries,
-    index = false,
     star = { index=true }
 }
 
