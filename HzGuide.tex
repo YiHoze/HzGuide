@@ -1,6 +1,6 @@
 \documentclass[pairquote, minted]{hzguide}
 
-\setmainfont{NotoSerifCJKkr-Regular.otf}[BoldFont={NotoSerifCJKkr-Bold.otf}, ItalicFont={NotoSerif-LightItalic.ttf}]
+\setmainfont{NotoSerifCJKkr-Regular.otf}[BoldFont={NotoSerifCJKkr-Bold.otf}, ItalicFont={NotoSerif-LightItalic.ttf}] %https://github.com/googlefonts/noto-cjk
 \setsansfont{NotoSansCJKkr-Regular.otf}[BoldFont={NotoSansCJKkr-Medium.otf}]
 \setmonofont{D2Coding}[Scale=0.95]% \setmonohangulfont{NotoSansMonoCJKkr-Regular.otf}[Scale=0.95]
 
@@ -1703,10 +1703,11 @@ true이면 줄 나눔이 허용된다.
 \item[\mi] 기기의 지시등이나 버튼에 표시된 문자열
 \end{macros}
 
-여러 \macro{\ui} 명령으로 이루어진 \macro{\menu} 명령은 메뉴 경로를 나타내기 위한 장치이다.
+\macro{\Menu} 명령은 \macro{menukeys} 패키지의 \macro{\menu} 명령이 하는 것과 동일하다.
+다른 점은 마지막 항목을 색인에 추가하는 것이다.
 
 \begin{coderesult}
-\menu[File][Preferences]{User Snippets}{latex.json}
+\Menu{File>Preferences>{User Snippets}>{latex.json}}
 \end{coderesult}
 
 \section{첨자}
@@ -1988,7 +1989,7 @@ HzGuide 클래스는, 다양한 언어들의 조판을 목적으로 하기 때�
 \begin{danger}
 \term{위험}은 사망이나 심각한 부상을 초래하는 상황을 가리킨다.
 \macro{danger} 환경이 이렇게 정의되어 있다.
-\hzsourceline[4283]
+\hzsourceline[4291]
 \end{danger}
 
 \begin{warning}

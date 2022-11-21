@@ -41,6 +41,7 @@
 \RequirePackage{tikz}
 \RequirePackage{tikzpagenodes}
 \RequirePackage{tcolorbox}
+\RequirePackage[os=win]{menukeys}
 
 \usetikzlibrary{shapes}
 \usetikzlibrary{shadows}
@@ -3801,11 +3802,22 @@
     star = { index=true }
 }
 
-\NewDocumentCommand \menu { o o m m }
-{
-    \IfValueT{ #1 }{ \ui{#1} ~ > ~ }
-    \IfValueT{ #2 }{ \ui{#2} ~ > ~ }
-    \ui{#3} ~ > ~ \ui{#4}
+%% menukeys package
+\copymenustyle{RoundedKeys}{roundedkeys}
+\changemenuelement{RoundedKeys}{sep}{\,+\,}
+\renewmenumacro{\keys}[+]{RoundedKeys}
+% to avoid conflict with that of tabto package
+\tw@make@key@macro*{\Tab} 
+% to add the last item to the index
+\NewDocumentCommand\Menu{m}{\menu{#1}\menuindex{#1}}
+\NewDocumentCommand\menuindex{m}{ 
+    \group_begin:
+        \regex_split:nnN {\>}{#1} \l_tmpa_seq
+        \seq_get_right:NN \l_tmpa_seq \l_tmpa_tl
+        \regex_replace_all:nnN { \{(.*?)\} } { \1 } \l_tmpa_tl
+        \tl_set:No \l_tmpb_tl { \string\termindexprint{\tl_to_str:n {\sffamily}}{\l_tmpa_tl} }
+        \index{\tl_use:N \l_tmpa_tl @\tl_use:N \l_tmpb_tl}
+    \group_end:
 }
 
 % ## annotate
@@ -4617,7 +4629,7 @@
 {
     \str_set:Nx \l_tmpa_str { \tl_to_str:n {#1} }
     \regex_replace_all:nnN { \? }{ \@ } \l_tmpa_str
-    \str_remove_all:Nn \l_tmpa_str { ~ }
+    % \str_remove_all:Nn \l_tmpa_str { ~ }
     \texttt{\str_use:N \l_tmpa_str}
 }
 
@@ -5071,19 +5083,26 @@
                     {\small\cover_note} \\
                 }
 			}{
-                \begin{raggedright}
+                \begin{IllustImage}[
+                        position=left,
+                        frame=false, 
+                        valign=b
+                    ]{ \cover_image_logo_back }
                     \small\cover_note
-                \end{raggedright}
-                \par \bigskip                
-                \includegraphics{\cover_image_logo_back} 
-				\bool_if:NT \l_image_showfilename_bool
-                {
-                    \tl_set:Nx \l_tmpa_tl { \cover_image_logo_back }
-                    \group_begin:
-                    \color{ImageName} \scriptsize \tl_to_str:N \l_tmpa_tl
-                    \group_end:
-                }
-                \newline
+                \end{IllustImage}\par
+                % \begin{raggedright}
+                %     \small\cover_note
+                % \end{raggedright}
+                % \par \bigskip                
+                % \includegraphics{\cover_image_logo_back} 
+				% \bool_if:NT \l_image_showfilename_bool
+                % {
+                %     \tl_set:Nx \l_tmpa_tl { \cover_image_logo_back }
+                %     \group_begin:
+                %     \color{ImageName} \scriptsize \tl_to_str:N \l_tmpa_tl
+                %     \group_end:
+                % }
+                % \newline
 			}
 			\raisebox{.5ex}{\rule{\headwidth}{0.5pt}} \\
 			© \space \cover_pub_year \space \cover_manufacturer \\
@@ -5283,7 +5302,6 @@
 \renewcommand{\chapterrefname}{\chaptername~}
 \renewcommand{\tablerefname}{\tablename}
 \renewcommand{\figurerefname}{\figurename}
-
 \LoadStyleset
 
 \endinput
