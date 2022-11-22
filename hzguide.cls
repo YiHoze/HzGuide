@@ -3734,7 +3734,7 @@
             {
                 \tl_set:No \l_tmpa_tl
                 {
-                    \string\termindexprint{\tl_to_str:V \l_term_font_tl}{#1}
+                    \string\termindexprint{\tl_to_str:V \l_term_font_tl}{##4}
                 }
                 \IfValueTF { ##3 }
                 {
@@ -3809,7 +3809,7 @@
 % to avoid conflict with that of tabto package
 \tw@make@key@macro*{\Tab} 
 % to add the last item to the index
-\NewDocumentCommand\Menu{m}{\menu{#1}\menuindex{#1}}
+\NewDocumentCommand\Menu{m}{\menu{#1}\menuindex{#1}\,}
 \NewDocumentCommand\menuindex{m}{ 
     \group_begin:
         \regex_split:nnN {\>}{#1} \l_tmpa_seq
