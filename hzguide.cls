@@ -3807,7 +3807,8 @@
 \changemenuelement{RoundedKeys}{sep}{\,+\,}
 \renewmenumacro{\keys}[+]{RoundedKeys}
 % to avoid conflict with that of tabto package
-\tw@make@key@macro*{\Tab} 
+\tw@make@key@macro{\Tab} 
+\cs_gset_eq:NN \tw@mk@Tab \tw@mk@tab@win
 % to add the last item to the index
 \NewDocumentCommand\Menu{m}{\menu{#1}\menuindex{#1}\,}
 \NewDocumentCommand\menuindex{m}{ 
