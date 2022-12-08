@@ -3732,6 +3732,7 @@
         \NewDocumentCommand
     } #2 { s t| o m o }
     {
+		\mbox{} % to keep the baseline in parbox
         \exp_args:Nno \keys_set:nn { term }{ \g_term_defaults_tl }
         \exp_args:Nno \keys_set:nn { term }{ \g_term_options_tl }
         \keys_set:nn { term }{ #3 }
@@ -3784,7 +3785,6 @@
                 }
             }
         }
-		\mbox{} % to keep the baseline in parbox
         \bool_if:NTF \l_term_breakable_bool
         {
             \textcolor{\l_term_color_tl}{\l_term_font_tl ##4 }
