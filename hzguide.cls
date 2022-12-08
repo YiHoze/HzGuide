@@ -1445,8 +1445,7 @@
     }
     \setlist{partopsep=0pt, topsep=0.5\onelineskip, itemsep=0pt}
     \setlist[itemize]{labelindent=1em,labelwidth=0.5em,labelsep=0.5em, leftmargin=*}
-    \setlist[enumerate]{labelindent=1em,labelwidth=1.25em,labelsep=0.5em, leftmargin=*}
-    \TermsInitialize{topsep=0.5\onelineskip,itemsep=.25ex}
+    \setlist[enumerate]{labelindent=1em,labelwidth=1.25em,labelsep=0.5em, leftmargin=*}    
 }
 
 \cs_new:Nn \style_paragraph_indent:
@@ -3208,6 +3207,7 @@
 % ## \NewTerms (definition lists)
 % \begin{terms}*|[options](base)
 
+\tl_new:N \g_terms_defaults_tl
 \tl_new:N \g_terms_options_tl
 \int_new:N \l_terms_int
 \tl_new:N \l_terms_marker
@@ -3280,9 +3280,11 @@
 \NewDocumentCommand \TermsInitialize { m }
 {
     \keys_set:nn { terms }{ #1 }
+	\tl_gset:Nn \g_terms_defaults_tl { #1 }
 }
 
 \TermsInitialize{
+	topsep=0.5\onelineskip,
     labeltype = default,
     offset = 0em,
     marker = {{},\textbullet},
@@ -3293,6 +3295,7 @@
     delimiter = :\hfill,
     labelsep = 0.5em,
 	leftmargin = 0pt,
+	itemsep=.25ex,
     star = { itemsep=0ex },
     vbar = { delimiter=\hfill },
     enummarker = { \parbox{20pt}{\raggedleft\int_use:N \l_terms_int)}\hskip\l_terms_marker_sep_skip }
@@ -3331,6 +3334,7 @@
     	\tl_gset:Nn \g_terms_options_tl { #2 }
 	}
 }
+
 \cs_new:Npn \terms_label_macro_write:n #1
 {
     \tl_if_in:nnTF { #1 }{ ~ }
@@ -3440,6 +3444,10 @@
         \newline
     }
 }
+
+% \cs_new:Npn \terms_label_adhoc:n #1 {}
+% \cs_undefine:N \terms_label_adhoc:n
+
 \cs_new:Npn \terms_label_type_set:n #1
 {
     \skip_set:Nn \partopsep { 0pt }
@@ -3474,6 +3482,10 @@
             \dim_set_eq:NN \labelwidth \l_terms_label_width_dim
             \cs_set_eq:NN \makelabel \terms_label_macro_single:n
         }
+		{ adhoc }{
+            \dim_set_eq:NN \labelwidth \l_terms_label_width_dim
+            \cs_set_eq:NN \makelabel \terms_label_adhoc:n
+		}
     }
     \skip_set_eq:NN \labelsep \l_terms_label_sep_skip
    	\dim_set:Nn \leftmargin { \labelwidth+\labelsep }
@@ -3504,6 +3516,7 @@
         \NewDocumentEnvironment
     }{ #2 }{ s t| O{} d() d<> }
     {
+        \exp_args:Nno \keys_set:nn { terms }{ \g_terms_defaults_tl }
         \exp_args:Nno \keys_set:nn { terms }{ \g_terms_options_tl }
         \keys_set:nn { terms }{ #3 }
         \IfBooleanT{ ##1 }
@@ -3559,8 +3572,6 @@
 {
     labeltype = multiline,
     labelwidth = 3em,
-    %beforelist = \RuleBox,
-    %afterlist = \endRuleBox,
     delimiter = \hfill,
     itemsep = 1ex
 }
@@ -3673,6 +3684,7 @@
 % ## \NewTerm
 % \term*|[index position]{\LaTeX}
 
+\tl_new:N \g_term_defaults_tl
 \tl_new:N \g_term_options_tl
 \tl_new:N \l_term_index_font_tl
 \keys_define:nn { term }
@@ -3688,8 +3700,10 @@
 \NewDocumentCommand \TermInitialize { m }
 {
     \keys_set:nn { term }{ #1 }
+	\tl_gset:Nn \g_term_defaults_tl { #1 }
 }
 \TermInitialize{
+	font = \rmfamily,
     color = black,
     index = false,
     indexsame = false,
@@ -3718,6 +3732,7 @@
         \NewDocumentCommand
     } #2 { s t| o m o }
     {
+        \exp_args:Nno \keys_set:nn { term }{ \g_term_defaults_tl }
         \exp_args:Nno \keys_set:nn { term }{ \g_term_options_tl }
         \keys_set:nn { term }{ #3 }
         \IfBooleanT{ ##1 }
@@ -3769,6 +3784,7 @@
                 }
             }
         }
+		\mbox{} % to keep the baseline in parbox
         \bool_if:NTF \l_term_breakable_bool
         {
             \textcolor{\l_term_color_tl}{\l_term_font_tl ##4 }
@@ -3783,23 +3799,24 @@
     \NewTerm*{ #1 }{ #2 }
 }
 
-\NewTerm{\term}{
-    font = {},
-    star = { font=\itshape }
+\NewTerm{\term}{	
+    star={font=\itshape}
 }
 
 % user interface
 \NewTerm{\ui}
 {
-    font = \sffamily\bfseries,
-    color = darkgray,
+    font=\sffamily\bfseries,
+    color=darkgray,
+	star={index=false}
 }
 
 % machine interface
 \NewTerm{\mi}
 {
-    font = \sffamily\mdseries,
-    star = { index=true }
+    font=\sffamily\mdseries,
+	color=black,
+    star={index=true}
 }
 
 %% menukeys package
@@ -3809,8 +3826,8 @@
 % to avoid conflict with that of tabto package
 \tw@make@key@macro{\Tab} 
 \cs_gset_eq:NN \tw@mk@Tab \tw@mk@tab@win
+\NewDocumentCommand\Menu{m}{\menu{#1}\menuindex{#1}}
 % to add the last item to the index
-\NewDocumentCommand\Menu{m}{\menu{#1}\menuindex{#1}\,}
 \NewDocumentCommand\menuindex{m}{ 
     \group_begin:
         \regex_split:nnN {\>}{#1} \l_tmpa_seq
@@ -4561,16 +4578,16 @@
 		\seq_map_inline:Nn #1
 		{
             \int_incr:N \l_tmpb_int
-            \tl_if_empty:nTF { ##1 }
-            {
-                \space
-            }{
-                \tsv_render_item:Nn \l_tmpb_int { ##1 }
-            }
+			\tl_if_empty:nTF { ##1 }
+			{
+				\space
+			}{
+				\tsv_render_item:Nn \l_tmpb_int { ##1 }
+			}
 			\int_compare:nTF { \l_tmpb_int < \l_tmpa_int }
 			{
-                \tl_use:N \mbox{}\l_tsv_space_tl
-			}{
+				\mbox{}\l_tsv_space_tl
+			}{	
 				\par\l_tsv_linterline_tl
 			}
 		}
@@ -4618,6 +4635,14 @@
 }
 
 % # source code _________________________________________________________________________
+\NewDocumentCommand\winpath{m}
+{ 
+	\group_begin:
+    \str_set:Nx \l_tmpa_str { \tl_to_str:n {#1} }
+    \str_remove_all:Nn \l_tmpa_str {~}
+    \texttt{\l_tmpa_str}
+	\group_end:
+}
 
 % ## tex commands
 
@@ -4630,7 +4655,7 @@
 {
     \str_set:Nx \l_tmpa_str { \tl_to_str:n {#1} }
     \regex_replace_all:nnN { \? }{ \@ } \l_tmpa_str
-    % \str_remove_all:Nn \l_tmpa_str { ~ }
+	\tl_trim_spaces:N \l_tmpa_str
     \texttt{\str_use:N \l_tmpa_str}
 }
 

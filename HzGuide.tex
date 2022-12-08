@@ -1502,12 +1502,23 @@ Nominal energy & 6.4 kW·h
 \macro{\TermsSetup}에 환경 이름을 지정하지 않으면 \macro{\NewTerms}에 의해 만들어진 모든 환경에 주어진 설정이 적용된다.
 
 \begin{macros}<\NewTerms>
-\item[labeltype] \keyvalue{default, singleline, multiline, macro, macrosingle}
+\item[labeltype] \keyvalue{default, singleline, multiline, macro, macrosingle, adhoc}
 \macro{singleline}을 지정하면 표제어가 한 줄을 차지한다. 
 \macro{macro}는 백슬래시를 비롯한 기호 문자들을 허용한다.
 이 두 가지를 결합한 것이 \macro{macrosingle}이다.
 \macro{multiline}을 지정하면, 표제어가 주어진 폭보다 길 때 두 줄이 된다.
 \ptref{chp:SourceCode}\를 보라.
+
+\macro{adhoc} 라벨 유형은 정의되어 있지 않다. 다음과 같이 그것을 활용하여 새 유형을 만들 수 있다.
+
+\begin{code}
+\cs_new:Npn \terms_label_adhoc:n #1
+{
+	\macro[#1]{<#1>} 
+	\l_terms_delimiter_tl
+}
+\NewTerms{Tags}{labeltype=adhoc, delimiter=\hfill}
+\end{code}
 
 \item[offset] \keyvalue{0em}
 다른 목록 환경 아래에서 왼쪽 여백에 추가되는 길이
@@ -1710,6 +1721,19 @@ true이면 줄 나눔이 허용된다.
 \Menu{File>Preferences>{User Snippets}>{latex.json}}
 \end{coderesult}
 
+\macro{tabto} 패키지의 \macro{\tab} 명령과의 충돌을 회피하기 위해 \macro{\Tab} 키가 정의되어 있다.
+
+\begin{coderesult}
+스니펫으로 바꾸려면 \keys{\Tab} 키를 눌러라.
+\end{coderesult}
+
+\macro{\path} 명령이 다른 명령에 포함될 때 백스페이스 앞에 공백이 생기는 경우가 있다.
+대안으로 \macro{\winpath}가 정의되어 있다.
+
+\begin{coderesult}
+settings.json 파일이 \winpath{C:\Users\USERNAME\AppData\Roaming\Code\User} 아래에 저장된다.
+\end{coderesult}
+
 \section{첨자}
 
 \macro{\textsuperscript}와 \macro{\textsubscript}의 다른 이름으로서 \macro{\Sup}와 \macro{\Sub}가 정의되어 있다.
@@ -1838,7 +1862,7 @@ HzGuide 클래스는, 다양한 언어들의 조판을 목적으로 하기 때�
 
 다양한 기호들이 종종 설명서에 필요한 반면, 지름 기호나 체크 박스까지 포함하는 폰트들은 흔하지 않다.
 
-\hzsource{54}{55}
+\hzsource{55}{56}
 
 오로지 기호들을 식자하기 위한 목적으로 \macro{\sbfamily}와 \macro{\textsb} 명령이 정의되어 있다.
 디폴트 폰트는 \term{함초롬 돋움}이다.
@@ -1989,7 +2013,7 @@ HzGuide 클래스는, 다양한 언어들의 조판을 목적으로 하기 때�
 \begin{danger}
 \term{위험}은 사망이나 심각한 부상을 초래하는 상황을 가리킨다.
 \macro{danger} 환경이 이렇게 정의되어 있다.
-\hzsourceline[4291]
+\hzsourceline[4309]
 \end{danger}
 
 \begin{warning}
