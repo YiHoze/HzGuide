@@ -348,10 +348,8 @@
 
     \bool_if:NT \g_Noto_bool
     {
-        \setmainfont{Noto~Serif~KR}[BoldFont={*~Bold}, Script=Hangul, Language=Korean]
-        \setsansfont{Noto~Sans~KR}[BoldFont={*~Medium}, Script=Hangul, Language=Korean]
-        % \setmainhangulfont{Noto~Serif~KR}[BoldFont={*~Bold}]
-        % \setsanshangulfont{Noto~Sans~KR}[BoldFont={*~Medium}]
+        \setmainhangulfont{Noto~Serif~KR}[BoldFont={*~Bold}, Script=Hangul, Language=Korean]
+        \setsanshangulfont{Noto~Sans~KR}[BoldFont={*~Medium}, Script=Hangul, Language=Korean]
     }
     \bool_gset_true:N \g_CJK_bool
     \newcommand\prenum{제}
@@ -4176,6 +4174,9 @@
 % \begin{BOUNDEDBOX}*: switch between breakable and unbreakable
 % \begin{BOUNDEDBOX}^: narrow the space above
 
+\tl_new:N \g_bounded_box_defaults_tl
+\tl_new:N \g_bounded_box_options_tl
+
 \keys_define:nn { BoundedBox }
 {
     beforeskip 		    .skip_set:N = \l_bbox_before_skip,
@@ -4195,6 +4196,7 @@
 \NewDocumentCommand \BoundedBoxInitialize { m }
 {
     \keys_set:nn { BoundedBox }{ #1 }
+	\tl_gset:Nn \g_bounded_box_defaults_tl { #1 }
 }
 
 \BoundedBoxInitialize {
@@ -4207,7 +4209,6 @@
 	breakable-adhoc = false
 }
 
-\tl_new:N \g_bounded_box_options_tl
 \NewDocumentCommand \BoundedBoxSetup { o m }
 {
 	\IfValueTF { #1 }
@@ -4233,6 +4234,7 @@
         \NewDocumentEnvironment
     }{ #2 }{ s t^ O{} d() +b }
     {
+        \exp_args:Nno \keys_set:nn { BoundedBox }{ \g_bounded_box_defaults_tl }
         \exp_args:Nno \keys_set:nn { BoundedBox }{ \g_bounded_box_options_tl }
         \keys_set:nn { BoundedBox }{ #3 }
         \group_begin:
