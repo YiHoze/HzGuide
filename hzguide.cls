@@ -1443,7 +1443,7 @@
     }
     \setlist{partopsep=0pt, topsep=0.5\onelineskip, itemsep=0pt}
     \setlist[itemize]{labelindent=1em,labelwidth=0.5em,labelsep=0.5em, leftmargin=*}
-    \setlist[enumerate]{labelindent=1em,labelwidth=1.25em,labelsep=0.5em, leftmargin=*}    
+    \setlist[enumerate]{labelindent=1em,labelwidth=1.25em,labelsep=0.5em, leftmargin=*}
 }
 
 \cs_new:Nn \style_paragraph_indent:
@@ -3655,28 +3655,31 @@
 \int_new:N \l_opt_cnt_int
 \newcommand*\optselected{☑}
 \newcommand*\optunselected{☐}
-\cs_new_nopar:Nn \opt_label:
+\NewDocumentCommand \OptionLabel {}
 {
     \int_gincr:N \l_opt_cnt_int
-    \clist_if_in:NoTF \l_tmpa_clist {\int_use:N \l_opt_cnt_int}
-    {
+	\clist_if_in:NoTF \l_tmpa_clist {\int_use:N \l_opt_cnt_int}
+	{
 		\textsb{\optselected}
 	}{
 		\textsb{\optunselected}
 	}
 }
 
+\newlist{oplist}{itemize}{3}
 \NewDocumentEnvironment { options } { s O{} }
 {
     \clist_set:Nn \l_tmpa_clist { #2 }
     \int_zero:N \l_opt_cnt_int
-    \begin{list} {}
-    {
-        \IfBooleanT {#1} { \tightlist }
-        \cs_set_eq:NN \makelabel \opt_label:
-    }
+	\IfBooleanTF {#1} 
+	{ 
+		\setlist[oplist]{label=\OptionLabel}
+	}{
+		\setlist[oplist]{label=\OptionLabel, noitemsep}
+	}
+	\begin{oplist}
 }{
-    \end{list}
+	\end{oplist}
 }
 
 % ## \NewTerm
