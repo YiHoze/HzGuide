@@ -305,6 +305,19 @@ memoir 클래스 옵션들과 함께 다음 옵션들을 사용할 수 있다.
 문서들 사이에 일관성을 유지하려면 \term{전제부}\annotate{preamble}에서 선언되는 설정들을 하나의 파일에 담아 여러 문서에 공통으로 사용해야 한다.
 이 옵션의 실제는 \macro{\input} 명령의 실행에 불과하나, 설정 파일을 클래스 옵션으로서 명시함으로써 문서의 정체성을 확인하는 데에 이것의 목적이 있다.
 
+\item[packageset] \keyvalue{packages.tex}
+특정한 순서로 패키지들을 가져와야 하는 예외적인 경우를 위해 이 옵션이 고안되었다.
+예를 들어 전제부에 다음과 같이 선언하면 HzGuide에 의해 kotex이 이미 올라온 뒤에 bidi가 읽힌다.
+그것은 공백 없이 영어 텍스트와 이어진 한글이 식자되지 않는 문제를 일으킨다. 
+다음과 같이 packages.tex을 작성하고 \macro{packageset} 옵션에 지정하면, 이 패키지들이 kotex보다 먼저 올라온다.
+
+\begin{code}
+\usepackage{stackengine}
+\usepackage{ulem}
+\usepackage{bidi}
+\end{code}
+
+
 \item[Noto] \keyvalueTF
 Noto 폰트가 사용된다.
 
@@ -2013,7 +2026,7 @@ HzGuide 클래스는, 다양한 언어들의 조판을 목적으로 하기 때�
 \begin{danger}
 \term{위험}은 사망이나 심각한 부상을 초래하는 상황을 가리킨다.
 \macro{danger} 환경이 이렇게 정의되어 있다.
-\hzsourceline[4314]
+\hzsourceline[4324]
 \end{danger}
 
 \begin{warning}

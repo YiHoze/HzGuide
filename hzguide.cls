@@ -263,12 +263,13 @@
 {
     language    .code:n = { \LanguageSetup*{ #1 } },
     english     .code:n = { \LanguageSetup*{ english } },
-    property    .clist_set:N = \g_doc_property_clist, %\g_tmpa_clist,
+    property    .clist_set:N = \g_doc_property_clist, 
+    packageset    .tl_set:N = \g_package_set_tl,
     styleset    .tl_set:N = \g_style_set_tl,
     Noto        .bool_set:N = \g_Noto_bool,
     minted    	.bool_set:N = \g_minted_bool,
     pairquote   .bool_set:N = \g_pairquote_bool,
-    template    .bool_set:N = \g_template_bool,
+    template    .bool_set:N = \g_template_bool
 }
 
 \bool_new:N \g_CJK_bool
@@ -277,6 +278,14 @@
 \NewDocumentCommand \ClassSetup { m }
 {
     \keys_set:nn { HzGuide }{ #1 }
+}
+
+\NewDocumentCommand \LoadPackageSet {}
+{
+    \tl_if_empty:NF \g_package_set_tl
+    {
+        \input{ \g_package_set_tl }
+    }
 }
 
 \NewDocumentCommand \LoadStyleset {}
@@ -299,7 +308,6 @@
     \setmainfont{Noto~Serif}[BoldFont={*~Bold}]
     \setsansfont{Noto~Sans}[BoldFont={*~SemiBold}]
 }
-%\setmonofont{zco} % to type space (␣)
 
 \bool_if:NT \g_minted_bool
 {
@@ -321,6 +329,8 @@
     \RequirePackage{csquotes}
     \MakeOuterQuote{"}
 }
+
+\LoadPackageSet
 
 \bool_if:NT \g_template_bool
 {
