@@ -554,10 +554,10 @@
 
 \ifLang{japanese}
 {
-    \RequirePackage{xeCJK}
-    \setCJKmainfont{Noto Serif JP}
-    \setCJKsansfont{Noto Sans JP}
-    \punctstyle{fullwidth}
+	\RequirePackage{luatexja}             % \RequirePackage{xeCJK} 
+	\RequirePackage{luatexja-fontspec}    % \setCJKmainfont{Noto Serif JP}
+    \setmainjfont{Noto Serif JP}          % \setCJKsansfont{Noto Sans JP}
+    \setsansjfont{Noto Sans JP}           % \punctstyle{fullwidth}
     \renewcommand*{\abstractname}{概要}
     \renewcommand*{\contentsname}{目次}
     \renewcommand*{\listfigurename}{図目次}
