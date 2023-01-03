@@ -264,7 +264,7 @@
     language    .code:n = { \LanguageSetup*{ #1 } },
     english     .code:n = { \LanguageSetup*{ english } },
     property    .clist_set:N = \g_doc_property_clist, 
-    packageset    .tl_set:N = \g_package_set_tl,
+    packageset  .tl_set:N = \g_package_set_tl,
     styleset    .tl_set:N = \g_style_set_tl,
     Noto        .bool_set:N = \g_Noto_bool,
     minted    	.bool_set:N = \g_minted_bool,
@@ -4670,7 +4670,10 @@
 {
     \str_set:Nx \l_tmpa_str { \tl_to_str:n {#1} }
     \regex_replace_all:nnN { \? }{ \@ } \l_tmpa_str
-	\tl_trim_spaces:N \l_tmpa_str
+	\tl_if_head_eq_catcode:nNT { #1 } \c_catcode_active_tl
+	{
+		\str_remove_all:Nn \l_tmpa_str {~}
+	}
     \texttt{\str_use:N \l_tmpa_str}
 }
 
