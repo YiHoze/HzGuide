@@ -1,2 +1,2 @@
-require"xindex-cfg"
+require"xindex-ko"
 idxnewletter = "\\lettergroup"
