@@ -3381,9 +3381,9 @@
     \exp_args:Nooo \label_macro_index_write:nnn { \l_tmpa_tl }{ \l_tmpb_tl }{ \l_tmpb_str }
 }
 
-\cs_new:Npn \label_macro_index_write:nnn #1 #2 #3
+\cs_new:Npn \label_macro_index_write:nnn #1#2#3
 {
-    \index{ #1!#2@\macroprint{#3} }
+    \index{ #1!#2@\string\macroprint{#3} }
 }
 
 \cs_new:Npn \terms_label_default:n #1
@@ -4653,9 +4653,15 @@
 \NewDocumentCommand\winpath{m}
 { 
 	\group_begin:
-    \str_set:Nx \l_tmpa_str { \tl_to_str:n {#1} }
-    \str_remove_all:Nn \l_tmpa_str {~}
-    \texttt{\l_tmpa_str}
+	\str_set:Nn \l_tmpa_str {#1}
+	\tl_trim_spaces:N \l_tmpa_str
+	\regex_replace_all:nnN {\\}{\\string\\} \l_tmpa_str
+	\regex_replace_all:nnN {\s\\string}{\\allowbreak\\string} \l_tmpa_str
+	\regex_replace_all:nnN {\_}{\\allowbreak\\_} \l_tmpa_str
+	\regex_replace_all:nnN {\s\\allowbreak}{\\allowbreak} \l_tmpa_str
+	\str_replace_all:Nnn \l_tmpa_str {~}{\space} 
+	\tl_set_rescan:Nno \l_tmpa_tl {}{\l_tmpa_str}
+	\texttt{\l_tmpa_tl}
 	\group_end:
 }
 
@@ -4693,11 +4699,11 @@
         \regex_replace_all:nnN { \@ }{ \? } \l_tmpa_str
         \regex_replace_all:nnN { \@ }{ \? } \l_tmpb_str
     }
-    \exp_args:NVV \macro_index_write:nn \l_tmpa_str \l_tmpb_str 
+    \exp_args:NVV \macro_index_write:nn { \l_tmpa_str }{ \l_tmpb_str }
 }
 \cs_new:Npn \macro_index_write:nn #1 #2
 {
-    \index{#1@\macroprint{#2}}
+    \index{#1@\string\macroprint{#2}}
 }
 
 \NewDocumentCommand \macro { s o m }

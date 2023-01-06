@@ -1740,8 +1740,9 @@ true이면 줄 나눔이 허용된다.
 스니펫으로 바꾸려면 \keys{\Tab} 키를 눌러라.
 \end{coderesult}
 
-\macro{\path} 명령이 다른 명령에 포함될 때 백스페이스 앞에 공백이 생기는 경우가 있다.
-대안으로 \macro{\winpath}가 정의되어 있다.
+\macro{url} 패키지의 \macro{\path} 명령을 써서 파일 경로를 나타낼 수 있다.
+그런데 이 명령이 \verb{\footnote} 같은 명령에 포함될 때 언더스코어 같은 기호 문자 앞에 공백이 생긴다.
+대안으로 \macro{\winpath}가 만들어졌다.
 
 \begin{coderesult}
 settings.json 파일이 \winpath{C:\Users\USERNAME\AppData\Roaming\Code\User} 아래에 저장된다.
