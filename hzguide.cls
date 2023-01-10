@@ -4653,15 +4653,10 @@
 \NewDocumentCommand\winpath{m}
 { 
 	\group_begin:
-	\str_set:Nn \l_tmpa_str {#1}
-	\tl_trim_spaces:N \l_tmpa_str
-	\regex_replace_all:nnN {\\}{\\string\\} \l_tmpa_str
-	\regex_replace_all:nnN {\s\\string}{\\allowbreak\\string} \l_tmpa_str
-	\regex_replace_all:nnN {\_}{\\allowbreak\\_} \l_tmpa_str
-	\regex_replace_all:nnN {\s\\allowbreak}{\\allowbreak} \l_tmpa_str
-	\str_replace_all:Nnn \l_tmpa_str {~}{\space} 
-	\tl_set_rescan:Nno \l_tmpa_tl {}{\l_tmpa_str}
-	\texttt{\l_tmpa_tl}
+	\str_set:Nn \l_tmpa_str { #1 }
+	\regex_replace_all:nnN { (\w+)\s } { \1 } \l_tmpa_str
+	\regex_replace_all:nnN { ([\\\-\_]) } { \1\c{allowbreak} } \l_tmpa_str 
+	\texttt{\l_tmpa_str}
 	\group_end:
 }
 
@@ -4674,13 +4669,13 @@
 
 \NewDocumentCommand \macroprint { m }
 {
-    \str_set:Nx \l_tmpa_str { \tl_to_str:n {#1} }
+	\group_begin:
+	\str_set:Nn \l_tmpa_str { #1 }
+	\regex_replace_all:nnN { (\w+)\s } { \1 } \l_tmpa_str
+	% \regex_replace_all:nnN { ([\\\-\_]) } { \1\c{allowbreak} } \l_tmpa_str 
     \regex_replace_all:nnN { \? }{ \@ } \l_tmpa_str
-	\tl_if_head_eq_catcode:nNT { #1 } \c_catcode_active_tl
-	{
-		\str_remove_all:Nn \l_tmpa_str {~}
-	}
-    \texttt{\str_use:N \l_tmpa_str}
+	\texttt{\l_tmpa_str}
+	\group_end:
 }
 
 \NewDocumentCommand \macroindex { o m }
