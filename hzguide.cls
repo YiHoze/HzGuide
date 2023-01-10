@@ -4563,15 +4563,18 @@
     \ior_open:Nn \l_tsv_ior { #1 }
         \ior_str_map_inline:Nn \l_tsv_ior
         {
-            \str_set:Nn \l_tmpa_str { ##1 }
-            \bool_if:NTF \l_csv_bool
-            {
-                \seq_set_split:NnV \l_tmpa_seq { , } \l_tmpa_str
-            }{
-                \regex_replace_all:nnN { \t }{ | } \l_tmpa_str
-                \seq_set_split:NnV \l_tmpa_seq { | } \l_tmpa_str
-            }
-            \tsv_render:N \l_tmpa_seq
+			\regex_match:nnF { \`{3,} }{##1} % ``` to write comments in .tsv
+			{
+				\str_set:Nn \l_tmpa_str { ##1 }
+				\bool_if:NTF \l_csv_bool
+				{
+					\seq_set_split:NnV \l_tmpa_seq { , } \l_tmpa_str
+				}{
+					\regex_replace_all:nnN { \t }{ | } \l_tmpa_str
+					\seq_set_split:NnV \l_tmpa_seq { | } \l_tmpa_str
+				}
+				\tsv_render:N \l_tmpa_seq
+			}
         }
     \ior_close:N \l_tsv_ior
     \group_end:
