@@ -3832,7 +3832,7 @@
 
 %% menukeys package
 \copymenustyle{RoundedKeys}{roundedkeys}
-\changemenuelement{RoundedKeys}{sep}{\,+\,}
+\changemenuelement{RoundedKeys}{sep}{\,+\,\allowbreak}
 \renewmenumacro{\keys}[+]{RoundedKeys}
 % to avoid conflict with that of tabto package
 \tw@make@key@macro{\Tab} 
@@ -4657,8 +4657,8 @@
 { 
 	\group_begin:
 	\str_set:Nn \l_tmpa_str { #1 }
-	\regex_replace_all:nnN { (\w+)\s } { \1 } \l_tmpa_str
-	\regex_replace_all:nnN { ([\\\-\_]) } { \1\c{allowbreak} } \l_tmpa_str 
+	\regex_replace_all:nnN { \s([\\\-\_]) } { \1\c{allowbreak} } \l_tmpa_str
+	\tl_trim_spaces:N  \l_tmpa_str
 	\texttt{\l_tmpa_str}
 	\group_end:
 }
@@ -4674,8 +4674,8 @@
 {
 	\group_begin:
 	\str_set:Nn \l_tmpa_str { #1 }
-	\regex_replace_all:nnN { (\w+)\s } { \1 } \l_tmpa_str
-	% \regex_replace_all:nnN { ([\\\-\_]) } { \1\c{allowbreak} } \l_tmpa_str 
+	\regex_replace_all:nnN { \s([\\\-\_\*\|\^\{\}\[\]]) } { \1\c{allowbreak} } \l_tmpa_str
+	\tl_trim_spaces:N  \l_tmpa_str
     \regex_replace_all:nnN { \? }{ \@ } \l_tmpa_str
 	\texttt{\l_tmpa_str}
 	\group_end:
