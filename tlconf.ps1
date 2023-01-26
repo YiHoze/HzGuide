@@ -20,7 +20,7 @@ tlconf.ps1 -e, -texedit [path]
     Set the TEXEIDT environment variable. The default is
     code.exe -r -g  %s:%d
 tlconf.ps1 -s, -sumatrapdf [path]
-    Set the inverse search command-line option of SumatraPDF. The  defalt is
+    Set the inverse search command-line option of SumatraPDF. The defalt is
     code.exe -r -g  %f:%l
 tlconf.ps1 -c, -conf
     Create local.conf that contains the user's local font directory. The default is

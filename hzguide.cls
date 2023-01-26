@@ -3363,22 +3363,14 @@
 
 \cs_new:Npn \label_macro_index:nn #1 #2
 {
-    \tl_if_head_eq_catcode:nNTF { #2 } \c_catcode_active_tl
-    {
-        \tl_set:Nx \l_tmpa_tl { \cs_to_str:N #2 }
-    }{
-        \tl_set:Nn \l_tmpa_tl { #2 }
-    }
-    \tl_if_head_eq_catcode:nNTF { #1 } \c_catcode_active_tl
-    {
-        \tl_set:Nx \l_tmpb_tl { \cs_to_str:N #1 }
-    }{
-        \tl_set:Nn \l_tmpb_tl { #1 }
-    }
-    \regex_replace_all:nnN { \@ }{ \? } \l_tmpb_tl
-    \str_set:Nn \l_tmpb_str { #1 }
-    \regex_replace_all:nnN { \@ }{ \? } \l_tmpb_str
-    \exp_args:Nooo \label_macro_index_write:nnn { \l_tmpa_tl }{ \l_tmpb_tl }{ \l_tmpb_str }
+    \str_set:Nn \l_tmpa_str { #2 }
+	\str_set:Nn \l_tmpb_str { #1 }
+	\str_set:Nn \l_tmpb_tl { #1 }
+	\regex_replace_all:nnN { ^\\ }{ } \l_tmpa_str
+	\regex_replace_all:nnN { ^\\ }{ } \l_tmpb_str
+	\regex_replace_all:nnN { \@ }{ \? } \l_tmpb_str
+	\regex_replace_all:nnN { \@ }{ \? } \l_tmpb_tl
+    \exp_args:Nooo \label_macro_index_write:nnn { \l_tmpa_str }{ \l_tmpb_str }{ \l_tmpb_tl }
 }
 
 \cs_new:Npn \label_macro_index_write:nnn #1#2#3
@@ -4674,7 +4666,7 @@
 {
 	\group_begin:
 	\str_set:Nn \l_tmpa_str { #1 }
-	\regex_replace_all:nnN { \s([\\\-\_\*\|\^\{\}\[\]]) } { \1\c{allowbreak} } \l_tmpa_str
+	\regex_replace_all:nnN { \s([\\\-\_\*\|\^\{\}\[\]]) }{ \1\c{allowbreak} } \l_tmpa_str
 	\tl_trim_spaces:N  \l_tmpa_str
     \regex_replace_all:nnN { \? }{ \@ } \l_tmpa_str
 	\texttt{\l_tmpa_str}
@@ -4688,12 +4680,8 @@
     {
         \str_set:Nn \l_tmpa_str { #1 }
     }{
-        \tl_if_head_eq_catcode:nNTF { #2 } \c_catcode_active_tl
-        {
-            \str_set:Nx \l_tmpa_str { \cs_to_str:N #2 }
-        }{
-            \str_set:Nn \l_tmpa_str { #2 }
-        }
+        \str_set:Nn \l_tmpa_str { #2 }
+		\regex_replace_all:nnN { ^\\ }{ } \l_tmpa_str
         \regex_replace_all:nnN { \@ }{ \? } \l_tmpa_str
         \regex_replace_all:nnN { \@ }{ \? } \l_tmpb_str
     }
@@ -4762,18 +4750,19 @@
 
 \keys_define:nn { CODE }
 {
-    width       .dim_set:N = \l_code_width_dim,
-    beforeskip  .skip_set:N = \l_code_before_skip,
-    afterskip   .skip_set:N = \l_code_after_skip,
-    offset      .skip_set:N = \l_code_raise_offset,
-    font        .code:n = { \code_verbatim_font:n {#1} },
-    fontsize    .tl_set:N = \l_code_fontsize_tl,
-    linespacing .tl_set:N = \l_code_linespacing_tl,
-    language    .tl_set:N = \l_code_language_tl,
-    codebox     .tl_set:N = \l_code_codebox_tl,
-    resultbox   .tl_set:N = \l_code_resultbox_tl,
-    file        .code:n = { \tl_set:Nx \l_code_file_tl { #1 } },
-    vbar        .tl_set:N = \l_code_vbar_tl
+    width       	.dim_set:N = \l_code_width_dim,
+    beforeskip  	.skip_set:N = \l_code_before_skip,
+    afterskip   	.skip_set:N = \l_code_after_skip,
+    offset      	.skip_set:N = \l_code_raise_offset,
+    offset-minted	.skip_set:N = \l_code_raise_offset_minted,
+    font        	.code:n = { \code_verbatim_font:n {#1} },
+    fontsize    	.tl_set:N = \l_code_fontsize_tl,
+    linespacing 	.tl_set:N = \l_code_linespacing_tl,
+    language    	.tl_set:N = \l_code_language_tl,
+    codebox     	.tl_set:N = \l_code_codebox_tl,
+    resultbox   	.tl_set:N = \l_code_resultbox_tl,
+    file        	.code:n = { \tl_set:Nx \l_code_file_tl { #1 } },
+    vbar        	.tl_set:N = \l_code_vbar_tl
 }
 
 \cs_new:Npn \code_verbatim_font:n #1
@@ -4795,6 +4784,12 @@
 \NewDocumentCommand \CodeSetup { m }
 {
     \keys_set:nn { CODE }{ #1 }
+	\bool_if:NT \g_minted_bool {
+		\dim_compare:nT { \l_code_raise_offset != 0pt }
+		{
+			\skip_set_eq:NN \l_code_raise_offset \l_code_raise_offset_minted
+		}
+	}
     \tl_if_empty:NF \l_code_codebox_tl
     {
         \RenewBoundedBox{ CodeBox }{ type=\l_code_codebox_tl }
@@ -4820,9 +4815,10 @@
     font=\ttfamily,
     fontsize=\small,
     width=0pt,
-    offset=-.75\onelineskip,
     beforeskip=\hznulldim,
     afterskip=\hznulldim,
+    offset=-1.25\onelineskip,
+    offset-minted=-0.75\onelineskip,
     linespacing=1.1,
     language=latex,
     vbar={language=text}
@@ -4887,9 +4883,9 @@
 {
     \int_compare:nTF { \@listdepth > 0 }
     {
-        \dim_set:Nn \l_tmpa_dim { .75\l_code_raise_offset }
+        \skip_set:Nn \l_tmpa_dim { .75\l_code_raise_offset }
     }{
-        \dim_set:Nn \l_tmpa_dim { \l_code_raise_offset }
+        \skip_set:Nn \l_tmpa_dim { \l_code_raise_offset }
     }
     \begin{CodeBox}[beforeskip=\l_code_before_skip, afterskip=\l_code_after_skip]
     \vspace{\l_tmpa_dim}\mbox{}

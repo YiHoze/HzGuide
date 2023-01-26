@@ -70,7 +70,7 @@ type %localconf%
 
 echo.
 echo.
-echo tlconf.cmd conf              : Create local.conf with the user's local font directory.
+echo tlconf.cmd conf             : Create local.conf with the user's local font directory.
 echo tlconf.cmd texedit [...]    : Set the TEXEIDT environment variable. The default is
 echo                               code.exe -r -g  %%s:%%d
 echo tlconf.cmd texmfhome [...]  : Set the TEXMFHOME environment variable. The default is
