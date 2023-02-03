@@ -103,10 +103,11 @@
 \IfHangul{
 	\RequirePackage{kotex}
 	% \setsanshanjafont{Noto Sans CJK KR}[BoldFont={* Medium}]	
-	\setmainfont{Noto Serif}
-	\setsansfont{Noto Sans}
-	\setmainhangulfont{Noto Serif CJK KR}[BoldFont={* Medium}]	
-	\setsanshangulfont{Noto Sans CJK KR}[BoldFont={* Medium}]	
+	% \setmainfont{Noto Serif}
+	% \setsansfont{Noto Sans}
+	% \setmainhangulfont{Noto Serif CJK KR}[BoldFont={* Medium}]	
+	% \setsanshangulfont{Noto Sans CJK KR}[BoldFont={* Medium}]	
+	\setmainfont{Noto Sans CJK KR}[BoldFont={* Medium}]	
     \setmonohangulfont{Noto Sans Mono CJK KR}
 }
 
@@ -215,8 +216,8 @@
 \dim_new:N \g_image_height
 \IfSlide
 {
-	\dim_gset:Nn \g_image_width {.95\textwidth}
-	\dim_gset:Nn \g_image_height {.85\textheight}
+	\dim_gset:Nn \g_image_width {.9\textwidth}
+	\dim_gset:Nn \g_image_height {.8\textheight}
 }[
 	\dim_gset:Nn \g_image_width {.8\textwidth}
 	\dim_gset:Nn \g_image_height {.3\textheight}
@@ -290,13 +291,7 @@
 \IfSlide{
 	\NewDocumentCommand \biblio { s m }
 	{
-		\group_begin:
-		\IfBooleanTF{#1}
-		{
-			\setlength\parskip{0ex}
-		}{
-			\setlength\parskip{-1ex}
-		}		
+		\smallskip
 		\begin{flushright}
 			\IfBooleanF{#1}
 			{
@@ -304,7 +299,6 @@
 			}
 			\footnotesize #2
 		\end{flushright}
-		\group_end:
 	}
 }[
 	\NewDocumentCommand \biblio {s m} {\mbox{}\newline---\thinspace #2}
@@ -363,39 +357,6 @@
 	\group_end:
 }
 
-
-%% characters & letters
-% \NewDocumentCommand \SetForeignFonts { m m }
-% {
-% 	\newfontfamily\foreignrmfamily{#1}
-% 	\newfontfamily\foreignsffamily{#2}
-% }
-
-% \SetForeignFonts{HCR Dotum}{HCR Dotum}
-
-% \tl_new:N \WithHangul
-% \IfHangul{ 
-% 	\sys_if_engine_xetex:TF
-% 	{
-% 		\tl_set:Nn \WithHangul { \disablekoreanfonts } 
-% 	}{
-% 		\tl_set:Nn \WithHangul {}
-% 	}
-% }
-
-% \NewDocumentCommand \foreign {s o m}
-% {
-% 	\group_begin:
-% 		\WithHangul
-% 		\ifx\f@family\rmdefault
-% 			\IfNoValueTF {#2} {\foreignrmfamily} {\fontspec{#2}}
-% 		\else
-% 			\IfNoValueTF {#2} {\foreignsffamily} {\fontspec{#2}}
-% 		\fi
-% 		\IfBooleanTF {#1} {\char"#3} {#3}
-% 	\group_end:
-% }
-
 \keys_define:nn { annotate }
 {
 	opening		.tl_set:N = \l_annotate_opening_tl,
@@ -412,9 +373,9 @@
 
 \AnnotateSetup{
 	font=\scriptsize,
-	color=darkgray,
-	opening=(,
-	closing=),
+	color=gray,
+	opening={},
+	closing={},
 	raise=.75ex
 }
 
@@ -495,11 +456,11 @@
 {
 	\IfBooleanTF { #1 }
 	{
-		\hfill \textcolor{lightgray}{\tiny #2}
-	}{
 		\begin{flushright}
 		\color{lightgray}\tiny #2
 		\end{flushright}
+	}{
+		\hfill \textcolor{lightgray}{\tiny #2}
 	}
 }
 
