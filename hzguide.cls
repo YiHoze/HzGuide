@@ -4580,7 +4580,13 @@
         \seq_pop:NN #1 \l_tmpa_str
         \str_if_empty:NF \l_tmpa_str
         {
-            \TSVheading{ \l_tmpa_str }
+			\bool_if:NTF \l_tsv_verb_bool
+			{
+				\tl_set:NV \l_tmpa_tl \l_tmpa_str
+			}{
+				\tl_set_rescan:Nno \l_tmpa_tl {}{ \l_tmpa_str }
+			}
+            \TSVheading{ \l_tmpa_tl }
         }
 	}{
         \noindent
