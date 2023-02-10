@@ -3915,15 +3915,15 @@
     {
         \tl_clear:N \l_annotate_tl
     }{
-        \tl_put_right:Nn \l_annotate_tl {#1}
-        \annotate_breakable:V \l_annotate_tl
-        \tl_clear:N \l_annotate_tl
-        \peek_catcode:NTF \c_space_token
-        {
-            \space\annotate_recur:n
-        }{
-            \annotate_recur:n
-        }
+		\tl_put_right:Nn \l_annotate_tl {#1}
+		\annotate_breakable:V \l_annotate_tl
+		\tl_clear:N \l_annotate_tl
+		\peek_catcode:NTF \c_space_token
+		{
+			\space\annotate_recur:n
+		}{
+			\annotate_recur:n 
+		}
     }
 }
 
@@ -4114,6 +4114,22 @@
     before~skip=0pt, after~skip=0pt, after={\par\normalcolor},
     boxrule=0.75pt, colframe=white, colback=backgray, arc=0.5ex,
     boxsep=0.5ex, top=0.75ex, bottom=0.75ex, left=0.5em, right=0.5em,
+    titlerule=0.75pt, toptitle=0.5ex, bottomtitle=0.5ex,
+    colbacktitle=lightgray, coltitle=black,
+    fonttitle=\l_bbox_title_font_tl, title=#2,
+	IfBooleanTF={#1}{
+		breakable=\l_bbox_breakable_adhoc_tl
+	}{
+		breakable=\l_bbox_breakable_default_tl
+	}
+}
+
+\NewTColorBox{OpenShadeBox}{ s O{} }
+{
+    before~skip=0pt, after~skip=0pt, after={\par\normalcolor},
+    boxrule=0pt, colframe=white, colback=white, arc=0pt,
+    boxsep=0.25ex,  top=0.75ex, bottom=0.75ex, left=0em, right=0em,
+    borderline~south={0.5pt}{0pt}{darkgray},
     titlerule=0.75pt, toptitle=0.5ex, bottomtitle=0.5ex,
     colbacktitle=lightgray, coltitle=black,
     fonttitle=\l_bbox_title_font_tl, title=#2,
