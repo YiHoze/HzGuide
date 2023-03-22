@@ -88,7 +88,7 @@ C:\>ltx -L -s foo.tex
 \item[-L] docenv.conf에 설정된 디폴트 컴파일러가 무시되고, \term{lualatex}이 실행된다.
 	docenv.conf가 존재하지 않으면, xelatex이 디폴트 컴파일러로 설정된다.
 \item[-X] \term{xelatex}이 실행된다.
-\item[-A] docenv.conf의 \macro{alternative_path} 옵션에 설정된 폴더에 있는 컴파일러가 사용된다.
+% \item[-A] docenv.conf의 \macro{alternative_path} 옵션에 설정된 폴더에 있는 컴파일러가 사용된다.
 예를 들어, \macro{PATH} 시스템 변수에 \verb{C:\texlive\2022\bin\win64}를 설정하고, \macro{alternative_path} 옵션에 \verb{C:\texlive\2022\bin\win32}를 설정하라.
 \item[-b] 이것은 \macro[interaction]{-interaction=batchmode}를 의미한다. 이 옵션이 주어지지 않으면 \macro[synctex]{-synctex=-1}이 사용된다.
 \item[-s] 이것은 \macro[shell]{-shell-escape}와 같다.
@@ -479,7 +479,7 @@ C:\>op -r foo*.xml
 	\item 정규 표현식에서 도트(.)는 개행 문자를 제외한 모든 문자에 대응된다. 주석 줄 끝에 \macro{DOTALL}이 있으면, 그 다음 주석 줄을 만날 때까지 그 아래에 있는 모든 정규 표현식들의 처리에서 도트가 개행 문자를 포함하는 모든 문자에 대응된다. 
 	\end{itemize}
 \item[-c] 찾기에서 대소문자를 구분한다. 바꾸기를 위한 찾기에서는 항상 대소문자를 구분한다.
-\item[-C] 
+\item[-C] 두 파일을 비교하여 일치하지 않는 줄들을 찾아낸다.
 
 \begin{code}
 C:\>wordig -C C:\project\A\foo.xml C:\project\B\goo.xml

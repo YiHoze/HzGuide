@@ -4883,7 +4883,7 @@
     \l_code_fontsize_tl
     \bool_if:NTF \g_minted_bool
     {
-        \inputminted{ \l_code_language_tl }{ \l_code_file_tl }
+        \exp_args:Noo \inputminted{ \l_code_language_tl }{ \l_code_file_tl }
     }{
         \verbatiminput{ \l_code_file_tl }
     }
@@ -4966,7 +4966,7 @@
                 \l_code_fontsize_tl
                 \bool_if:NTF \g_minted_bool
                 {
-                    \inputminted{ latex }{ \l_code_file_tl }
+                    \exp_args:Nno \inputminted{ latex }{ \l_code_file_tl }
                 }{
                     \verbatiminput{ \l_code_file_tl }
                 }
