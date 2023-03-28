@@ -178,8 +178,8 @@ i.ini는, 다양한 방법으로 처리할 수 있도록, 여러 옵션들을 �
 [tex]
 target = foo.tex
 compiler = xelatex
-draft = wordig.py -a "..." -s "..." %(target)s
-final = wordig.py -a "..." -s "..." %(target)s
+draft = wordig.py -a "..." -s "..." -v %(target)s
+final = wordig.py -a "..." -s "..." -v %(target)s
 final_compiler = lualatex
 after = 
 main = \input{preamble}
@@ -510,7 +510,8 @@ C:\>wordig -a="\w+" -g *.tex
 
 \term{폴더 구분자}\annotate{directory separator}로 백슬래시(\verb{\}) 대신 슬래시(\verb{/})를 사용할 수 있다.
 
-\item[-v] 출력 파일의 이름이 지정되지 않으면 ---\verb{-o} 옵션이 주어지지 않으면--- 문자열 치환이 그 결과를 원본 파일에 덮어 쓴다. 이 옵션이 주어지면 같은 이름의 파일이 존재할 때 출력을 위한 파일 이름에 번호가 추가된다. 다른 기능이 수행될 때에도 마찬가지이다. 
+\item[-v] 이 옵션이 주어졌을 때 출력 파일의 이름이 지정되지 않으면 ---\verb{-o} 옵션이 주어지지 않으면--- 같은 이름의 파일이 존재할 때 출력을 위한 파일 이름에 번호가 추가된다. 
+다른 기능이 수행될 때에도 마찬가지이다. 문자열 치환이 그 결과를 원본 파일에 덮어 쓴다. 
 \item[-r] 모든 하위 폴더에 있는 파일들이 처리된다.
 \item[-p] 각 PDF 파일들의 페이지 수와 합계를 구하려면 이 옵션을 사용하라.
 \item[-U] 주어진 문자들의 유니코드 정보가 표시된다.

@@ -2922,7 +2922,7 @@
         \ImageSetup{showfilename=false}
     }{
         \ImageSetup{showfilename=true}
-        \CaptionSetup{align=\raggedright}
+        \CaptionSetup{align=\raggedright, font=\ttfamily\small}
     }
     \ior_open:Nn \g_tmpa_ior { #3 }
     \ior_map_inline:Nn \g_tmpa_ior
