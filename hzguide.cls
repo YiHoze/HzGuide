@@ -5341,6 +5341,7 @@
 % for transtex  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 \NewDocumentCommand\htmlbegin{}{}
 \NewDocumentCommand\htmlend{}{}
+\NewDocumentEnvironment{html}{+b}{}{}
 
 % default settings * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
