@@ -177,10 +177,10 @@ i.ini는, 다양한 방법으로 처리할 수 있도록, 여러 옵션들을 �
 \begin{codewrite}
 [tex]
 target = foo.tex
-compiler = xelatex
+compiler = -X -s
 draft = wordig.py -a "..." -s "..." -v %(target)s
 final = wordig.py -a "..." -s "..." -v %(target)s
-final_compiler = lualatex
+final_compiler = -L -f
 after = 
 main = \input{preamble}
     \begin{document}

@@ -2945,8 +2945,8 @@
 
 \cs_new:Npn \table_footnotestyle:n #1
 {
-    \renewcommand\thefootnote{ \use:c {#1} {footnote} }
-    \renewcommand\thempfootnote{ \use:c {#1} {mpfootnote} }
+    \renewcommand*{\thefootnote}{ \use:c {#1} {footnote} }
+    \renewcommand*{\thempfootnote}{ \use:c {#1} {mpfootnote} }
 }
 
 \keys_define:nn { table }
@@ -2969,7 +2969,8 @@
 	star		  	.tl_set:N 	= \l_table_star_tl,
 	vbar		  	.tl_set:N 	= \l_table_vbar_tl,
 	protrude		.dim_set:N  = \l_table_protrude_dim, % valid only at vartwo
-    style           .tl_set:N   = \l_table_style_tl
+    style           .tl_set:N   = \l_table_style_tl,
+    fake            .bool_set:N = \l_table_fake_bool % to contain csv lists or others
 }
 
 \NewDocumentCommand \TableSetup { m }
@@ -3133,8 +3134,24 @@
 	{
 		\tl_set:Nn \l_table_footnote {#5}
 	}
-    \placetable{ #6 }
+    \bool_if:nTF \l_table_fake_bool
+    { 
+        \faketable{ #6 }
+    }{
+        \placetable{ #6 }
+    }
 }{}
+
+\NewDocumentCommand{ \faketable }{ m }
+{
+    % \object_skip_before:n {\l_table_before_skip}
+    \table_caption: 
+    \skip_vertical:N \belowcaptionskip
+    \begin{RuleBox}
+        #1
+    \end{RuleBox}
+    \object_skip_after:n {\l_table_after_skip}
+}
 
 \NewDocumentEnvironment { SpecTable } { s O{lX} d() d<> +b }
 {
@@ -4640,6 +4657,20 @@
     }{
         \exp_args:NNno \clist_item:Nn \l_tsv_renderers_clist { #1 } \l_tmpa_tl
     }
+}
+
+\NewDocumentEnvironment { CSVoutput }{ }
+{
+    \group_begin:
+        \exp_args:Nx \verbatimoutput { \jobname.tsv }
+}{
+        \endverbatimoutput
+    \group_end:
+}
+
+\NewDocumentCommand { \CSVinput }{ O{} }
+{
+    \ReadTSV{\jobname.tsv}[csv=true, #1] 
 }
 
 % ### switching between two sets of settings from outside
