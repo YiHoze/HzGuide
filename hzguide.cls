@@ -3144,7 +3144,7 @@
 
 \NewDocumentCommand{ \faketable }{ m }
 {
-    % \object_skip_before:n {\l_table_before_skip}
+    \object_skip_before:n {\l_table_before_skip}
     \table_caption: 
     \skip_vertical:N \belowcaptionskip
     \begin{RuleBox}
