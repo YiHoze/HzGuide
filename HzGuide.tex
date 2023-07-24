@@ -1527,6 +1527,17 @@ Nominal energy & 6.4 kW·h
 \NewTerms{Tags}{labeltype=adhoc, delimiter=\hfill}
 \end{code}
 
+\item[hyperlink] \keyvalueTF
+표제어에 하이퍼링크 앵커가 만들어진다.
+표제어로 연결되는 링크를 만들려면 \macro{\tlink} 명령을 사용하라.
+
+\begin{code}
+\begin{terms}
+\item[Artificial Intelligence] is the intelligence of ...
+\end{terms}
+See \tlink{Artificial Intelligence}
+\end{code}
+
 \item[offset] \keyvalue{0em}
 다른 목록 환경 아래에서 왼쪽 여백에 추가되는 길이
 
@@ -1693,7 +1704,7 @@ This edition supports as follows:
 용어가 색인에 추가된다.
 
 \item[indexsame] \keyvalueTF
-표제어가 색인에서 지정된 것과 동일한 폰트로 식자된다.
+색인에서, 지정된 것과 동일한 폰트로 표제어가 식자된다.
 
 \item[breakable] \keyvalueTF
 true이면 줄 나눔이 허용된다.
@@ -2030,7 +2041,7 @@ HzGuide 클래스는, 다양한 언어들의 조판을 목적으로 하기 때�
 \begin{danger}
 \term{위험}은 사망이나 심각한 부상을 초래하는 상황을 가리킨다.
 \macro{danger} 환경이 이렇게 정의되어 있다.
-\hzsourceline[4332]
+\hzsourceline[4358]
 \end{danger}
 
 \begin{warning}

@@ -3276,6 +3276,7 @@
 \keys_define:nn { terms }
 {
     labeltype   .tl_set:N = \l_terms_label_type_tl,
+    hyperlink   .bool_set:N = \l_terms_hyperlink_bool,
     offset      .skip_set:N = \l_terms_offset_skip,
     marker      .code:n = { \terms_define_marker:n {#1} },
     markersep   .skip_set:N = \l_terms_marker_sep_skip,
@@ -3311,6 +3312,7 @@
 \TermsInitialize{
 	topsep=0.5\onelineskip,
     labeltype = default,
+    hyperlink = false,
     offset = 0em,
     marker = {{},\textbullet},
     markersep = 0.5em,
@@ -3395,6 +3397,8 @@
     \index{ #1!#2@\string\macroprint{#3} }
 }
 
+\NewDocumentCommand{\tlink}{m}{\hyperlink{#1}{#1}}
+
 \cs_new:Npn \terms_label_default:n #1
 {
     \int_gincr:N \l_terms_int
@@ -3403,6 +3407,7 @@
         \color{\l_terms_color_tl}
         \l_terms_marker
         \l_terms_font_tl #1
+        \bool_if:NT \l_terms_hyperlink_bool { \hypertarget{#1}{} }
     \group_end:
     \l_terms_delimiter_tl
 }
@@ -3430,6 +3435,7 @@
             \raggedright
             \color{\l_terms_color_tl}
             \l_terms_font_tl #1
+            \bool_if:NT \l_terms_hyperlink_bool { \hypertarget{#1}{} }
         }
     }
     \hbox_set:Nn \l_tmpb_box {\l_terms_font_tl A}
@@ -3443,6 +3449,7 @@
         \color{\l_terms_color_tl}
         \l_terms_marker
         \l_terms_font_tl
+        \bool_if:NT \l_terms_hyperlink_bool { \hypertarget{#1}{} }
         \terms_label_macro_write:n {#1}
     \group_end:
     \l_terms_delimiter_tl
@@ -3455,6 +3462,7 @@
             \color{\l_terms_color_tl}
             \l_terms_marker
             \l_terms_font_tl
+            \bool_if:NT \l_terms_hyperlink_bool { \hypertarget{#1}{} }
 			\terms_label_macro_write:n {#1}
             \l_terms_delimiter_tl
         }
