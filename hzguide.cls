@@ -3364,10 +3364,10 @@
 
 \cs_new:Npn \terms_label_macro_write:n #1
 {
-    \tl_if_in:nnTF { #1 }{ ~ }
-    {
-        \texttt{ \tl_to_str:n { #1 } }
-    }{
+    % \tl_if_in:nnTF { #1 }{ ~ }
+    % {
+    %     \texttt{ \tl_to_str:n { #1 } }
+    % }{
         \macroprint{#1}
         \bool_if:NT \l_terms_index_bool
         {
@@ -3377,7 +3377,7 @@
                 \exp_args:NnV \label_macro_index:nn { #1 } \l_terms_index_category_tl
             }
         }
-    }
+    % }
 }
 
 \cs_new:Npn \label_macro_index:nn #1 #2
