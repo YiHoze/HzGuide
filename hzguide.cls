@@ -22,7 +22,7 @@
 \RequirePackage{calc}
 
 \RequirePackage{fontspec}
-\RequirePackage{ragged2e}
+% \RequirePackage{ragged2e}
 \RequirePackage[shortlabels]{enumitem}
 \RequirePackage{tabto}
 \RequirePackage[normalem]{ulem}
@@ -2368,7 +2368,7 @@
             {
                 \tl_set:Nx \l_image_caption_tl { \tl_to_str:N \l_image_caption_tl }
             }{
-                \regex_replace_all:nnN { \_ } { \c{_} } \l_image_caption_tl % to allow '_' in image file names
+                \regex_replace_all:nnN { \_ } { \c{_} } \l_image_caption_tl 
             }
 			\bool_if:NTF \l_image_legend_bool
 			{
