@@ -3924,10 +3924,20 @@
 		}
 		\bool_if:NT \l_annotate_index_bool
 		{
-			\index{#3}
+			\annotate_index:n {#3} % \index{#3}
 		}
 		\l_annotate_space
 	\group_end:
+}
+
+\cs_new:Npn \annotate_index:n #1
+{
+    \group_begin:
+    \tl_set:Nn \l_tmpa_tl { #1 }
+    \tl_set:Nn \l_tmpb_tl { #1 }
+    \regex_replace_all:nnN { ^\. }{ } \l_tmpa_tl
+    \index{\tl_use:N \l_tmpa_tl @ \tl_use:N \l_tmpb_tl}
+    \group_end:
 }
 
 \cs_new:Npn \annotate_scope:n #1
@@ -4743,7 +4753,7 @@
         \str_set:Nn \l_tmpa_str { #1 }
     }{
         \str_set:Nn \l_tmpa_str { #2 }
-		\regex_replace_all:nnN { ^\\ }{ } \l_tmpa_str
+		\regex_replace_all:nnN { ^[\\\_\-] }{ } \l_tmpa_str
         \regex_replace_all:nnN { \@ }{ \? } \l_tmpa_str
         \regex_replace_all:nnN { \@ }{ \? } \l_tmpb_str
     }
