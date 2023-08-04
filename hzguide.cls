@@ -2913,7 +2913,8 @@
 
 % ## album
 
-\NewDocumentCommand \MakeAlbum { s O {1} m }
+\newcommand*{\albumhook}{\par}
+\NewDocumentCommand \MakeAlbum { s O{1} m }
 {
     \int_zero:N \l_tmpa_int
     \ImageSetup{scale=#2, fitline=true}
@@ -2935,7 +2936,7 @@
         {
             \int_incr:N \l_tmpa_int
             \pdfbookmark[1]{\tl_to_str:N \l_tmpa_tl}{\int_use:N \l_tmpa_int}
-            \image{\l_tmpa_tl}\par
+            \image{\l_tmpa_tl}\albumhook
         }
     }
     \ior_close:N \g_tmpa_ior
