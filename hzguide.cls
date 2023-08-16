@@ -4966,7 +4966,7 @@
     \end{CodeBox}
 }
 
-\NewDocumentEnvironment { code }{}
+\NewDocumentEnvironment { code }{ s }
 {
     \group_begin:
     \exp_args:Nx \verbatimoutput { \l_code_file_tl }
@@ -4974,7 +4974,8 @@
     \endverbatimoutput
     \group_end:
 
-    \coderead
+    \IfBooleanTF{#1}{\coderead|}{\coderead}
+    % \coderead
 }
 
 \NewDocumentEnvironment { coderesult }{}
