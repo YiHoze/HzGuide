@@ -4832,10 +4832,11 @@
     fontsize    	.tl_set:N = \l_code_fontsize_tl,
     linespacing 	.tl_set:N = \l_code_linespacing_tl,
     language    	.tl_set:N = \l_code_language_tl,
+    boxed           .bool_set:N = \l_code_boxed_bool,
     codebox     	.tl_set:N = \l_code_codebox_tl,
     resultbox   	.tl_set:N = \l_code_resultbox_tl,
     file        	.code:n = { \tl_set:Nx \l_code_file_tl { #1 } },
-    vbar        	.tl_set:N = \l_code_vbar_tl
+    star            .tl_set:N = \l_code_star_tl
 }
 
 \cs_new:Npn \code_verbatim_font:n #1
@@ -4893,8 +4894,9 @@
     offset=-1.25\onelineskip,
     offset-minted=-0.75\onelineskip,
     linespacing=1.1,
+    boxed=true,
     language=latex,
-    vbar={language=text}
+    star={language=text}
 }
 
 \NewDocumentEnvironment { codewrite }{ }
@@ -4906,26 +4908,27 @@
     \group_end:
 }
 
-\NewDocumentCommand \coderead { s t| O{} }
+\NewDocumentCommand \coderead { s O{} }
 {
     \group_begin:
-    \setSpacing{ \l_code_linespacing_tl }
-    \CodeSetup{ #3 }
-    \IfBooleanT{ #2 }
+    \IfBooleanT{ #1 }
     {
-        \exp_args:No \CodeSetup{ \l_code_vbar_tl }
+        \exp_args:No \CodeSetup{ \l_code_star_tl }
     }
-    \IfBooleanTF { #1 }
+    \CodeSetup{ #2 }
+    \setSpacing{ \l_code_linespacing_tl }
+    \bool_if:NTF \l_code_boxed_bool
     {
-        \code_read_verbatim:
-    }{
         \dim_compare:nTF { \l_code_width_dim > 0pt }
         {
             \code_read_minipage:
         }{
             \code_read_box:
         }
+    }{
+        \code_read_verbatim:
     }
+
     \group_end:
 }
 
@@ -4966,7 +4969,7 @@
     \end{CodeBox}
 }
 
-\NewDocumentEnvironment { code }{ s }
+\NewDocumentEnvironment { code }{}
 {
     \group_begin:
     \exp_args:Nx \verbatimoutput { \l_code_file_tl }
@@ -4974,9 +4977,18 @@
     \endverbatimoutput
     \group_end:
 
-    \IfBooleanTF{#1}{\coderead|}{\coderead}
-    % \coderead
-}
+    \coderead
+ }
+\NewDocumentEnvironment { code* }{}
+{
+    \group_begin:
+    \exp_args:Nx \verbatimoutput { \l_code_file_tl }
+}{
+    \endverbatimoutput
+    \group_end:
+
+    \coderead*
+ }
 
 \NewDocumentEnvironment { coderesult }{}
 {
@@ -4986,10 +4998,14 @@
     \endverbatimoutput
     \group_end:
 
-    \code_read_box:
-    \begin{ResultBox}
-    \input{\l_code_file_tl}
-    \end{ResultBox}
+    \bool_if:NTF \l_code_boxed_bool
+    {
+        \begin{ResultBox}
+        \input{\l_code_file_tl}
+        \end{ResultBox}
+    }{
+        \input{\l_code_file_tl}
+    }
 }
 
 \NewDocumentCommand \codeinput {}
@@ -5013,16 +5029,27 @@
         \begin{minipage}{\linewidth}
             \begin{minipage}[t]{\l_code_width_dim}
                 \setSpacing{ \l_code_linespacing_tl }
-                \begin{CodeBox}[beforeskip=0pt, afterskip=0pt]
-                \vspace{\l_code_raise_offset}\mbox{}
-                \l_code_fontsize_tl
-                \bool_if:NTF \g_minted_bool
+                \bool_if:NTF \l_code_boxed_bool
                 {
-                    \exp_args:Nno \inputminted{ latex }{ \l_code_file_tl }
+                    \begin{CodeBox}[beforeskip=0pt, afterskip=0pt]
+                    \vspace{\l_code_raise_offset}\mbox{}
+                    \l_code_fontsize_tl
+                    \bool_if:NTF \g_minted_bool
+                    {
+                        \exp_args:Nno \inputminted{ latex }{ \l_code_file_tl }
+                    }{
+                        \verbatiminput{ \l_code_file_tl }
+                    }
+                    \end{CodeBox}
                 }{
-                    \verbatiminput{ \l_code_file_tl }
+                    \l_code_fontsize_tl
+                    \bool_if:NTF \g_minted_bool
+                    {
+                        \exp_args:Nno \inputminted{ latex }{ \l_code_file_tl }
+                    }{
+                        \verbatiminput{ \l_code_file_tl }
+                    }
                 }
-                \end{CodeBox}
             \end{minipage}
             \hfill
             \begin{minipage}[t]{\l_code_description_width_dim}

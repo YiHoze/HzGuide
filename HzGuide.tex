@@ -70,6 +70,7 @@
 \CodeSetup{
     beforeskip=.5\onelineskip,
     afterskip=0pt,
+    star={boxed=false}
 }
 
 \ExplSyntaxOn
@@ -1737,7 +1738,7 @@ true이면 줄 나눔이 허용된다.
 다른 점은 마지막 항목을 색인에 추가하는 것이다.
 
 \begin{coderesult}
-\Menu{File>Preferences>{User Snippets}>{latex.json}}
+\Menu{File > Preferences > {User Snippets} > {latex.json}}
 \end{coderesult}
 
 \macro{tabto} 패키지의 \macro{\tab} 명령과의 충돌을 회피하기 위해 \macro{\Tab} 키가 정의되어 있다.
@@ -2041,7 +2042,7 @@ HzGuide 클래스는, 다양한 언어들의 조판을 목적으로 하기 때�
 \begin{danger}
 \term{위험}은 사망이나 심각한 부상을 초래하는 상황을 가리킨다.
 \macro{danger} 환경이 이렇게 정의되어 있다.
-\hzsourceline[4358]
+\hzsourceline[4369]
 \end{danger}
 
 \begin{warning}
@@ -2584,6 +2585,7 @@ xelatex $tex
 
 \begin{codewrite}
 \begin{code} \end{code}
+\begin{code*} \end{code*}
 \begin{coderesult} \end{coderesult}
 \CodeSetup{옵션}
 \end{codewrite}
@@ -2625,27 +2627,33 @@ xelatex $tex
 \item[codebox] \keyvalue{FrameBox, LeftBarBox, RightBarBox, ShadeBox, ShadowBox, RuleBox, TabBox}
 소스 코드를 보여주는 박스의 모양. \ptref{sec:ColoredBoxes}\를 보라.
 
-\item[resultbox] \keyvalue{FrameBox, …}
+\item[resultbox] \keyvalue{FrameBox, LeftBarBox, RightBarBox, ShadeBox, ShadowBox, RuleBox, TabBox}
 결과를 보여주는 박스의 모양
+
+\item[boxed] \keyvalueTF
+\macro{codebox}와 \macro{resultbox}의 설정이 무시된다. 
+따라서 소스 코드와 그 결과를 보여주는 데에 박스가 사용되지 않는다.
 
 \item[file] \keyvalue{\jobname.vrb}
 소스 코드를 임시로 저장하는 파일의 이름
 
-\item[vbar] \keyvalue{옵션}
-이것은 기본 설정과 다른 작동을 허용하기 위한 목적으로 고안되었다. 주어진 옵션이 수직선(\macro*{|})이 붙은 \macro{\coderead|}에 적용된다. 디폴트는 \macro*{language=text}이다.
+\item[star] \keyvalue{옵션}
+이것은 기본 설정과 다른 작동을 허용하기 위한 목적으로 고안되었다. 
+주어진 옵션이 별표가 붙은 \macro{code*} 환경과 \macro{\coderead*} 명령에 적용된다.
+디폴트는 \macro*{language=text}이다.
 \end{macros}
 
 \macro{\verb} 명령과 \macro{verbatim} 환경은 다른 명령이나 환경에 인수가 될 수 없기 때문에, 소스 코드의 저장과 읽기를 분리해야 하는 경우들이 있다.
 
 \begin{code}
 \begin{codewrite} \end{codewrite}
-\coderead*|[옵션]
+\coderead*[옵션]
 \codeinput
 \begin{codedesc} \end{codedesc}
 \end{code}
 
 \macro{codewrite} 환경은 소스 코드를 임시 파일에 저장한다.
-\macro{\coderead} 명령은 저장된 소스 코드를 읽고 지정된 모양의 박스 안에 식자하는 반면, 별표가 붙은 \macro{\coderead*}는 박스를 사용하지 않는다.
+\macro{\coderead} 명령은 저장된 소스 코드를 읽고 지정된 모양의 박스 안에 식자한다.
 \macro{\codeinput} 명령은 저장된 소스 코드를 텍 파일로서 삽입한다.
 \macro{codedesc} 환경은 저장된 소스 코드를 읽어서 왼쪽에 두고 오른쪽에 그에 대한 설명을 추가한다.
 
