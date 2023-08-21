@@ -305,7 +305,7 @@
 % font
 \bool_if:NT \g_Noto_bool
 {
-    \setmainfont{Noto~Serif}[BoldFont={*~Bold}]
+    \setmainfont{Noto~Serif}[BoldFont={*~SemiBold}]
     \setsansfont{Noto~Sans}[BoldFont={*~SemiBold}]
 }
 
@@ -358,7 +358,7 @@
 
     \bool_if:NT \g_Noto_bool
     {
-        \setmainhangulfont{Noto~Serif~KR}[BoldFont={*~Bold}, Script=Hangul, Language=Korean]
+        \setmainhangulfont{Noto~Serif~KR}[BoldFont={*~SemiBold}, Script=Hangul, Language=Korean]
         \setsanshangulfont{Noto~Sans~KR}[BoldFont={*~Medium}, Script=Hangul, Language=Korean]
     }
     \bool_gset_true:N \g_CJK_bool
