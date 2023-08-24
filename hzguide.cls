@@ -3388,8 +3388,8 @@
 	\str_set:Nn \l_tmpb_tl { #1 }
 	\regex_replace_all:nnN { ^\\ }{ } \l_tmpa_str
 	\regex_replace_all:nnN { ^\\ }{ } \l_tmpb_str
-	\regex_replace_all:nnN { \@ }{ \? } \l_tmpb_str
-	\regex_replace_all:nnN { \@ }{ \? } \l_tmpb_tl
+	\regex_replace_all:nnN { \@ }{ ※ } \l_tmpb_str
+	\regex_replace_all:nnN { \@ }{ ※ } \l_tmpb_tl
     \exp_args:Nooo \label_macro_index_write:nnn { \l_tmpa_str }{ \l_tmpb_str }{ \l_tmpb_tl }
 }
 
@@ -4741,7 +4741,7 @@
 	\str_set:Nn \l_tmpa_str { #1 }
 	\regex_replace_all:nnN { \s([\\\-\_\*\|\^\{\}\[\]]) }{ \1\c{allowbreak} } \l_tmpa_str
 	\tl_trim_spaces:N  \l_tmpa_str
-    \regex_replace_all:nnN { \? }{ \@ } \l_tmpa_str
+    \regex_replace_all:nnN { ※ }{ \@ } \l_tmpa_str
 	\texttt{\l_tmpa_str}
 	\group_end:
 }
@@ -4755,8 +4755,8 @@
     }{
         \str_set:Nn \l_tmpa_str { #2 }
 		\regex_replace_all:nnN { ^[\\\_\-] }{ } \l_tmpa_str
-        \regex_replace_all:nnN { \@ }{ \? } \l_tmpa_str
-        \regex_replace_all:nnN { \@ }{ \? } \l_tmpb_str
+        \regex_replace_all:nnN { \@ }{ ※ } \l_tmpa_str
+        \regex_replace_all:nnN { \@ }{ ※ } \l_tmpb_str
     }
     \exp_args:NVV \macro_index_write:nn { \l_tmpa_str }{ \l_tmpb_str }
 }
