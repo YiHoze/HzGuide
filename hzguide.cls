@@ -4754,7 +4754,7 @@
         \str_set:Nn \l_tmpa_str { #1 }
     }{
         \str_set:Nn \l_tmpa_str { #2 }
-		\regex_replace_all:nnN { ^[\\\_\-] }{ } \l_tmpa_str
+		\regex_replace_all:nnN { ^[\\\_\-\.] }{ } \l_tmpa_str
         \regex_replace_all:nnN { \@ }{ ※ } \l_tmpa_str
         \regex_replace_all:nnN { \@ }{ ※ } \l_tmpb_str
     }
@@ -5229,6 +5229,7 @@
                 }
 			}{
                 \begin{IllustImage}[
+                        afterskip=.25\onelineskip,
                         position=left,
                         frame=false, 
                         valign=b
@@ -5249,7 +5250,7 @@
                 % }
                 % \newline
 			}
-			\raisebox{.5ex}{\rule{\headwidth}{0.5pt}} \\
+			\raisebox{.75ex}{\rule{\headwidth}{0.5pt}} \\
 			© \space \cover_pub_year \space \cover_manufacturer \\
 			\cover_manufacturer_address
 		\end{IfVartwoEnlarge}
