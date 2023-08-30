@@ -4990,6 +4990,7 @@
     \coderead*
  }
 
+
 \NewDocumentEnvironment { coderesult }{}
 {
     \group_begin:
@@ -4997,6 +4998,8 @@
 }{
     \endverbatimoutput
     \group_end:
+
+    \coderead
 
     \bool_if:NTF \l_code_boxed_bool
     {

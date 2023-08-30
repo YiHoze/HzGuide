@@ -1,5 +1,8 @@
 
-\CodeSetup{language=powershell}
+\CodeSetup{
+    language=powershell,
+    star={language=text}
+}
 \RenewTerms{macros}{
     labeltype=macro,
     font=\ttfamily,
@@ -497,7 +500,7 @@ C:\>wordig -a="\w+" -g *.tex
 
 \item[-o] 출력 파일을 위한 이름을 지정하라. 디폴트는 기능에 따라 달라진다. 대상 파일의 이름이 \verb{foo.tex}일 때, 주어진 이름에 따라 출력 파일의 이름이 다음과 같이 결정된다. 
 
-\begin{codewrite}
+\begin{code*}
 -o "_replaced" → foo_replaced.tex
 -o "replaced_" → replaced_foo.tex
 -o ".txt" → foo.txt
@@ -505,8 +508,7 @@ C:\>wordig -a="\w+" -g *.tex
 -o "goo.txt" → goo.txt
 -o "sub\" → sub\foo.tex
 -o "sub\_replaced" → sub\foo_replaced.tex
-\end{codewrite}
-\coderead|
+\end{code*}
 
 \term{폴더 구분자}\annotate{directory separator}로 백슬래시(\verb{\}) 대신 슬래시(\verb{/})를 사용할 수 있다.
 
@@ -563,14 +565,13 @@ C:\>wordig -a="(ref.+?\})([은는이가을를와과으로])" -s="\1\\\2" *.tex
 
 텍 매크로들을 제거하기 위한 목적으로 \term{detex.tsv}가 작성되었다.
 
-\begin{codewrite}
+\begin{code*}
 (?<!\\)%.*?$
 \\include.+$
 \\begin\{.+\}.+$
 \\end\{.+\}
 \\[a-zA-Z*]{1,25}
-\end{codewrite}
-\coderead|
+\end{code*}
 
 \begin{code}
 C:\>wordig -P detex.tsv -o "_cleaned" *.tex 
@@ -578,12 +579,11 @@ C:\>wordig -P detex.tsv -o "_cleaned" *.tex
 
 텍 매크로들을 추출하려면 다음과 같이 정규 표현식 파일을 작성한다.
 
-\begin{codewrite}
+\begin{code*}
 \\[^a-zA-Z]
 \\[a-zA-Z*^|+]+
 \\begin(\{.+?\}[*^|+]*)
-\end{codewrite}
-\coderead|
+\end{code*}
 
 \begin{code}
 C:\>wordig -A extractex.txt -g *.tex 
@@ -593,10 +593,9 @@ C:\>wordig -A extractex.txt -g *.tex
 
 \term{unit.py}는 다음과 같은 여러 비표준 단위의 값들을 미터법 단위로 환산한다.\annotate*{미국이 미터법을 채용하지 않은 거의 유일한 나라이다.}
 
-\begin{codewrite}
+\begin{code*}
 acre, degree, fahrenheit, foot, gallon, hp, inch, km/h, knot, mile, Newton, pascal, pint, point, pound, psi, pyeong, yard
-\end{codewrite}
-\coderead|
+\end{code*}
 
 다른 단위와 구분될 수 있을 만큼 사용할 단위의 처음 글자들을 숫자와 함께 지정하라.
 아래 예에서 첫 줄의 \verb{p}는 \verb{pascal}로, 둘째 줄의 \verb{po}는 \verb{point}로 간주된다.
@@ -1017,7 +1016,7 @@ C:\>xlsx2pdf.cmd UI.xlsx UI_eng_ger "1,3,5"
 \end{code}
 
 \begin{note}
-파워셸에서는 cmd 명령에 인수를 전달하기 위해 따옴표에 억음 부호를 추가해야 한다. (\verb{`"1-3`"})
+파워셸에서는 cmd 명령에 인수를 전달하기 위해 따옴표에 억음 부호를 추가해야 한다. (\macro*{`"1-3`"})
 \end{note}
 
 그러면 \verb{UI_kor_eng.pdf}, \verb{UI_eng_fre.pdf}, \verb{UI_eng_ger.pdf}가 만들어질 것이다.
