@@ -5089,6 +5089,7 @@
     PubYear				.tl_set:N = \cover_pub_year,
     revision		    .tl_set:N = \cover_revision,
     note			    .tl_set:N = \cover_note,
+    notelineskip        .skip_set:N = \cover_noteline_skip,
     manufacturer	    .tl_set:N = \cover_manufacturer,
     address             .tl_set:N = \cover_manufacturer_address,
     AfterFront		    .tl_set:N = \cover_after_front,
@@ -5124,7 +5125,8 @@
     AfterFront = \clearpage, %\cleartorecto,
     BeforeBack = \clearpage, %\cleartoverso,
 	BlankFront = false,
-	BlankBack = false
+	BlankBack = false,
+    notelineskip = .25\onelineskip
 }
 
 \NewDocumentCommand \CoverFontSize { m }
@@ -5229,34 +5231,30 @@
                 }
 			}{
                 \begin{IllustImage}[
-                        afterskip=.25\onelineskip,
+                        afterskip=-\cover_noteline_skip,
                         position=left,
                         frame=false, 
                         valign=b
                     ]{ \cover_image_logo_back }
                     \small\cover_note
                 \end{IllustImage}\par
-                % \begin{raggedright}
-                %     \small\cover_note
-                % \end{raggedright}
-                % \par \bigskip                
-                % \includegraphics{\cover_image_logo_back} 
-				% \bool_if:NT \l_image_showfilename_bool
-                % {
-                %     \tl_set:Nx \l_tmpa_tl { \cover_image_logo_back }
-                %     \group_begin:
-                %     \color{ImageName} \scriptsize \tl_to_str:N \l_tmpa_tl
-                %     \group_end:
-                % }
-                % \newline
 			}
-			\raisebox{.75ex}{\rule{\headwidth}{0.5pt}} \\
+			\raisebox{\cover_noteline_skip}{\rule{\headwidth}{0.5pt}} \\
 			© \space \cover_pub_year \space \cover_manufacturer \\
 			\cover_manufacturer_address
 		\end{IfVartwoEnlarge}
 	}
 }
 
+
+\NewDocumentCommand\UnitTo{smm}
+{
+    \IfBooleanT{#1}
+    {
+        \macroprint{#2}\space=\space
+    }
+    \dim_to_decimal_in_unit:nn { #2 }{ 1#3 }\,#3
+}
 \ExplSyntaxOff
 
 % page layout thanks to https://www.kockoc.com/newgari/1119255
