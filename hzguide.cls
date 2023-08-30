@@ -5247,7 +5247,7 @@
 }
 
 
-\NewDocumentCommand\UnitTo{smm}
+\NewDocumentCommand\tounit{smm}
 {
     \IfBooleanT{#1}
     {
