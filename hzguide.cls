@@ -5247,13 +5247,9 @@
 }
 
 
-\NewDocumentCommand\tounit{smm}
+\NewDocumentCommand\tounit{mm}
 {
-    \IfBooleanT{#1}
-    {
-        \macroprint{#2}\space=\space
-    }
-    \dim_to_decimal_in_unit:nn { #2 }{ 1#3 }\,#3
+    \macroprint{#1} \space=\space \dim_to_decimal_in_unit:nn { #1 }{ 1#2 }\,#2
 }
 \ExplSyntaxOff
 
