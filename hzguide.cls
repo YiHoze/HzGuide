@@ -52,8 +52,8 @@
 
 % # global variables
 
-\newfontfamily\sbfamily{HANDotum.ttf}[BoldFont=HANDotumB.ttf]
-\DeclareTextFontCommand{\textsb}{\sbfamily}
+\newfontfamily\symbolfont{NotoSansSymbols-Regular.ttf}[BoldFont=NotoSansSymbols-Bold.ttf]
+\DeclareTextFontCommand{\textsb}{\symbolfont}
 
 % ^^^^ac00 ^^^^^^020000
 % \char44032 \char"AC00 \char'126000 \char`가 \char`^^^^ac00
@@ -4493,7 +4493,7 @@
 %\def\flushleft{\setlength\topsep{0pt}\trivlist \raggedright\item\relax}
 
 % ## editing tools
-
+\newfontfamily\commentfont{UnDotum.ttf}[BoldFont=UnDotumBold.ttf]
 \keys_define:nn { pending }
 {
     color	.tl_set:N = \l_pending_color_tl,
@@ -4508,7 +4508,7 @@
 
 \PendingSetup{
     color=purple,
-    font=\small,
+    font=\commentfont\small,
     hide=false
 }
 
