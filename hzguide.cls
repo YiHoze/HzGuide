@@ -4541,7 +4541,7 @@
 
 \newcounter{query}
 \renewcommand\thequery{<\arabic{query}>}
-\newlistof{listofqueries}{loq}{질의}
+\newlistof{listofqueries}{loq}{Queries}
 \newlistentry{query}{loq}{0}
 \setcounter{loqdepth}{1}
 \renewcommand*\cftqueryafterpnum{\bigskip}
@@ -4558,9 +4558,9 @@
 		\textcolor{\l_pending_color_tl}{ \l_pending_font_tl #1 }
         \IfValueTF {#2}
         {
-            \addcontentsline{loq}{query}{\thequery\enspace #2 }
+            \addcontentsline{loq}{query}{ {\l_pending_font_tl\thequery\enspace #2} }
         }{
-            \addcontentsline{loq}{query}{\thequery\enspace #1 }
+            \addcontentsline{loq}{query}{ {\l_pending_font_tl\thequery\enspace #1} }
         }
     }
 }
