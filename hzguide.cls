@@ -2322,7 +2322,7 @@
     \bool_if:NTF \l_image_clockwise_bool
     {
         \rotatebox{-90}{
-            \begin{minipage}{\l_tmpa_dim}
+            \begin{minipage}{\textwidth}
                 \l_image_align\mbox{}
                 \box_use:N \l_image_box
                 \image_caption:
@@ -2332,7 +2332,7 @@
     }{
         \raisebox{ -\l_tmpb_dim }{
             \rotatebox{90}{
-                \begin{minipage}{\l_tmpa_dim}
+                \begin{minipage}{\textwidth}
                     \l_image_align\mbox{}
                     \box_use:N \l_image_box
                     \image_caption:
@@ -2344,6 +2344,12 @@
 
 \cs_new:Nn \image_caption:
 {
+	\bool_if:NT \l_image_caption_fit_bool
+	{
+		\dim_set_towidth:Nn \l_tmpa_dim { \box_use:N \l_image_box }
+		\captionwidth{\l_tmpa_dim}
+		\changecaptionwidth
+	}
     \bool_if:NT \l_image_showfilename_bool
     {
         \bool_if:NTF \g_image_counter_bool
@@ -2354,21 +2360,15 @@
             \legend{\exp_args:Nx \tl_to_str:N \l_image_label_tl }
         }
     }
-	\bool_if:NT \l_image_caption_fit_bool
-	{
-		\dim_set_towidth:Nn \l_tmpa_dim { \box_use:N \l_image_box }
-		\captionwidth{\l_tmpa_dim}
-		\changecaptionwidth
-	}
+
     \tl_if_empty:NF \l_image_caption_tl
 	{
 		\bool_if:NF \l_image_caption_ignore_bool
 		{
-            \bool_if:NTF \l_image_caption_verbatim_bool
+            \bool_if:NT \l_image_caption_verbatim_bool
             {
-                \tl_set:Nx \l_image_caption_tl { \tl_to_str:N \l_image_caption_tl }
-            }{
-                \regex_replace_all:nnN { \_ } { \c{_} } \l_image_caption_tl 
+                % \tl_set:Nx \l_image_caption_tl { \tl_to_str:N \l_image_caption_tl }
+                \regex_replace_all:nnN { ([\\\`\~\#\$\^\&\_]) } { \c{\1} } \l_image_caption_tl 
             }
 			\bool_if:NTF \l_image_legend_bool
 			{
@@ -2892,7 +2892,7 @@
     \IfBooleanT{#1} {
         \LineImageSetup{showfilename=true}
     }
-    \CaptionSetup{font=\color{ImageName}\footnotesize}
+    \CaptionSetup{font=\color{ImageName}\scriptsize}
 }
 \int_new:N \g_image_counter_int
 \bool_new:N \g_image_counter_bool
