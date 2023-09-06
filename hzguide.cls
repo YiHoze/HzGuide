@@ -4551,7 +4551,7 @@
 	\bool_if:NF \l_pending_hide_bool
     {
 	    \refstepcounter{query}
-		\hangfrom{
+        \mbox{} \hangfrom{
 			\textcolor{ \l_pending_color_tl }{ \l_pending_font_tl \thequery }
 		}
         \space
