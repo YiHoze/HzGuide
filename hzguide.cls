@@ -713,7 +713,7 @@
             warning=VARNING,
             caution=FÖRSIKTIGT,
             notice=UPPMÄRKSAMMA,
-            note=OBSERVERA
+            note=ANMÄRKNING % note=OBSERVERA
         }
     }
 }
@@ -5446,6 +5446,7 @@
 \renewcommand{\chapterrefname}{\chaptername~}
 \renewcommand{\tablerefname}{\tablename}
 \renewcommand{\figurerefname}{\figurename}
+
 \LoadStyleset
 
 \endinput
