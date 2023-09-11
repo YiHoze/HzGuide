@@ -31,7 +31,7 @@ if /i .%1. NEQ .batch. goto eof
 
 :texedit
 if .%2. == .. (
-setx TEXEDIT "code.exe -r -g %%s:%%d"
+setx TEXEDIT "code.exe -r -g ^"%%s:%%d^""
 ) else (
 setx TEXEDIT "%2"
 )
@@ -48,7 +48,7 @@ reg query HKEY_CURRENT_USER\Environment /v TEXMFHOME
 if /i .%1. NEQ .batch. goto eof
 
 :SumatraPDF
-reg query HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Applications\SumatraPDF.exe\DefaultIcon >nul 2>&1
+reg query HKEY_LOCAL_MACHINE\SOFTWARE\Classes\SumatraPDF.azw\DefaultIcon >nul 2>&1
 if errorlevel 1 (
 echo SumatraPDF is not found.
 goto eof
@@ -57,7 +57,7 @@ for /f "usebackq tokens=3-4 delims=, " %%x in (`reg query  HKEY_LOCAL_MACHINE\SO
 )
 set sumatra=start "" %sumatra% -inverse-search
 if .%2. == .. (
-%sumatra% "code.exe -r -g %%f:%%l"
+%sumatra% "code.exe -r -g ^"%%f:%%l^""
 ) else (
 %sumatra% %2
 )
@@ -72,11 +72,11 @@ echo.
 echo.
 echo tlconf.cmd conf             : Create local.conf with the user's local font directory.
 echo tlconf.cmd texedit [...]    : Set the TEXEIDT environment variable. The default is
-echo                               code.exe -r -g  %%s:%%d
+echo                               code.exe -r -g  "%%s:%%d"
 echo tlconf.cmd texmfhome [...]  : Set the TEXMFHOME environment variable. The default is
 echo                               C:\home\texmf
 echo tlconf.cmd sumatrapdf [...] : Set the inverse search command-line option of SumatraPDF. The  default is
-echo                               code.exe -r -g  %%f:%%l
+echo                               code.exe -r -g  "%%f:%%l"
 echo tlconf.cmd batch            : Proceed with all options.
 
 :eof

@@ -18,10 +18,10 @@ tlconf.ps1 -t, -texmfhome [path]
     C:\home\texmf
 tlconf.ps1 -e, -texedit [path]
     Set the TEXEIDT environment variable. The default is
-    code.exe -r -g  %s:%d
+    code.exe -r -g  `"%s:%d`"
 tlconf.ps1 -s, -sumatrapdf [path]
     Set the inverse search command-line option of SumatraPDF. The defalt is
-    code.exe -r -g  %f:%l
+    code.exe -r -g  `"%f:%l`"
 tlconf.ps1 -c, -conf
     Create local.conf that contains the user's local font directory. The default is
     C:\texlive\2022\texmf-var\fonts\conf\local.conf
@@ -56,7 +56,7 @@ function SetTexmfhome()
 function SetTexedit()
 {
     if (!$arg) {
-        $editor = "code.exe -r -g %s:%d"
+        $editor = "code.exe -r -g `"%s:%d`""
     } else {
         $editor = $arg
     }
@@ -94,7 +94,7 @@ function SetSumatrapdf()
     }
 
     if (!$arg) {
-        $editor = 'code.exe -r -g  %f:%l'
+        $editor = "code.exe -r -g  `"%f:%l`""
     } else {
         $editor = $arg
     }
