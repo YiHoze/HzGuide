@@ -4094,7 +4094,7 @@
 
 % # text boxes ___________________________________________________________
 
-\NewTColorBox{FrameBox}{ s O{} }
+\NewTColorBox{FrameBox}{ s }
 {
     colframe=gray, colback=white, after={\par\normalcolor},
     boxrule=0.5pt, arc=0pt,
@@ -4106,7 +4106,7 @@
 	}
 }
 
-\NewTColorBox{LeftBarBox}{ s O{} }
+\NewTColorBox{LeftBarBox}{ s }
 {
     before~skip=0pt, after~skip=0pt, breakable=false, after={\par\normalcolor},
     colframe=white, colback=white, arc=0pt, boxrule=0pt,
@@ -4118,7 +4118,7 @@
 		breakable=\l_bbox_breakable_default_tl
 	}
 }
-\NewTColorBox{RightBarBox}{ s O{} }
+\NewTColorBox{RightBarBox}{ s }
 {
     before~skip=0pt, after~skip=0pt, breakable=false, after={\par\normalcolor},
     colframe=white, colback=white, arc=0pt, boxrule=0pt,
@@ -4177,7 +4177,7 @@
 	}
 }
 
-\NewTColorBox{RuleBox}{ s O{} }
+\NewTColorBox{RuleBox}{ s }
 {
     opacityfill=0,
     before~skip=0pt, after~skip=0pt, after={\par\normalcolor},
