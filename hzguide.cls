@@ -3835,16 +3835,16 @@
 % user interface
 \NewTerm{\ui}
 {
-    font=\sffamily\bfseries,
-    color=darkgray,
+    font=\sffamily\mdseries,
+    color=black,
 	star={index=false}
 }
 
 % machine interface
 \NewTerm{\mi}
 {
-    font=\sffamily\mdseries,
-	color=black,
+    font=\sffamily\bfseries,
+	color=darkgray,
     star={index=true}
 }
 
@@ -5415,7 +5415,7 @@
     }
 }
 
-% for transtex  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+% for Cloche  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 \NewDocumentCommand\htmlbegin{}{}
 \NewDocumentCommand\htmlend{}{}
 \NewDocumentEnvironment{html}{+b}{}{}
@@ -5446,6 +5446,8 @@
 \renewcommand{\chapterrefname}{\chaptername~}
 \renewcommand{\tablerefname}{\tablename}
 \renewcommand{\figurerefname}{\figurename}
+
+\NewDocumentCommand{\quotes}{sm}{\IfBooleanTF{#1}{`#2'}{``#2''}}
 
 \LoadStyleset
 
