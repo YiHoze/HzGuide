@@ -1,4 +1,4 @@
-\documentclass[pairquote, minted]{hzguide}
+\documentclass[minted]{hzguide}
 
 \setmainfont{NotoSerifCJKkr-Regular.otf}[BoldFont={NotoSerifCJKkr-Bold.otf}, ItalicFont={NotoSerif-LightItalic.ttf}] %https://github.com/googlefonts/noto-cjk
 \setsansfont{NotoSansCJKkr-Regular.otf}[BoldFont={NotoSansCJKkr-Medium.otf}]
@@ -315,9 +315,6 @@ Noto 폰트가 사용된다.
 
 \item[minted] \keyvalueTF
 \macro{minted} 패키지가 사용된다. \macro{\coderead} 명령이 \macro{\verbatiminput} 대신 \macro{\inputminted}를 사용하게 된다.
-
-\item[pairquote] \keyvalueTF
-\macro{csquotes} 패키지가 사용된다.
 
 \item[template] \keyvalueTF
 \term{hztemplate.tex}을 불러들인다. 설명서 초안을 만들기 위한 목적으로, 설명서에 사용되는 여러 요소들을 예시하는 명령들을 제공한다.
@@ -1893,6 +1890,14 @@ HzGuide 클래스는, 다양한 언어들의 조판을 목적으로 하기 때�
 \textsb{⌀} \textsb{☑}
 \end{coderesult}
 }
+
+\section{인용 부호}
+
+번역 과정에서 발생할 수 있는 오류를 피하기 위해 \macro{\quotes} 명령이 정의되어 있다.
+
+\begin{coderesult}
+\quotes{인용} \quotes*{부호}
+\end{coderesult}
 
 \chapter{글상자와 경고문}
 

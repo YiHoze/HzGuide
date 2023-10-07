@@ -268,7 +268,7 @@
     styleset    .tl_set:N = \g_style_set_tl,
     Noto        .bool_set:N = \g_Noto_bool,
     minted    	.bool_set:N = \g_minted_bool,
-    pairquote   .bool_set:N = \g_pairquote_bool,
+    % pairquote   .bool_set:N = \g_pairquote_bool,
     template    .bool_set:N = \g_template_bool
 }
 
@@ -324,11 +324,11 @@
     \patchcmd{\FV@ListVSpace}{\@topsepadd\topsep}{\vspace{.25\onelineskip}}{}{}
 }
 
-\bool_if:NT \g_pairquote_bool
-{
-    \RequirePackage{csquotes}
-    \MakeOuterQuote{"}
-}
+% \bool_if:NT \g_pairquote_bool
+% {
+%     \RequirePackage{csquotes}
+%     \MakeOuterQuote{"}
+% }
 
 \LoadPackageSet
 
@@ -654,9 +654,9 @@
     \RequirePackage{polyglossia}
     \setmainlanguage{russian}
     \setotherlanguage{english}
-    \@ifpackageloaded{csquotes}{
-        \setquotestyle{russian}
-    }{}
+    % \@ifpackageloaded{csquotes}{
+    %     \setquotestyle{russian}
+    % }{}
     \newfontfamily\cyrillicfont{CMU Serif}[Script=Cyrillic]
     \newfontfamily\cyrillicfontsf{CMU Sans Serif}[Script=Cyrillic]
     \AtBeginDocument{
