@@ -2845,11 +2845,11 @@
 
 \NewDocumentEnvironment {callout} { s o }
 {
-    \bool_if:NT \l_callout_rule_bool
+    \bool_if:NTF \l_callout_rule_bool
     {
         \object_skip_before:n {\l_callout_before_skip}
         \begin{RuleBox}
-    }
+    }{ \object_skip_before:n {0pt} }
     \l_callout_font_tl
     \IfBooleanTF {#1}
     {
@@ -2873,11 +2873,11 @@
     }{
         \end{flushleft}
     }
-    \bool_if:NT \l_callout_rule_bool
+    \bool_if:NTF \l_callout_rule_bool
     {
         \end{RuleBox}
         \object_skip_after:n {\l_callout_after_skip}
-    }
+    }{ \object_skip_after:n {0pt} }
 }
 
 \newlist{calloutenum}{enumerate}{1}
