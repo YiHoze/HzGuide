@@ -2492,8 +2492,8 @@
 
 \IllustImageSetup{
     beforeskip=.25\onelineskip,
-    extraskip=.5\onelineskip,
-    afterskip=.25\onelineskip,
+    extraskip=.75\onelineskip,
+    afterskip=.5\onelineskip,
     frame=false,
     minwidth=0pt,
     position=left,
