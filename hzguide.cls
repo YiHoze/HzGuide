@@ -52,7 +52,7 @@
 
 % # global variables
 
-\newfontfamily\symbolfont{NotoSansSymbols-Regular.ttf}[BoldFont=NotoSansSymbols-Bold.ttf]
+\newfontfamily\symbolfont{HANBatang.ttf}[BoldFont=HANBatangB.ttf]
 \DeclareTextFontCommand{\textsb}{\symbolfont}
 
 % ^^^^ac00 ^^^^^^020000
