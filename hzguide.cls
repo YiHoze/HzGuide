@@ -704,9 +704,9 @@
 
 \ifLang{swedish}
 {
-    \RequirePackage{polyglossia}
-    \setmainlanguage{swedish}
-    \setotherlanguage{english}
+    \RequirePackage[swedish]{babel}%\RequirePackage{polyglossia}
+    % \setmainlanguage{swedish}
+    % \setotherlanguage{english}
     \AtBeginDocument{
         \AdmonitionSetup {
             danger=FARA,
@@ -2015,7 +2015,7 @@
 
 % # images and tables _________________________________________________________
 
-\graphicspath{ {images/}{../images/} }
+\graphicspath{ {images/}{../images/} } % \DeclareGraphicsExtensions{.pdf, .jpg, .png}
 
 \NewDocumentCommand \ShowGraphicspath { O{\scriptsize} }
 {
