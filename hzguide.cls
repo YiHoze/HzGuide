@@ -2168,6 +2168,7 @@
     }
     \bool_if:NTF \l_image_fake_bool 
     {
+        \bool_set_false:N \l_image_showfilename_bool
         \image_save_fake:nn { #4 }{ #5 }
     }{
         \exp_args:Nxx \image_save:nn { #4 }{ #5 }
@@ -2491,7 +2492,7 @@
 }
 
 \IllustImageSetup{
-    beforeskip=.25\onelineskip,
+    beforeskip=.5\onelineskip,
     extraskip=.75\onelineskip,
     afterskip=.5\onelineskip,
     frame=false,
@@ -2541,6 +2542,7 @@
     }
     \bool_if:NTF \l_illustimage_fake_bool
     {
+        \bool_set_false:N \l_illustimage_showfilename_bool
         \hbox_set:Nn \l_image_box { \parbox{.4\linewidth}{ \fakeimage[#4] }}
     }{
         \bool_if:NTF \l_illustimage_frame_bool
@@ -5237,10 +5239,11 @@
                         afterskip=-\cover_noteline_skip,
                         position=left,
                         frame=false, 
-                        valign=b
+                        valign=b,
+                        textstyle=\raggedright
                     ]{ \cover_image_logo_back }
                     \small\cover_note
-                \end{IllustImage}\par
+                \end{IllustImage}\linebreak
 			}
 			\raisebox{\cover_noteline_skip}{\rule{\headwidth}{0.5pt}} \\
 			© \space \cover_pub_year \space \cover_manufacturer \\
