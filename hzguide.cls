@@ -3865,8 +3865,13 @@
         \seq_get_right:NN \l_tmpa_seq \l_tmpa_tl
         \tl_trim_spaces:N \l_tmpa_tl
         \regex_replace_all:nnN { \{(.*?)\} } { \1 } \l_tmpa_tl
-        \tl_set:No \l_tmpb_tl { \string\termindexprint{\tl_to_str:n {\sffamily}}{\l_tmpa_tl} }
-        \index{\tl_use:N \l_tmpa_tl @\tl_use:N \l_tmpb_tl}
+        \bool_if:NTF \l_term_index_same_bool
+        { 
+            \tl_set:No \l_tmpb_tl { \string\termindexprint{\tl_to_str:n {\sffamily}}{\l_tmpa_tl} }
+            \index{\tl_use:N \l_tmpa_tl @\tl_use:N \l_tmpb_tl}
+        }{
+            \index{\tl_use:N \l_tmpa_tl}
+        }
     \group_end:
 }
 
