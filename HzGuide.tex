@@ -1256,7 +1256,7 @@ If \ui{Security Type} is set to \ui{Personal}, select the security type in use.
 텍으로 만들어진 문서를 인디자인 같은 다른 프로그램의 형식으로 옮겨야 할 때, 이미지 아래에 표시된 파일 이름이 이미지들을 식별하는 데에 도움이 된다.
 
 \begin{code}
-\ShowImageFilename*
+\ShowImageFilename*[불투명도]
 \ShowImageCounter*
 \ResetImageCounter
 \end{code}
@@ -1264,6 +1264,9 @@ If \ui{Security Type} is set to \ui{Personal}, select the security type in use.
 \begin{flushleft}
 \macro{\ShowImageFilename} 명령은 \macro{\ImageSetup}과 \macro{\IllustImageSetup}에, \macro{\ShowImageFilename*}은 \macro{\LineImageSetup}까지 포함하여, \macro{showfilename} 옵션을 지시한다.
 \end{flushleft}
+파일 이름이 이미지의 오른쪽 하단에 겹체 투명하게 표시된다. 
+불투명도를 0부터 1까지 지정할 수 있다.
+디폴트는 0.25이다.
 
 \macro{\ShowImageCount} 명령은, 파일 이름 대신, 이미지 아래에 일련번호를 붙인다.
 이 명령은 문서에 포함된 많은 이미지들의 수를 파악하기 위해 고안되었다.
@@ -1879,7 +1882,7 @@ HzGuide 클래스는, 다양한 언어들의 조판을 목적으로 하기 때�
 
 다양한 기호들이 종종 설명서에 필요한 반면, 지름 기호나 체크 박스까지 포함하는 폰트들은 흔하지 않다.
 
-\hzsource{55}{56}
+\hzsource{56}{57}
 
 오로지 기호들을 식자하기 위한 목적으로 \macro{\symbolfont}와 \macro{\textsb} 명령이 정의되어 있다.
 디폴트 폰트는 \term{함초롬 바탕}이다.
@@ -2046,7 +2049,7 @@ HzGuide 클래스는, 다양한 언어들의 조판을 목적으로 하기 때�
 \begin{danger}
 \term{위험}은 사망이나 심각한 부상을 초래하는 상황을 가리킨다.
 \macro{danger} 환경이 이렇게 정의되어 있다.
-\hzsourceline[4376]
+\hzsourceline[4457]
 \end{danger}
 
 \begin{warning}

@@ -13,7 +13,7 @@
 
 % A memoir-based class for techincal writers
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{hzguide}[2022/03/18 v2.1.0]
+\ProvidesClass{hzguide}[2023/12/04 v2.1.1]
 
 \LoadClassWithOptions{memoir}
 
@@ -31,6 +31,7 @@
 \RequirePackage[svgnames,x11names,dvipsnames,hyperref,table]{xcolor}
 \RequirePackage{graphicx}
 \RequirePackage{eso-pic}
+\RequirePackage{transparent}
 
 \RequirePackage{tabularray}
 
@@ -2061,6 +2062,7 @@
 
 % measuring boxes
 \box_new:N \l_tmpc_box
+\dim_new:N \l_tmpc_dim
 \cs_new:Npn \dim_set_towidth:Nn #1 #2
 {
     \exp_args:NNo \hbox_set:Nn \l_tmpc_box { #2 }
@@ -2307,7 +2309,7 @@
     }
     \begin{minipage}{\l_tmpa_dim}
         \l_image_align\mbox{}
-        \box_use:N \l_image_box
+        \box_use:N \l_image_box \nobreak
         \image_caption:
     \end{minipage}
 }
@@ -2325,7 +2327,7 @@
         \rotatebox{-90}{
             \begin{minipage}{\textwidth}
                 \l_image_align\mbox{}
-                \box_use:N \l_image_box
+                \box_use:N \l_image_box \nobreak
                 \image_caption:
             \end{minipage}
         }
@@ -2335,7 +2337,7 @@
             \rotatebox{90}{
                 \begin{minipage}{\textwidth}
                     \l_image_align\mbox{}
-                    \box_use:N \l_image_box
+                    \box_use:N \l_image_box \nobreak
                     \image_caption:
                 \end{minipage}
             }
@@ -2347,8 +2349,8 @@
 {
 	\bool_if:NT \l_image_caption_fit_bool
 	{
-		\dim_set_towidth:Nn \l_tmpa_dim { \box_use:N \l_image_box }
-		\captionwidth{\l_tmpa_dim}
+		\dim_set_towidth:Nn \l_tmpc_dim { \box_use:N \l_image_box }
+		\captionwidth{\l_tmpc_dim}
 		\changecaptionwidth
 	}
     \bool_if:NT \l_image_showfilename_bool
@@ -2356,9 +2358,25 @@
         \bool_if:NTF \g_image_counter_bool
         {
             \int_gincr:N \g_image_counter_int
-            \legend{ \int_use:N \g_image_counter_int }
+            \exp_args:NNo \hbox_set:Nn \l_tmpc_box { 
+                \color{ImageName} \tiny \int_use:N \g_image_counter_int  
+            }
         }{
-            \legend{\exp_args:Nx \tl_to_str:N \l_image_label_tl }
+            \tl_set:Nx \l_tmpa_tl \l_image_label_tl
+            \regex_replace_all:nnN { ([\\\`\~\#\$\^\&\_]) } { \c{\1} } \l_tmpa_tl
+            \exp_args:NNo \hbox_set:Nn \l_tmpc_box { 
+                \color{ImageName} \tiny \l_tmpa_tl 
+            }
+        }
+        \dim_set:Nn \l_tmpc_dim { \box_wd:N \l_tmpc_box }
+        \hspace{-\l_tmpc_dim}
+        \sys_if_engine_luatex:TF
+        {
+            \fntransparent:Vn \g_filename_opacity_tl {
+                \box_move_up:nn {0.5ex}{\box_use:N \l_tmpc_box}
+            }
+        }{
+            \box_move_up:nn {0.5ex}{\box_use:N \l_tmpc_box}
         }
     }
 
@@ -2368,7 +2386,6 @@
 		{
             \bool_if:NT \l_image_caption_verbatim_bool
             {
-                % \tl_set:Nx \l_image_caption_tl { \tl_to_str:N \l_image_caption_tl }
                 \regex_replace_all:nnN { ([\\\`\~\#\$\^\&\_]) } { \c{\1} } \l_image_caption_tl 
             }
 			\bool_if:NTF \l_image_legend_bool
@@ -2397,15 +2414,28 @@
         \includegraphics[scale=\l_image_scale_tl]{#3}
         \bool_if:NT { \l_image_showfilename_bool }
         {
-            \bool_if:NT \g_image_counter_bool
+            \bool_if:NTF \g_image_counter_bool
             {
                 \int_gincr:N \g_image_counter_int
-                \legend{ \int_use:N \g_image_counter_int }
+                \exp_args:NNo \hbox_set:Nn \l_tmpc_box { 
+                    \color{ImageName} \tiny \int_use:N \g_image_counter_int  
+                }
             }{
-                \tl_set:Nx \l_tmpa_tl { #3 }
-                \group_begin:
-                \allowbreak \color{ImageName} \scriptsize \tl_to_str:N \l_tmpa_tl
-                \group_end:
+                \tl_set:Nn \l_tmpa_tl { #3 }
+                \regex_replace_all:nnN { ([\\\`\~\#\$\^\&\_]) } { \c{\1} } \l_tmpa_tl
+                \exp_args:NNo \hbox_set:Nn \l_tmpc_box { 
+                    \color{ImageName} \tiny \l_tmpa_tl 
+                }
+            }
+            \dim_set:Nn \l_tmpc_dim { \box_wd:N \l_tmpc_box }
+            \hspace{-\l_tmpc_dim}
+            \sys_if_engine_luatex:TF
+            {
+                \fntransparent:Vn \g_filename_opacity_tl {
+                    \box_move_up:nn {0.5ex}{\box_use:N \l_tmpc_box}
+                }
+            }{
+                \box_move_up:nn {0.5ex}{\box_use:N \l_tmpc_box}
             }
         }
     }
@@ -2648,10 +2678,27 @@
         \bool_if:NTF \g_image_counter_bool
         {
             \int_gincr:N \g_image_counter_int
-            \legend{ \int_use:N \g_image_counter_int }
+            \exp_args:NNo \hbox_set:Nn \l_tmpc_box { 
+                \color{ImageName} \tiny \int_use:N \g_image_counter_int  
+            }
         }{
-            \legend{\exp_args:No \tl_to_str:N \l_illustimage_label_tl }
+            \tl_set:Nx \l_tmpa_tl \l_illustimage_label_tl
+            \regex_replace_all:nnN { ([\\\`\~\#\$\^\&\_]) } { \c{\1} } \l_tmpa_tl
+            \exp_args:NNo \hbox_set:Nn \l_tmpc_box { 
+                \color{ImageName} \tiny \l_tmpa_tl 
+            }
         }
+        \dim_set:Nn \l_tmpc_dim { \box_wd:N \l_tmpc_box }
+        \hspace{-\l_tmpc_dim}
+        \sys_if_engine_luatex:TF
+        {
+            \fntransparent:Vn \g_filename_opacity_tl {
+                \box_move_up:nn {0.5ex}{\box_use:N \l_tmpc_box}
+            }
+        }{
+            \box_move_up:nn {0.5ex}{\box_use:N \l_tmpc_box}
+        }
+
     }
     \tl_if_empty:NF \l_illustimage_caption_tl
     {
@@ -2767,9 +2814,19 @@
         }
         \bool_if:NT { \l_lineimg_showfilename_bool}
         {
-            \group_begin:
-            \allowbreak \color{ImageName} \scriptsize \tl_to_str:n { #3 }
-            \group_end:
+            \tl_set:Nn \l_tmpa_tl { #3 }
+            \regex_replace_all:nnN { ([\\\`\~\#\$\^\&\_]) } { \c{\1} } \l_tmpa_tl
+            \exp_args:NNo \hbox_set:Nn \l_tmpc_box { 
+                \color{ImageName} \tiny \l_tmpa_tl 
+            }
+            \dim_set:Nn \l_tmpc_dim { \box_wd:N \l_tmpc_box }
+            \hspace{-\l_tmpc_dim}
+            \sys_if_engine_luatex:TF
+            {
+                \fntransparent:Vn \g_filename_opacity_tl { \box_use:N \l_tmpc_box }
+            }{
+                \box_use:N \l_tmpc_box
+            }
         }
     }
     \l_lineimg_after_tl
@@ -2886,15 +2943,21 @@
 \setlist[calloutenum]{label=\arabic*), noitemsep}
 
 \definecolor{ImageName}{named}{violet}
+\tl_new:N \g_filename_opacity_tl
+\cs_new:Npn \fntransparent:Vn #1 #2
+{
+    \texttransparent{#1}{#2}
+}
 
-\NewDocumentCommand \ShowImageFilename { s }
+
+\NewDocumentCommand \ShowImageFilename { s O{0.25} }
 {
     \ImageSetup{showfilename=true}
     \IllustImageSetup{showfilename=true}
     \IfBooleanT{#1} {
         \LineImageSetup{showfilename=true}
     }
-    \CaptionSetup{font=\color{ImageName}\scriptsize}
+    \tl_gset:Nn \g_filename_opacity_tl {#2}
 }
 \int_new:N \g_image_counter_int
 \bool_new:N \g_image_counter_bool
@@ -2906,7 +2969,6 @@
     \IfBooleanT{#1} {
         \LineImageSetup{showfilename=true}
     }
-    \CaptionSetup{font=\color{ImageName}\scriptsize}
 }
 \NewDocumentCommand \ResetImageCounter {}
 {
@@ -3163,13 +3225,13 @@
     \IfBooleanTF{#1}
     {
         \placetable{
-            \begin{tblr}{colspec={#2}, hline{1,2,Z}=0.4pt, row{even}=backgray, row{1}={font=\bfseries}}
+            \begin{tblr}{colspec={#2}, hline{1,Z}=\heavyrulewidth, hline{2}=\lightrulewidth, row{even}=backgray, row{1}={font=\bfseries}}
             #5
             \end{tblr}
         }
     }{
         \placetable{
-            \begin{tblr}{colspec={#2}, hline{1,Z}=0.4pt, row{even}=backgray}
+            \begin{tblr}{colspec={#2}, hline{1,Z}=\heavyrulewidth, row{even}=backgray}
             #5
             \end{tblr}
         }
@@ -3598,10 +3660,11 @@
 
 \NewTerms{ signs }
 {
+    index=false,
     labeltype = multiline,
     labelwidth = 3em,
     delimiter = \hfill,
-    itemsep = 1ex
+    itemsep = 0pt
 }
 
 % use \cellimg in tables or list labels
@@ -3621,20 +3684,38 @@
     \dim_set:Nn \l_tmpa_dim { \box_ht:N \l_tmpa_box }
     \dim_set:Nn \l_tmpb_dim { \box_wd:N \l_tmpa_box }
 
+    \bool_if:NT { \l_lineimg_showfilename_bool }
+    {
+        \bool_if:NTF \g_image_counter_bool
+        {
+            \int_gincr:N \g_image_counter_int
+            \exp_args:NNo \hbox_set:Nn \l_tmpc_box { 
+                \color{ImageName} \tiny \int_use:N \g_image_counter_int  
+            }
+        }{
+            \tl_set:Nn \l_tmpa_tl { #2 }
+            \regex_replace_all:nnN { ([\\\`\~\#\$\^\&\_]) } { \c{\1} } \l_tmpa_tl
+            \exp_args:NNo \hbox_set:Nn \l_tmpc_box { 
+                \color{ImageName} \tiny \l_tmpa_tl 
+            }
+        }
+        \dim_set:Nn \l_tmpc_dim { \box_wd:N \l_tmpc_box }
+    }
+
     \parbox[t]{ \l_tmpb_dim }{
         \raisebox{ -\l_tmpa_dim + #1 }{ \box_use:N \l_tmpa_box }
         \bool_if:NT { \l_lineimg_showfilename_bool }
         {
-            \newline \color{ImageName} \scriptsize
-            \bool_if:NTF \g_image_counter_bool
+            \hspace{-\l_tmpc_dim}
+            \sys_if_engine_luatex:TF
             {
-                \int_gincr:N \g_image_counter_int
-                \int_use:N \g_image_counter_int 
+                \fntransparent:Vn \g_filename_opacity_tl { 
+                    \box_move_up:nn {1ex}{ \box_use:N \l_tmpc_box }
+                }
             }{
-                \tl_to_str:n { #2 }
+                \box_move_up:nn {1ex}{ \box_use:N \l_tmpc_box }
             }
         }
-
     }
     \group_end:
 }
