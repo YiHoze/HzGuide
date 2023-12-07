@@ -3340,32 +3340,32 @@
 
 \keys_define:nn { terms }
 {
-    labeltype   .tl_set:N = \l_terms_label_type_tl,
-    hyperlink   .bool_set:N = \l_terms_hyperlink_bool,
-    offset      .skip_set:N = \l_terms_offset_skip,
-    marker      .code:n = { \terms_define_marker:n {#1} },
-    markersep   .skip_set:N = \l_terms_marker_sep_skip,
-    enumerate   .bool_set:N = \l_terms_enumerate_bool,
-    enummarker  .tl_set:N = \l_terms_enummarker_tl,
-    base        .tl_set:N = \l_terms_base_tl,
-    font        .tl_set:N = \l_terms_font_tl,
-    color       .tl_set:N = \l_terms_color_tl,
-    delimiter   .tl_set:N = \l_terms_delimiter_tl,
-    labelwidth  .dim_set:N = \l_terms_label_width_dim,
-    labelsep    .skip_set:N = \l_terms_label_sep_skip,
+    labeltype       .tl_set:N   = \l_terms_label_type_tl,
+    hyperlink       .bool_set:N = \l_terms_hyperlink_bool,
+    offset          .skip_set:N = \l_terms_offset_skip,
+    marker          .code:n     = { \terms_define_marker:n {#1} },
+    markersep       .skip_set:N = \l_terms_marker_sep_skip,
+    enumerate       .bool_set:N = \l_terms_enumerate_bool,
+    enummarker      .tl_set:N   = \l_terms_enummarker_tl,
+    base            .tl_set:N   = \l_terms_base_tl,
+    font            .tl_set:N   = \l_terms_font_tl,
+    color           .tl_set:N   = \l_terms_color_tl,
+    delimiter       .tl_set:N   = \l_terms_delimiter_tl,
+    labelwidth      .dim_set:N  = \l_terms_label_width_dim,
+    labelsep        .skip_set:N = \l_terms_label_sep_skip,
     labelvoffset    .skip_set:N = \l_terms_label_voffset_dim,
-	itemindent  .dim_set:N = \l_terms_item_indent_dim,
-	leftmargin  .dim_set:N = \l_terms_left_margin_dim,
-    index       .bool_set:N = \l_terms_index_bool,
-    indexcategory .tl_set:N = \l_terms_index_category_tl,
-    indexsame   .bool_set:N = \l_terms_index_same_bool,
-    topsep      .skip_set:N = \l_terms_top_sep_skip,
-    itemsep     .skip_set:N  = \l_terms_item_sep_skip,
-    style       .tl_set:N = \l_terms_style_tl,
-    beforelist  .tl_set:N = \l_terms_before_list_tl,
-    afterlist   .tl_set:N = \l_terms_after_list_tl,
-    star        .tl_set:N = \l_terms_star_tl,
-    vbar        .tl_set:N = \l_terms_vbar_tl
+	itemindent      .dim_set:N  = \l_terms_item_indent_dim,
+	leftmargin      .dim_set:N  = \l_terms_left_margin_dim,
+    index           .bool_set:N = \l_terms_index_bool,
+    indexcategory   .tl_set:N   = \l_terms_index_category_tl,
+    indexsame       .bool_set:N = \l_terms_index_same_bool,
+    topsep          .skip_set:N = \l_terms_top_sep_skip,
+    itemsep         .skip_set:N = \l_terms_item_sep_skip,
+    style           .tl_set:N   = \l_terms_style_tl,
+    beforelist      .tl_set:N   = \l_terms_before_list_tl,
+    afterlist       .tl_set:N   = \l_terms_after_list_tl,
+    star            .tl_set:N   = \l_terms_star_tl,
+    vbar            .tl_set:N   = \l_terms_vbar_tl
 }
 
 \NewDocumentCommand \TermsInitialize { m }
@@ -3654,8 +3654,8 @@
 
 \NewTerms{UI}
 {
-    font = \sffamily\bfseries,
-    color = darkgray,
+    font = \sffamily\mdseries,
+    color = black,
 }
 
 \NewTerms{ signs }
