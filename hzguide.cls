@@ -4970,7 +4970,7 @@
 \def\verbatimbreakchar{\CRsymbol}
 \setlength\verbatimindent{0pt}
 \setlength\ragrparindent{0pt}
-\wrappingon
+% \wrappingon discontinued by memoir v3.8
 
 %\def\m@mverbfont{\ttfamily}
 \CodeSetup{
